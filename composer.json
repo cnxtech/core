@@ -1,0 +1,49 @@
+{
+    "name": "codex/core",
+    "license": "MIT",
+    "require": {
+        "php": ">=7.0.0",
+        "codex/composer-plugin": "~1.0",
+        "laradic/support": "~1.5",
+        "laradic/dependency-sorter": "~1.1",
+        "laradic/service-provider": "~1.0",
+        "symfony/yaml": "~2.7|~3.0|~4.0",
+        "vierbergenlars/php-semver": "~3.0",
+        "nicmart/tree": "0.2.*",
+        "league/uri": "~4.0|~5.0",
+        "fluentdom/fluentdom": "~7.0",
+        "paquettg/php-html-parser": "~1.7",
+        "myclabs/php-enum": "~1.5",
+        "cebe/markdown": "~1.1",
+        "barryvdh/laravel-cors": "~0.9",
+        "graham-campbell/flysystem": "~5.0",
+        "symfony/config": "~4.0",
+        "nuwave/lighthouse": "~2.6",
+        "deinternetjongens/lighthouse-utils": "~0.2"
+    },
+    "autoload": {
+        "files": [
+            "src/helpers.php"
+        ],
+        "psr-4": {
+            "Codex\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Codex\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "2.1.x-dev"
+        },
+        "laravel": {
+            "dont-discover": [
+                "codex/core",
+                "nuwave/lighthouse",
+                "deinternetjongens/lighthouse-utils"
+            ]
+        }
+    }
+}

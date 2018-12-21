@@ -1,0 +1,41 @@
+#import ./constraints.graphqls
+#import ./menu.graphqls
+#import ./layout.graphqls
+#import ./meta.graphqls
+#import ./structure.graphqls
+
+scalar Mixed
+scalar Assoc
+directive @assoc on FIELD
+
+type Query {
+    me: User @auth
+    codex: Codex!
+    config: Config!
+    projects:[Project!]! @constraints(resolver: "Codex\\Api\\GraphQL\\Queries\\Projects@resolve")
+    project(key:ID):Project! @constraints(resolver: "Codex\\Api\\GraphQL\\Queries\\Project@resolve")
+    revisions(projectKey: ID) : [Revision!]!  @constraints(resolver: "Codex\\Api\\GraphQL\\Queries\\Revisions@resolve")
+    revision(projectKey: ID!, revisionKey: ID!) : Revision!  @constraints(resolver: "Codex\\Api\\GraphQL\\Queries\\Revision@resolve")
+    documents(projectKey: ID, revisionKey: ID) : [Document!]!  @constraints(resolver: "Codex\\Api\\GraphQL\\Queries\\Documents@resolve")
+    document(projectKey: ID!, revisionKey: ID!, documentKey: ID!) : Document!  @constraints(resolver: "Codex\\Api\\GraphQL\\Queries\\Document@resolve")
+}
+
+type User {
+    id: ID!
+}
+
+type Codex {
+    display_name: String!
+    description: String!
+    default_project: String!
+    projects: [Project!]!
+}
+
+type Config {
+    name:String!
+    env:String!
+    debug:Boolean!
+    timezone:String!
+    locale:String!
+    fallback_locale:String!
+}
