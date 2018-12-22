@@ -115,7 +115,8 @@ class CodexServiceProvider extends ServiceProvider
         $codex->add('display_name', 'string')->setDefault('Codex');
         $codex->add('description', 'string')->setDefault('');
         $codex->add('default_project', 'string', 'ID')->setDefault(null);
-//        $processors = $codex->add('processors', 'dictionary')->setApiType('Processors', [ 'new' ]);
+        $processors = $codex->add('processors', 'dictionary')->setApiType('Processors', [ 'new' ]);
+        $processors->add('enabled', 'array.scalarPrototype');
 
         $menu = AttributeDefinitionFactory::attribute('menu', 'array.recursive')->setApiType('MenuItem', [ 'array', 'new' ]);
         $menu->add('id', 'string', 'ID', function () {

@@ -66,14 +66,14 @@ return [
             'file_types' => [ 'md', 'markdown' ],
             'options'    => [
                 'html5' => true,
-                'table' => [
-                    'class' => 'table stack',
-                ],
-                'code'  => [
-                    'line_numbers' => true,
-                    'command_line' => true,
-                    'loader'       => false,
-                ],
+//                'table' => [
+//                    'class' => 'table stack',
+//                ],
+//                'code'  => [
+//                    'line_numbers' => true,
+//                    'command_line' => true,
+//                    'loader'       => false,
+//                ],
             ],
         ],
         'rst'      => [ // refers to parser name

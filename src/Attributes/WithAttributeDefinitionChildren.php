@@ -44,4 +44,5 @@ trait WithAttributeDefinitionChildren
     {
         return $this->children[ $name ];
     }
+
 }

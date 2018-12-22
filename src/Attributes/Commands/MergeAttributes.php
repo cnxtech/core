@@ -45,32 +45,7 @@ class MergeAttributes
 
         $builder   = $generator->generateGroup($this->target->getAttributeDefinitions()->name);
         $processor = new Processor();
-        $final     = $processor->process($builder->buildTree(), [
-            [
-                'layout' => [
-                    'header' => [
-                        'menu' => [
-                            [
-                                'label'    => 'Item',
-                                'path'     => '/',
-                                'children' => [
-                                    [
-                                        'label'    => 'ItemChild',
-                                        'path'     => '/child',
-                                        'children' => [
-                                            [
-                                                'label' => 'ItemChildChild',
-                                                'path'  => '/child/child',
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ]);
+        $final     = $processor->process($builder->buildTree(), [ $result ]);
 
         $this->target->setMergedAttributes($final);
 

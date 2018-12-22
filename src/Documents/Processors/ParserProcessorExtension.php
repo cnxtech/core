@@ -24,8 +24,8 @@ class ParserProcessorExtension extends ProcessorExtension
 
         $parser = $definition->add('markdown', 'dictionary');
         $parser->add('parser', 'string');
-        $parser->add('file_types', 'array')->setDefault([]);
-        $parser->add('options', 'array')->setDefault([]);
+        $parser->add('file_types', 'array.scalarPrototype');
+        $parser->add('options', 'array.scalarPrototype');
     }
 
     public function process(Document $document)

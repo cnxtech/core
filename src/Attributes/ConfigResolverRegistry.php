@@ -7,16 +7,17 @@ use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 class ConfigResolverRegistry
 {
     protected $resolvers = [
-        'scalar'                => ConfigResolver::class . '@scalar',
-        'string'                => ConfigResolver::class . '@scalar',
-        'boolean'               => ConfigResolver::class . '@boolean',
-        'integer'               => ConfigResolver::class . '@integer',
-        'array'                 => ConfigResolver::class . '@array',
-        'dictionary'            => ConfigResolver::class . '@dictionary',
-        'array.scalarPrototype' => ConfigResolver::class . '@arrayScalar',
-        'array.arrayPrototype'  => ConfigResolver::class . '@arrayArray',
-        'array.recursive'       => ConfigResolver::class . '@arrayRecursive',
-        'recurse'       => ConfigResolver::class . '@recurse',
+        'scalar'                    => ConfigResolver::class . '@scalar',
+        'string'                    => ConfigResolver::class . '@scalar',
+        'boolean'                   => ConfigResolver::class . '@boolean',
+        'integer'                   => ConfigResolver::class . '@integer',
+        'array'                     => ConfigResolver::class . '@array',
+        'dictionary'                => ConfigResolver::class . '@dictionary',
+        'array.dictionaryPrototype' => ConfigResolver::class . '@arrayDictionary',
+        'array.scalarPrototype'     => ConfigResolver::class . '@arrayScalar',
+        'array.arrayPrototype'      => ConfigResolver::class . '@arrayArray',
+        'array.recursive'           => ConfigResolver::class . '@arrayRecursive',
+        'recurse'                   => ConfigResolver::class . '@recurse',
     ];
 
     /**

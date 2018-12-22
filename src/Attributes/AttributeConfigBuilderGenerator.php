@@ -69,7 +69,7 @@ class AttributeConfigBuilderGenerator
                 $child,
                 $nodeDefinition
             );
-            if ($node instanceof ParentNodeDefinitionInterface && $child->hasChildren()) {
+            if ($node instanceof ParentNodeDefinitionInterface && $child->hasChildren() && false === $child->type->is(AttributeDefinitionType::ARRAY_RECURSIVE(), AttributeDefinitionType::RECURSE())) {
                 $this->addNodeChildren($child->children, $node);
             }
         }

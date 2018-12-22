@@ -6,6 +6,7 @@ use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
+use Symfony\Component\Config\Definition\PrototypedArrayNode;
 
 
 class ConfigResolver
@@ -88,6 +89,16 @@ class ConfigResolver
         $node->ignoreExtraKeys(true);
         return $node;
     }
+    public function arrayDictionary(AttributeDefinition $attribute, ArrayNodeDefinition $target)
+    {
+        $target->attribute('attribute', $attribute);
+        $target->addDefaultsIfNotSet();
+        $target->ignoreExtraKeys(true);
+        $node = $target->children()->arrayNode($attribute->name);
+        $node->useAttributeAsKey('name');
+        $node = $node->arrayPrototype();
+        return $node;
+    }
 
     public function arrayScalar(AttributeDefinition $attribute, ArrayNodeDefinition $target)
     {
@@ -119,7 +130,7 @@ class ConfigResolver
     public function arrayRecursive(AttributeDefinition $attribute, ArrayNodeDefinition $target)
     {
         $children = collect($attribute->children);
-        $attribute->children = [];
+//        $attribute->children = [];
         $target->attribute('attribute', $attribute);
         $target->addDefaultsIfNotSet();
         $target->ignoreExtraKeys(true);
@@ -159,7 +170,10 @@ class ConfigResolver
 
     protected function buildArrayRecursiveDefinition(ArrayNodeDefinition $node, $recurseName, callable $addFn)
     {
-        $child = $node->addDefaultsIfNotSet()->children();
+
+
+
+        $child = $node->children();
 
         $addFn($child);
 
@@ -175,6 +189,7 @@ class ConfigResolver
                 $config = [];
                 foreach ($children as $name => $child) {
                     $node = $builder->root($name);
+                    $node->addDefaultsIfNotSet();
                     $this->buildArrayRecursiveDefinition($node, $recurseName, $addFn);
                     $config[ $name ] = $node->getNode(true)->finalize($child);
                 }

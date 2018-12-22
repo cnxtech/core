@@ -19,7 +19,9 @@ class AttributeProcessorExtension extends ProcessorExtension
 
     public function defineConfigAttributes(AttributeDefinition $definition)
     {
-        $tags = $definition->add('tags', 'array')->setDefault([]);
+        $tags = $definition->add('tags', 'array.arrayPrototype');
+        $tags->add('open', 'string');
+        $tags->add('close', 'string');
     }
 
     public function process(Document $document)

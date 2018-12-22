@@ -21,6 +21,7 @@ class AttributeDefinitionType extends Enum
 {
     const MIXED = 'mixed';
     const DICTIONARY = 'dictionary';
+    const ARRAY_DICTIONARY = 'array.dictionaryPrototype';
     const ARRAY_ARRAY = 'array.arrayPrototype';
     const ARRAY_SCALAR = 'array.scalarPrototype';
     const ARRAY_RECURSIVE = 'array.recursive';
@@ -31,16 +32,17 @@ class AttributeDefinitionType extends Enum
     const ARRAY = 'array';
 
     public static $apiTypeMap = [
-        self::MIXED           => 'Mixed',
-        self::DICTIONARY      => 'Assoc',
-        self::ARRAY_ARRAY     => 'Assoc',
-        self::ARRAY_SCALAR    => 'Assoc',
-        self::ARRAY_RECURSIVE => 'Assoc',
-        self::RECURSE => 'Assoc',
-        self::STRING          => 'String',
-        self::BOOLEAN         => 'Boolean',
-        self::INTEGER         => 'Int',
-        self::ARRAY           => 'Assoc',
+        self::MIXED            => 'Mixed',
+        self::DICTIONARY       => 'Assoc',
+        self::ARRAY_DICTIONARY => 'Assoc',
+        self::ARRAY_ARRAY      => 'Assoc',
+        self::ARRAY_SCALAR     => 'Assoc',
+        self::ARRAY_RECURSIVE  => 'Assoc',
+        self::RECURSE          => 'Assoc',
+        self::STRING           => 'String',
+        self::BOOLEAN          => 'Boolean',
+        self::INTEGER          => 'Int',
+        self::ARRAY            => 'Assoc',
     ];
 
     public function toApiType(): string
@@ -49,16 +51,17 @@ class AttributeDefinitionType extends Enum
     }
 
     public static $nodeTypeMap = [
-        self::MIXED        => 'scalar',
-        self::DICTIONARY   => 'dictionary',
-        self::ARRAY_ARRAY  => 'array.arrayPrototype',
-        self::ARRAY_SCALAR => 'array.scalarPrototype',
-        self::ARRAY_RECURSIVE=> 'array.recursive',
-        self::RECURSE=> 'recurse',
-        self::STRING       => 'scalar',
-        self::BOOLEAN      => 'boolean',
-        self::INTEGER      => 'integer',
-        self::ARRAY        => 'array',
+        self::MIXED            => 'scalar',
+        self::DICTIONARY       => 'dictionary',
+        self::ARRAY_DICTIONARY => 'array.dictionaryPrototype',
+        self::ARRAY_ARRAY      => 'array.arrayPrototype',
+        self::ARRAY_SCALAR     => 'array.scalarPrototype',
+        self::ARRAY_RECURSIVE  => 'array.recursive',
+        self::RECURSE          => 'recurse',
+        self::STRING           => 'scalar',
+        self::BOOLEAN          => 'boolean',
+        self::INTEGER          => 'integer',
+        self::ARRAY            => 'array',
     ];
 
     public function toNodeType(): string
