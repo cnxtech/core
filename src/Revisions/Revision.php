@@ -54,7 +54,7 @@ class Revision extends Model implements RevisionContract, ChildInterface, Parent
     public function __construct(array $attributes, DocumentCollection $documents)
     {
         $this->setChildren($documents->setParent($this));
-        $this->init($attributes, $this->getCodex()->getAttributeRegistry()->resolveGroup('revisions'));
+        $this->init($attributes, $this->getCodex()->getRegistry()->resolveGroup('revisions'));
         $this->addGetMutator('default_document', 'getDefaultDocumentKey', true, true);
     }
 

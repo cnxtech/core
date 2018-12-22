@@ -2,6 +2,8 @@
 
 namespace Codex;
 
+use Codex\Addons\AddonCollection;
+use Codex\Addons\Extensions\ExtensionCollection;
 use Codex\Attributes\AttributeDefinitionRegistry;
 use Codex\Contracts\Mergable\ParentInterface;
 use Codex\Exceptions\NotFoundException;
@@ -31,16 +33,31 @@ class Codex extends Model implements ParentInterface
     /** @var \Codex\Attributes\AttributeDefinitionRegistry */
     protected $registry;
 
+    /** @var \Codex\Addons\AddonCollection */
+    protected $addons;
+
+    /** @var \Codex\Addons\Extensions\ExtensionCollection */
+    protected $extensions;
+
     /**
      * Codex constructor.
      *
      * @param \Illuminate\Contracts\Config\Repository       $config
      * @param \Codex\Projects\ProjectCollection             $projects
      * @param \Codex\Attributes\AttributeDefinitionRegistry $registry
+     * @param \Codex\Addons\AddonCollection                 $addons
+     * @param \Codex\Addons\Extensions\ExtensionCollection  $extensions
      */
-    public function __construct(Config $config, ProjectCollection $projects, AttributeDefinitionRegistry $registry)
+    public function __construct(
+        Config $config,
+        ProjectCollection $projects,
+        AttributeDefinitionRegistry $registry,
+        AddonCollection $addons,
+        ExtensionCollection $extensions)
     {
-        $this->registry = $registry;
+        $this->registry   = $registry;
+        $this->addons     = $addons;
+        $this->extensions = $extensions;
         $this->setChildren($projects->setParent($this));
         $attributes = array_except($config->get('codex', []), [ 'projects', 'revisions', 'documents' ]);
         $this->init($attributes, $registry->resolveGroup('codex'))->rehide();
@@ -85,16 +102,25 @@ class Codex extends Model implements ParentInterface
         return $this->getProjects()->has($key);
     }
 
-    public function getAttributeRegistry()
+    public function getRegistry()
     {
         return $this->registry;
     }
 
-    public function getDocsPath()
+    public function getAddons()
     {
-        return $this[ 'paths' ][ 'docs' ];
+        return $this->addons;
     }
 
+    public function getExtensions()
+    {
+        return $this->extensions;
+    }
+
+    public function getDocsPath()
+    {
+        return $this[ 'paths.docs' ];
+    }
 
     /**
      * Shorthand method for getting projects, refs or documents.

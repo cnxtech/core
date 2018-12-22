@@ -55,7 +55,7 @@ class Document extends Model implements DocumentContract, ChildInterface
     {
         $this->setParent($revision);
         $this->setFiles($revision->getFiles());
-        $definitions = $this->getCodex()->getAttributeRegistry()->resolveGroup('documents');
+        $definitions = $this->getCodex()->getRegistry()->resolveGroup('documents');
         $attributes[ 'extension' ] = path_get_extension($attributes[ 'path' ]);
         $this->init($attributes, $definitions);
         $this->addGetMutator('content', 'getContent', true, true);
