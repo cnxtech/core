@@ -7,6 +7,10 @@ use MyCLabs\Enum\Enum;
 /**
  * @method static AttributeDefinitionType MIXED()
  * @method static AttributeDefinitionType DICTIONARY()
+ * @method static AttributeDefinitionType ARRAY_ARRAY()
+ * @method static AttributeDefinitionType ARRAY_SCALAR()
+ * @method static AttributeDefinitionType ARRAY_RECURSIVE()
+ * @method static AttributeDefinitionType RECURSE()
  * @method static AttributeDefinitionType OBJECT()
  * @method static AttributeDefinitionType STRING()
  * @method static AttributeDefinitionType BOOLEAN()
@@ -17,20 +21,26 @@ class AttributeDefinitionType extends Enum
 {
     const MIXED = 'mixed';
     const DICTIONARY = 'dictionary';
-    const OBJECT = 'object';
+    const ARRAY_ARRAY = 'array.arrayPrototype';
+    const ARRAY_SCALAR = 'array.scalarPrototype';
+    const ARRAY_RECURSIVE = 'array.recursive';
+    const RECURSE = 'recurse';
     const STRING = 'string';
     const BOOLEAN = 'boolean';
     const INTEGER = 'integer';
     const ARRAY = 'array';
 
     public static $apiTypeMap = [
-        self::MIXED      => 'Mixed',
-        self::DICTIONARY => 'Assoc',
-        self::OBJECT     => 'Mixed',
-        self::STRING     => 'String',
-        self::BOOLEAN    => 'Boolean',
-        self::INTEGER    => 'Int',
-        self::ARRAY      => 'Assoc',
+        self::MIXED           => 'Mixed',
+        self::DICTIONARY      => 'Assoc',
+        self::ARRAY_ARRAY     => 'Assoc',
+        self::ARRAY_SCALAR    => 'Assoc',
+        self::ARRAY_RECURSIVE => 'Assoc',
+        self::RECURSE => 'Assoc',
+        self::STRING          => 'String',
+        self::BOOLEAN         => 'Boolean',
+        self::INTEGER         => 'Int',
+        self::ARRAY           => 'Assoc',
     ];
 
     public function toApiType(): string
@@ -39,13 +49,16 @@ class AttributeDefinitionType extends Enum
     }
 
     public static $nodeTypeMap = [
-        self::MIXED      => 'scalar',
-        self::DICTIONARY => 'array',
-        self::OBJECT     => 'scalar',
-        self::STRING     => 'scalar',
-        self::BOOLEAN    => 'boolean',
-        self::INTEGER    => 'integer',
-        self::ARRAY      => 'array',
+        self::MIXED        => 'scalar',
+        self::DICTIONARY   => 'dictionary',
+        self::ARRAY_ARRAY  => 'array.arrayPrototype',
+        self::ARRAY_SCALAR => 'array.scalarPrototype',
+        self::ARRAY_RECURSIVE=> 'array.recursive',
+        self::RECURSE=> 'recurse',
+        self::STRING       => 'scalar',
+        self::BOOLEAN      => 'boolean',
+        self::INTEGER      => 'integer',
+        self::ARRAY        => 'array',
     ];
 
     public function toNodeType(): string

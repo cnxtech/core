@@ -45,11 +45,36 @@ class MergeAttributes
 
         $builder   = $generator->generateGroup($this->target->getAttributeDefinitions()->name);
         $processor = new Processor();
-        $final     = $processor->process($builder->buildTree(), [ $result ]);
+        $final     = $processor->process($builder->buildTree(), [
+            [
+                'layout' => [
+                    'header' => [
+                        'menu' => [
+                            [
+                                'label'    => 'Item',
+                                'path'     => '/',
+                                'children' => [
+                                    [
+                                        'label'    => 'ItemChild',
+                                        'path'     => '/child',
+                                        'children' => [
+                                            [
+                                                'label' => 'ItemChildChild',
+                                                'path'  => '/child/child',
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
 
         $this->target->setMergedAttributes($final);
 
-        $parent  = array_dot($parentAttributes);
+        $parent = array_dot($parentAttributes);
 //        $target  = array_dot(array_only($result, $this->getInheritKeys()));
         $target  = array_dot(array_only($final, $this->getInheritKeys()));
         $changes = [];

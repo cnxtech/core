@@ -32,6 +32,7 @@ class CodexServiceProvider extends ServiceProvider
         Addons\AddonRegistry::class                   => Addons\AddonRegistry::class,
         Addons\Extensions\ExtensionCollection::class  => Addons\Extensions\ExtensionCollection::class,
         Attributes\AttributeDefinitionRegistry::class => Attributes\AttributeDefinitionRegistry::class,
+        Attributes\ConfigResolverRegistry::class      => Attributes\ConfigResolverRegistry::class,
     ];
 
     public $providers = [
@@ -43,6 +44,7 @@ class CodexServiceProvider extends ServiceProvider
         'codex.addons'                      => Addons\AddonCollection::class,
         'codex.extensions'                  => Addons\Extensions\ExtensionCollection::class,
         'codex.attributes'                  => Attributes\AttributeDefinitionRegistry::class,
+        'codex.attributes.config'           => Attributes\ConfigResolverRegistry::class,
         Contracts\Projects\Project::class   => Projects\Project::class,
         Contracts\Revisions\Revision::class => Revisions\Revision::class,
         Contracts\Documents\Document::class => Documents\Document::class,
@@ -113,9 +115,9 @@ class CodexServiceProvider extends ServiceProvider
         $codex->add('display_name', 'string')->setDefault('Codex');
         $codex->add('description', 'string')->setDefault('');
         $codex->add('default_project', 'string', 'ID')->setDefault(null);
-        $processors = $codex->add('processors', 'dictionary')->setApiType('Processors', [ 'new' ]);
+//        $processors = $codex->add('processors', 'dictionary')->setApiType('Processors', [ 'new' ]);
 
-        $menu       = AttributeDefinitionFactory::attribute('menu', 'array')->setApiType('MenuItem', [ 'array', 'new' ]);
+        $menu = AttributeDefinitionFactory::attribute('menu', 'array.recursive')->setApiType('MenuItem', [ 'array', 'new' ]);
         $menu->add('id', 'string', 'ID', function () {
             return md5(str_random());
         });
@@ -135,21 +137,21 @@ class CodexServiceProvider extends ServiceProvider
         $menu->add('document', 'string');
         $menu->add('projects', 'boolean');
         $menu->add('revisions', 'boolean');
-        $menu->add('children', 'array')->setApiType('MenuItem', [ 'array' ]);
+        $menu->add('children', 'recurse')->setApiType('MenuItem', [ 'array' ]); //->children = $menu->children;
 
         $layout                  = $codex->add('layout', 'dictionary')->setApiType('Layout', [ 'new' ]);
         $addLayoutPart           = function (string $name, string $apiType) use ($layout) {
             $part = $layout->add($name, 'dictionary')->setApiType($apiType, [ 'new' ]);
-            $part->add('class', 'array')->setDefault([]);
-            $part->add('style', 'array')->setDefault([]);
+            $part->add('class', 'array.scalarPrototype');
+            $part->add('style', 'array.scalarPrototype');
             $part->add('color', 'string')->setDefault(null);
             return $part;
         };
         $addLayoutHorizontalSide = function (string $name, string $apiType) use ($addLayoutPart, $menu) {
             $part = $addLayoutPart($name, $apiType);
-            $part->add('show', 'boolean');
-            $part->add('collapsed', 'boolean');
-            $part->add('outside', 'boolean');
+            $part->add('show', 'boolean')->setDefault(true);
+            $part->add('collapsed', 'boolean')->setDefault(false);
+            $part->add('outside', 'boolean')->setDefault(true);
             $part->add('width', 'integer')->setDefault(200);
             $part->add('collapsedWidth', 'integer')->setDefault(50);
             $part->addChild($menu);
@@ -157,8 +159,8 @@ class CodexServiceProvider extends ServiceProvider
         };
         $addLayoutVerticalSide   = function (string $name, string $apiType) use ($addLayoutPart, $menu) {
             $part = $addLayoutPart($name, $apiType);
-            $part->add('show', 'boolean');
-            $part->add('fixed', 'boolean');
+            $part->add('show', 'boolean')->setDefault(true);
+            $part->add('fixed', 'boolean')->setDefault(false);
             $part->add('height', 'integer')->setDefault(64);
             $part->addChild($menu);
             return $part;
@@ -185,24 +187,30 @@ class CodexServiceProvider extends ServiceProvider
         $projects->add('default_revision', 'string');
         $projects->add('disk', 'string')->setDefault(null);
         $projects->add('view', 'string')->setDefault('codex::document');
+
         $cache = $projects->add('cache', 'dictionary')->setApiType('Cache', [ 'new' ]);
         $cache->add('mode', 'string')->setDefault(null);
         $cache->add('minutes', 'integer')->setDefault(7);
+
         $meta = $projects->add('meta', 'dictionary')->setApiType('Meta', [ 'new' ]);
         $meta->add('icon', 'string')->setDefault('fa-book');
         $meta->add('color', 'string')->setDefault('deep-orange');
         $meta->add('license', 'string')->setDefault('MIT');
-        $meta->add('stylesheets', 'array')->setDefault([]);
-        $meta->add('javascripts', 'array')->setDefault([]);
-        $meta->add('styles', 'array')->setDefault([]);
-        $meta->add('scripts', 'array')->setDefault([]);
+        $meta->add('stylesheets', 'array.scalarPrototype');
+        $meta->add('javascripts', 'array.scalarPrototype');
+        $meta->add('styles', 'array.scalarPrototype');
+        $meta->add('scripts', 'array.scalarPrototype');
+
         $revision = $projects->add('revision', 'dictionary')->setApiType('RevisionConfig', [ 'new' ]);
         $revision->add('default', 'string')->setDefault('master');
         $revision->add('allow_php_config', 'string')->setDefault(false);
-        $revision->add('allowed_config_files', 'array')->setDefault([]);
+        $revision->add('allowed_config_files', 'array.scalarPrototype');
+
         $document = $projects->add('document', 'dictionary')->setApiType('RevisionConfig', [ 'new' ]);
         $document->add('default', 'string')->setDefault('index');
-        $document->add('extensions', 'array')->setDefault([]);
+        $document->add('extensions', 'array.scalarPrototype');
+
+
 
 
         $revisions = $registry->revisions;

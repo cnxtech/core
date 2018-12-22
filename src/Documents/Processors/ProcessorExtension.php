@@ -44,9 +44,9 @@ abstract class ProcessorExtension extends Extension implements Dependable
         }
         $config->set('codex.processors.' . $this->getName(), $defaultConfig);
 
-        $processors = $registry->getGroup('codex')->getChild('processors');
-        $processor  = $processors->add($this->getName(), 'dictionary', 'Assoc');
-        $this->defineConfigAttributes($processor);
+//        $processors = $registry->getGroup('codex')->getChild('processors');
+//        $processor  = $processors->add($this->getName(), 'dictionary', 'Assoc');
+//        $this->defineConfigAttributes($processor);
     }
 
     public function isEnabledForDocument(Document $document)

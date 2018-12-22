@@ -90,13 +90,18 @@ class AttributeDefinition
         return $this;
     }
 
+    public function hasDefault()
+    {
+        return isset($this->default);
+    }
+
     public function resolveDefault()
     {
-        if (AttributeDefinitionType::ARRAY()->equals($this->type)) {
-            return $this->children;
-        }
-        if (is_callable($this->default)) {
-            $closure = \Closure::fromCallable($this->default)->bindTo($this);
+//        if (AttributeDefinitionType::ARRAY()->equals($this->type)) {
+//            return $this->children;
+//        }
+        if ($this->default instanceof \Closure) {
+            $closure = \Closure::bind($this->default, $this);
             return app()->call($closure);
         }
         return $this->default;
