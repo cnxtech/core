@@ -21,6 +21,8 @@ class CodexServiceProvider extends ServiceProvider
 
     protected $configFiles = [ 'codex', 'codex.layout', 'codex.processor-defaults' ];
 
+    protected $viewDirs = [ 'views' => 'codex' ];
+
     protected $commands = [
         Addons\Console\AddonCommand::class,
     ];
@@ -59,6 +61,7 @@ class CodexServiceProvider extends ServiceProvider
     protected $extensions = [
         Documents\Processors\AttributeProcessorExtension::class,
         Documents\Processors\ParserProcessorExtension::class,
+        Documents\Processors\CacheProcessorExtension::class,
         Attributes\AttributeSchemaExtension::class
     ];
 

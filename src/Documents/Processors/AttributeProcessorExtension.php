@@ -4,10 +4,15 @@ namespace Codex\Documents\Processors;
 
 use Codex\Attributes\AttributeDefinition;
 use Codex\Contracts\Documents\Document;
+use Codex\Mergable\Commands\MergeAttributes;
+use Illuminate\Foundation\Bus\DispatchesJobs;
+use Illuminate\Support\Arr;
 use Symfony\Component\Yaml\Yaml;
 
 class AttributeProcessorExtension extends ProcessorExtension implements PreProcessorInterface
 {
+    use DispatchesJobs;
+
     protected $defaultConfig = 'codex.processor-defaults.attributes';
 
     public function getName()
@@ -43,9 +48,11 @@ class AttributeProcessorExtension extends ProcessorExtension implements PreProce
         fclose($stream);
 
         $attributes = $this->getAttributes($headContent);
-        foreach (array_dot($attributes) as $key => $value) {
-            $document->setAttribute($key, $value);
-        }
+        $this->dispatch(new MergeAttributes($document, $attributes));
+
+//        foreach (array_dot($attributes) as $key => $value) {
+//            $document->setAttribute($key, $value);
+//        }
 
         $document->setContentResolver(function (Document $document) use ($pointerPosition) {
             $stream = $document->getFiles()->readStream($document->getPath());

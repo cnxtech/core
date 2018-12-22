@@ -5,7 +5,7 @@ namespace Codex\Documents\Processors;
 use Codex\Attributes\AttributeDefinition;
 use Codex\Contracts\Documents\Document;
 
-class ParserProcessorExtension extends ProcessorExtension implements PostProcessorInterface
+class ParserProcessorExtension extends ProcessorExtension implements ProcessorInterface
 {
     protected $defaultConfig = 'codex.processor-defaults.parser';
 
@@ -22,12 +22,13 @@ class ParserProcessorExtension extends ProcessorExtension implements PostProcess
         $parser->add('options', 'array.scalarPrototype');
     }
 
-    public function postProcess(Document $document)
+    public function process(Document $document)
     {
-        $ext    = $document->getExtension();
-        $parser = $this->getDocumentParser($document);
-        $parsed = $parser->parse($document->getContent());
-        $document->setContent($parsed);
+        $ext     = $document->getExtension();
+        $parser  = $this->getDocumentParser($document);
+        $parsed  = $parser->parse($document->getContent(false));
+        $content = view($document->getAttribute('view'), [ 'content' => $parsed, 'document' => $document ])->render();
+        $document->setContent($content);
     }
 
     protected function getDocumentParser(Document $document)

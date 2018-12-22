@@ -13,9 +13,13 @@ class MergeAttributes
 {
     protected $target;
 
-    public function __construct(Mergable $target)
+    /** @var array */
+    protected $attributes;
+
+    public function __construct(Mergable $target, array $attributes = [])
     {
-        $this->target = $target;
+        $this->target     = $target;
+        $this->attributes = $attributes;
     }
 
     /**
@@ -42,6 +46,7 @@ class MergeAttributes
             $result = Arr::merge($result, data_get($parentAttributes, $mergeKey, []));
         }
 
+        $result = Arr::merge($result, $this->attributes);
 
         $builder   = $generator->generateGroup($this->target->getAttributeDefinitions()->name);
         $processor = new Processor();
