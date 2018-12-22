@@ -60,7 +60,6 @@ class AddonServiceProvider extends ServiceProvider
         $this->addon = $addon;
     }
 
-
     /**
      * Get the services provided by the provider.
      *

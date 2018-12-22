@@ -2,11 +2,11 @@
 
 namespace Codex\Documents\Commands;
 
-use Codex\Attributes\Commands\MergeAttributes;
 use Codex\Contracts\Documents\Document as DocumentContract;
 use Codex\Contracts\Revisions\Revision;
 use Codex\Documents\Document;
 use Codex\Documents\Events\ResolvedDocument;
+use Codex\Mergable\Commands\MergeAttributes;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
 class MakeDocument

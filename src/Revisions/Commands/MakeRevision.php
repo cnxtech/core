@@ -3,7 +3,7 @@
 namespace Codex\Revisions\Commands;
 
 use Codex\Contracts\Projects\Project;
-use Codex\Attributes\Commands\MergeAttributes;
+use Codex\Mergable\Commands\MergeAttributes;
 use Codex\Revisions\Events\ResolvedRevision;
 use Codex\Revisions\Revision;
 use Illuminate\Filesystem\Filesystem;

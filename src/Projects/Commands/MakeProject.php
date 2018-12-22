@@ -3,7 +3,7 @@
 namespace Codex\Projects\Commands;
 
 use Codex\Contracts\Projects\Project;
-use Codex\Attributes\Commands\MergeAttributes;
+use Codex\Mergable\Commands\MergeAttributes;
 use Codex\Projects\Events\ResolvedProject;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 

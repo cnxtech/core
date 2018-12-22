@@ -20,19 +20,10 @@ class ConfigResolverRegistry
         'recurse'                   => ConfigResolver::class . '@recurse',
     ];
 
-    /**
-     * register method
-     *
-     * @param string|\Codex\Attributes\AttributeDefinitionType $attributeType
-     * @param string|callable                                  $resolver
-     *
-     * @return void
-     */
-    public function register($attributeType, $resolver)
+    public function set(string $type, $resolver)
     {
-        if ( ! $attributeType instanceof AttributeDefinitionType) {
-            $attributeType = new AttributeDefinitionType($attributeType);
-        }
+        $this->resolvers[$type] = $resolver;
+        return $this;
     }
 
     public function call(string $name, AttributeDefinition $attribute, NodeDefinition $target)

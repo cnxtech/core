@@ -2,17 +2,15 @@
 
 namespace Codex\Mergable\Commands;
 
+use Codex\Attributes\AttributeConfigBuilderGenerator;
 use Codex\Contracts\Mergable\Mergable;
+use Illuminate\Contracts\Config\Repository;
+use Illuminate\Support\Arr;
+use Symfony\Component\Config\Definition\Processor;
 
-/**
- * This is the class MergeAttributes.
- *
- * @package Codex\Projects\Commands
- * @author  Robin Radic
- */
+
 class MergeAttributes
 {
-
     protected $target;
 
     public function __construct(Mergable $target)
@@ -23,28 +21,42 @@ class MergeAttributes
     /**
      * handle method
      *
+     * @param \Codex\Attributes\AttributeConfigBuilderGenerator $generator
+     *
      * @return void
      */
-    public function handle()
+    public function handle(AttributeConfigBuilderGenerator $generator)
     {
-        $inheritableKeys   = $this->target->getInheritableKeys();
         $defaultAttributes = $this->target->getDefaultAttributes();
         $parentAttributes  = $this->target->getParentAttributes();
-        $parentAttributes  = array_only($parentAttributes, $inheritableKeys);
         $attributes        = $this->target->getAttributes();
 
-        $result = $parentAttributes;
-        $result = static::merge($result, $defaultAttributes);
-        $result = static::merge($result, $attributes);
-        $this->target->setMergedAttributes($result);
+        if ($defaultAttributes instanceof Repository) {
+            $defaultAttributes = $defaultAttributes->all();
+        }
+        $inherited = $this->getInheritedParentAttributes();
+        $result    = Arr::merge($inherited, $defaultAttributes);
+        $result    = Arr::merge($result, $attributes);
+
+        foreach ($this->getMergeKeys() as $mergeKey) {
+            $result = Arr::merge($result, data_get($parentAttributes, $mergeKey, []));
+        }
+
+
+        $builder   = $generator->generateGroup($this->target->getAttributeDefinitions()->name);
+        $processor = new Processor();
+        $final     = $processor->process($builder->buildTree(), [ $result ]);
+
+        $this->target->setMergedAttributes($final);
 
         $parent = array_dot($parentAttributes);
-        $target = array_dot(array_only($result, $inheritableKeys));
+//        $target  = array_dot(array_only($result, $this->getInheritKeys()));
+        $target  = array_dot(array_only($final, $this->getInheritKeys()));
         $changes = [];
 
-        foreach($target as $key => $val){
-            if(!array_key_exists($key, $parent) || $parent[$key] !== $val){
-                $changes[$key] = $val;
+        foreach ($target as $key => $val) {
+            if ( ! array_key_exists($key, $parent) || $parent[ $key ] !== $val) {
+                $changes[ $key ] = $val;
             }
         }
 
@@ -52,69 +64,32 @@ class MergeAttributes
         $a = 'a';
     }
 
-    /**
-     * onlyDot method
-     *
-     * @param array $array
-     * @param       $keys
-     *
-     * @return array
-     */
-    protected function onlyDot(array $array, $keys)
+    protected function getInheritKeys()
     {
-        $result = [];
-        foreach ($keys as $key) {
-            data_set($result, $key, data_get($array, $key));
+        $keys     = $this->target->getAttributeDefinitions()->inheritKeys;
+        $resolved = [];
+        foreach ($keys as $sourceKey => $targetKey) {
+            if (is_int($sourceKey)) {
+                $sourceKey = $targetKey;
+            }
+            $resolved[ $sourceKey ] = $targetKey;
         }
-
-        return $result;
+        return $resolved;
     }
 
-
-    /**
-     * merge method
-     * unique = false === append (double values in arrays may occur)
-     * unique = true === merge
-     *
-     * @param array $arr1
-     * @param array $arr2
-     * @param bool  $unique
-     *
-     * @return array
-     */
-    public static function merge(array $arr1, array $arr2, $unique = true)
+    protected function getMergeKeys()
     {
-        if (empty($arr1)) {
-            return $arr2;
-        }
+        return $this->target->getAttributeDefinitions()->mergeKeys;
+    }
 
-        if (empty($arr2)) {
-            return $arr1;
+    protected function getInheritedParentAttributes()
+    {
+        $parentAttributes = $this->target->getParentAttributes();
+        $attributes       = [];
+        foreach ($this->getInheritKeys() as $sourceKey => $targetKey) {
+            data_set($attributes, $targetKey, data_get($parentAttributes, $sourceKey));
         }
-
-        foreach ($arr2 as $key => $value) {
-            if (\is_int($key)) {
-                if ( ! $unique || ! \in_array($value, $arr1, true)) {
-                    $arr1[] = $value;
-                }
-            } elseif (\is_array($arr2[ $key ])) {
-                if ( ! isset($arr1[ $key ])) {
-                    $arr1[ $key ] = [];
-                }
-                if (\is_array($arr1[ $key ])) {
-                    $value = static::merge($arr1[ $key ], $value, $unique);
-                }
-
-                if (\is_int($key)) {
-                    $arr1[] = $unique ? array_unique($value) : $value;
-                } else {
-                    $arr1[ $key ] = $value;
-                }
-            } else {
-                $arr1[ $key ] = $value;
-            }
-        }
-        return $arr1;
+        return $attributes;
     }
 
 }
