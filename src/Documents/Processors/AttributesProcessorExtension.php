@@ -6,10 +6,9 @@ use Codex\Attributes\AttributeDefinition;
 use Codex\Contracts\Documents\Document;
 use Codex\Mergable\Commands\MergeAttributes;
 use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Support\Arr;
 use Symfony\Component\Yaml\Yaml;
 
-class AttributeProcessorExtension extends ProcessorExtension implements PreProcessorInterface
+class AttributesProcessorExtension extends ProcessorExtension implements PreProcessorInterface
 {
     use DispatchesJobs;
 

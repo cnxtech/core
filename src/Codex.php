@@ -71,6 +71,30 @@ class Codex extends Model implements ParentInterface
         $this->init($attributes, $registry->resolveGroup('codex'))->rehide();
     }
 
+    public function url($projectKey = null, $revisionKey = null, $documentKey = null)
+    {
+        $parts = [];
+        if ($this[ 'http.prefix' ] !== null) {
+            $parts[] = $this[ 'http.prefix' ];
+        }
+        if ($this[ 'http.documentation_prefix' ] !== null) {
+            $parts[] = $this[ 'http.documentation_prefix' ];
+        }
+        if ($projectKey !== null) {
+            $parts[] = $projectKey;
+        }
+        if ($projectKey !== null && $revisionKey !== null) {
+            $parts[] = $revisionKey;
+        }
+        if ($revisionKey !== null && $documentKey !== null) {
+            $parts[] = $documentKey;
+        }
+
+        $uri = implode('/', $parts);
+
+        return url()->to($uri);
+    }
+
     public function projects()
     {
         return $this->getProjects()->toRelationship();

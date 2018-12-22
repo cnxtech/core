@@ -19,6 +19,10 @@ class CodexServiceProvider extends ServiceProvider
 
     protected $strict = false;
 
+    protected $configPluginPriority = [ 5, 10 ];
+
+    protected $providersPluginPriority = 45;
+
     protected $configFiles = [ 'codex', 'codex.layout', 'codex.processor-defaults' ];
 
     protected $viewDirs = [ 'views' => 'codex' ];
@@ -38,7 +42,8 @@ class CodexServiceProvider extends ServiceProvider
     ];
 
     public $providers = [
-        Api\ApiAddonServiceProvider::class,
+        Api\ApiServiceProvider::class,
+        Http\HttpServiceProvider::class,
     ];
 
     public $bindings = [
@@ -59,10 +64,10 @@ class CodexServiceProvider extends ServiceProvider
     ];
 
     protected $extensions = [
-        Documents\Processors\AttributeProcessorExtension::class,
+        Documents\Processors\AttributesProcessorExtension::class,
         Documents\Processors\ParserProcessorExtension::class,
         Documents\Processors\CacheProcessorExtension::class,
-        Attributes\AttributeSchemaExtension::class
+        Attributes\AttributeSchemaExtension::class,
     ];
 
     /**
@@ -75,14 +80,19 @@ class CodexServiceProvider extends ServiceProvider
     {
         $app = parent::boot();
 
+
+        return $app;
+    }
+
+    public function booting()
+    {
+
         $this->registerAttributeDefinitions();
 
-        $manager = $app->make(Addons\AddonManager::class);
+        $manager = $this->app->make(Addons\AddonManager::class);
         $manager->register();
 
         $this->dispatch(new RegisterExtension($this->extensions));
-
-        return $app;
     }
 
     /**
@@ -121,6 +131,12 @@ class CodexServiceProvider extends ServiceProvider
         $codex->add('default_project', 'string', 'ID')->setDefault(null);
         $processors = $codex->add('processors', 'dictionary')->setApiType('Processors', [ 'new' ]);
         $processors->add('enabled', 'array.scalarPrototype');
+
+        $http = $codex->add('http', 'dictionary')->setApiType('HttpConfig', [ 'new' ]);
+        $http->add('prefix', 'string');
+        $http->add('api_prefix', 'string');
+        $http->add('documentation_prefix', 'string');
+        $http->add('documentation_view', 'string');
 
         $menu = AttributeDefinitionFactory::attribute('menu', 'array.recursive')->setApiType('MenuItem', [ 'array', 'new' ]);
         $menu->add('id', 'string', 'ID', function () {
@@ -214,8 +230,6 @@ class CodexServiceProvider extends ServiceProvider
         $document = $projects->add('document', 'dictionary')->setApiType('DocumentConfig', [ 'new' ]);
         $document->add('default', 'string')->setDefault('index');
         $document->add('extensions', 'array.scalarPrototype');
-
-
 
 
         $revisions = $registry->revisions;

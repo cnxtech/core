@@ -62,6 +62,11 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
         $this->addGetMutator('default_revision', 'getDefaultRevisionKey', true, true);
     }
 
+    public function url($revisionKey = null, $documentKey = null)
+    {
+        return $this->getCodex()->url($this->getKey(), $revisionKey, $documentKey);
+    }
+
     public function revisions()
     {
         return $this->getRevisions()->toRelationship();

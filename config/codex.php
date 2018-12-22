@@ -35,7 +35,21 @@ return [
         'docs' => resource_path('docs'),
     ],
 
-    'processors' => [],
+    'http' => [
+        // run codex under a specific uri. For example, setting this to 'foobar' will result in urls like
+        // http://host.com/foobar/documentation/$PROJECT/$REVISION/$DOCUMENT
+        // http://host.com/foobar/graphql
+        // you can leave this to null to not have a base_route
+        'prefix'               => env('CODEX_ROUTING_PREFIX', null),
+        'api_prefix'           => 'graphql',
+        'documentation_prefix' => 'documentation',
+        'documentation_view'   => 'codex::index',
+    ],
+
+    'processors' => [
+        'enabled'  => [],
+        'disabled' => [],
+    ],
 
     'projects' => [
         'meta' => [
@@ -59,7 +73,7 @@ return [
         'description'  => '',
         'processors'   => [ 'enabled' => [], 'disabled' => [], ],
 
-        'view'  => 'codex::document',
+        'view'  => 'codex::partials.document',
         'cache' => [
             // true     = enabled
             // false    = disabled

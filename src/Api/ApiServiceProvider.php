@@ -8,7 +8,7 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider;
 use Nuwave\Lighthouse\Events\BuildingAST;
 use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 
-class ApiAddonServiceProvider extends EventServiceProvider
+class ApiServiceProvider extends EventServiceProvider
 {
     public $listen = [
         BuildingAST::class => [
@@ -18,14 +18,27 @@ class ApiAddonServiceProvider extends EventServiceProvider
 
     public function register()
     {
-        $this->app[ 'config' ]->set('lighthouse.schema.register', __DIR__ . '/../../routes/schema.graphqls');
-        $this->app[ 'config' ]->set('lighthouse.extensions', [ \App\TestGraphQLExtension::class ]);
-        $this->app[ 'config' ]->set('lighthouse.namespaces', [
-            'models'    => 'Codex\\Api\\GraphQL\\Models',
-            'mutations' => 'Codex\\Api\\GraphQL\\Mutations',
-            'queries'   => 'Codex\\Api\\GraphQL\\Queries',
-            'scalars'   => 'Codex\\Api\\GraphQL\\Scalars',
-        ]);
+        $overrides = [
+            'route_name'      => $this->app[ 'config' ][ 'codex.http.api_prefix' ],
+            'cache'           => [
+                'enable' => env('LIGHTHOUSE_CACHE_ENABLE', false),
+                'key'    => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
+            ],
+            'controller'      => \Codex\Http\Controllers\ApiController::class . '@query',
+            'schema.register' => __DIR__ . '/../../routes/schema.graphqls',
+            'extensions'      => [ \App\TestGraphQLExtension::class ],
+            'error_handlers'  => [ \Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class ],
+            'namespaces'      => [
+                'models'    => 'Codex\\Api\\GraphQL\\Models',
+                'mutations' => 'Codex\\Api\\GraphQL\\Mutations',
+                'queries'   => 'Codex\\Api\\GraphQL\\Queries',
+                'scalars'   => 'Codex\\Api\\GraphQL\\Scalars',
+            ],
+        ];
+        foreach ($overrides as $key => $value) {
+            $this->app[ 'config' ][ "lighthouse.{$key}" ] = $value;
+        }
+
         $this->app->singleton(GraphQL\QueryDirectiveRegistry::class);
         $this->app->bind(\Nuwave\Lighthouse\Schema\SchemaBuilder::class, GraphQL\SchemaBuilder::class);
         $this->app->register(\Nuwave\Lighthouse\Providers\LighthouseServiceProvider::class, true);

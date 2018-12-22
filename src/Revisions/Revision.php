@@ -51,6 +51,11 @@ class Revision extends Model implements RevisionContract, ChildInterface, Parent
         $this->addGetMutator('default_document', 'getDefaultDocumentKey', true, true);
     }
 
+    public function url($documentKey = null)
+    {
+        return $this->getCodex()->url($this->getProject()->getKey(), $this->getKey(), $documentKey);
+    }
+
     public function documents()
     {
         return $this->getDocuments()->toRelationship();
