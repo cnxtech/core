@@ -12,9 +12,11 @@
 namespace Codex\Documents\Processors\Links;
 
 //use Codex\Concerns\HasConfig;
+use Codex\Documents\Commands\AssignClassDocumentProperties;
 use Codex\Documents\Processors\LinksProcessorExtension;
 use FluentDOM;
 use FluentDOM\DOM\Element;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 
 /**
  * This is the class Action.
@@ -23,7 +25,7 @@ use FluentDOM\DOM\Element;
  */
 class Link
 {
-//    use HasConfig;
+    use DispatchesJobs;
     use HasParameters;
 
     /** @var LinksProcessorExtension */
@@ -61,6 +63,7 @@ class Link
      */
     public function __construct(LinksProcessorExtension $processor, Element $element)
     {
+        $this->dispatch(new AssignClassDocumentProperties($processor->getDocument(), $this));
         $this->processor = $processor;
         $this->url       = Url::createFromString(urldecode($element->getAttribute('href')));
         $this->element   = $element;
@@ -139,20 +142,56 @@ class Link
      */
     public function isAction()
     {
-        return starts_with($this->getUrl()->getFragment(), config('codex.processors.prefix', 'codex') . ':');
+        return starts_with($this->getUrl()->getFragment(), $this->processor->config('prefix', 'codex') . ':');
     }
 
-    /**
-     * isDocumentLink method.
-     *
-     * @return bool
-     */
+    public function isInternal()
+    {
+        /** @noinspection TypeUnsafeComparisonInspection */
+        $internal = $this->getUrl()->getHost() == null;
+        $relative = ! starts_with($this->getUrl()->getPath(), '/');
+        return $internal && $relative;
+    }
+
+    public function getAllowedExtensions($withDotPrefix = false)
+    {
+        if ( ! $withDotPrefix) {
+            return $this->revision[ 'document.extensions' ];
+        }
+        return collect($this->revision[ 'document.extensions' ])->map(function ($extension) {
+            return str_ensure_left($extension, '.');
+        })->toArray();
+    }
+
     public function isDocumentPath()
     {
-        $extensions = config('codex.documents.extensions', []);
-        $extension  = last(explode('.', $this->getUrl()));
+        // no host = internal link
+        /** @noinspection TypeUnsafeComparisonInspection */
+        if ($this->getUrl()->getHost() == null) {
+            $path       = $this->getUrl()->getPath();
+            $isRelative = ! starts_with($path, '/');
+            $dotted     = starts_with($path, '..');
+            if ($isRelative) {
 
-        return array_key_exists($extension, $extensions) && false === starts_with($this->getUrl()->getPath(), '/');
+            }
+            if ($dotted) {
+                $host       = str_replace_first('http://', '', url(''));
+                $url        = Url::createFromString(url('documentation/codex/master/getting-started/installation'));
+                $url        = $url->withPath($url->getPath() . str_ensure_left($path, '/../'));
+                $normalized = $url->normalize();
+            }
+            if (str_contains($path, '.')) {
+                $extensions = $this->revision[ 'document.extensions' ];
+                $extension  = last(explode('.', $path));
+                return in_array($extension, $extensions) && $isRelative;
+            }
+            $paths = $this->revision->getDocuments()->loadable();
+            if ($paths->has($path)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

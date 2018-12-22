@@ -1,0 +1,22 @@
+/**
+ * Copyright (c) 2018. Codex Project
+ *
+ * The license can be found in the package and online at https://codex-project.mit-license.org.
+ *
+ * @copyright 2018 Codex Project
+ * @author Robin Radic
+ * @license https://codex-project.mit-license.org MIT License
+ */
+
+@mixin badge-variant($bg) {
+  @include color-yiq($bg);
+  background-color: $bg;
+
+  &[href] {
+    @include hover-focus {
+      @include color-yiq($bg);
+      text-decoration: none;
+      background-color: darken($bg, 10%);
+    }
+  }
+}

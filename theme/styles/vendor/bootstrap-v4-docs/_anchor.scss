@@ -1,0 +1,30 @@
+/**
+ * Copyright (c) 2018. Codex Project
+ *
+ * The license can be found in the package and online at https://codex-project.mit-license.org.
+ *
+ * @copyright 2018 Codex Project
+ * @author Robin Radic
+ * @license https://codex-project.mit-license.org MIT License
+ */
+
+.anchorjs-link {
+  color: inherit;
+}
+
+@media (max-width: 480px) {
+  .anchorjs-link {
+    display: none;
+  }
+}
+
+*:hover > .anchorjs-link {
+  opacity: .75;
+  transition: color .16s linear;
+}
+
+*:hover > .anchorjs-link:hover,
+.anchorjs-link:focus {
+  text-decoration: none;
+  opacity: 1;
+}

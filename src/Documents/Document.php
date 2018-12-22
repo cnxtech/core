@@ -80,6 +80,11 @@ class Document extends Model implements DocumentContract, ChildInterface
         $registry->add('last_modified', 'integer');
     }
 
+    public function url()
+    {
+        return $this->getRevision()->url($this->getKey());
+    }
+
     /**
      * getRevision method
      *

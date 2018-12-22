@@ -5,15 +5,9 @@
     <title>{{ $codex['display_name'] }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <link href="https://bootswatch.com/4/{{ data_get($__env,'theme', 'superhero')  }}/bootstrap.min.css" rel="stylesheet" media="screen">
-    <link href="https://unpkg.com/metismenu/dist/metisMenu.min.css" rel="stylesheet"/>
-    <link href="https://mm.onokumus.com/assets/css/mm-horizontal.css" rel="stylesheet"/>
-    <style type="text/css">
-        #header .navbar-brand {
-            float: left;
-            margin: 5px 20px;
-        }
-    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.2.0/custom-elements-es5-adapter.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.2.0/webcomponents-loader.js"></script>
+
 </head>
 <body>
 
@@ -28,77 +22,17 @@
     </div>
 </div>
 
-<div class="container">
+<div class="container" id="content">
 
     {!! $content !!}
 
 </div>
 
-<script src="https://bootswatch.com/_vendor/jquery/dist/jquery.min.js"></script>
-<script src="https://bootswatch.com/_vendor/popper.js/dist/umd/popper.min.js"></script>
-<script src="https://bootswatch.com/_vendor/bootstrap/dist/js/bootstrap.min.js"></script>
-<script src="https://unpkg.com/metismenu"></script>
+<script src="{{ asset('vendor/codex/js/runtime.js') }}"></script>
+<script src="{{ asset('vendor/codex/js/chunk.main.js') }}"></script>
 
 <script>
-    $(function () {
-        $('#header-menu').metisMenu();
-        $(window).scroll(function () {
-            var top = $(document).scrollTop();
-            if ( top > 50 )
-                $('#home > .navbar').removeClass('navbar-transparent');
-            else
-                $('#home > .navbar').addClass('navbar-transparent');
-        });
-
-        $('a[href=\'#\']').click(function (e) {
-            e.preventDefault();
-        });
-
-        var $button = $('<div id=\'source-button\' class=\'btn btn-primary btn-xs\'>&lt; &gt;</div>').click(function () {
-            var html = $(this).parent().html();
-            html = cleanSource(html);
-            $('#source-modal pre').text(html);
-            $('#source-modal').modal();
-        });
-
-        $('.bs-component [data-toggle="popover"]').popover();
-        $('.bs-component [data-toggle="tooltip"]').tooltip();
-
-        $('.bs-component').hover(function () {
-            $(this).append($button);
-            $button.show();
-        }, function () {
-            $button.hide();
-        });
-
-        function cleanSource(html) {
-            html = html.replace(/×/g, '&times;')
-                .replace(/«/g, '&laquo;')
-                .replace(/»/g, '&raquo;')
-                .replace(/←/g, '&larr;')
-                .replace(/→/g, '&rarr;');
-
-            var lines = html.split(/\n/);
-
-            lines.shift();
-            lines.splice(- 1, 1);
-
-            var indentSize = lines[0].length - lines[0].trim().length,
-                re         = new RegExp(' {' + indentSize + '}');
-
-            lines = lines.map(function (line) {
-                if ( line.match(re) ) {
-                    line = line.substring(indentSize);
-                }
-
-                return line;
-            });
-
-            lines = lines.join('\n');
-
-            return lines;
-        }
-    });
+    app.start();
 </script>
 </body>
 </html>

@@ -47,6 +47,11 @@ abstract class ModelCollection extends EloquentCollection
      */
     abstract public function getDefaultKey();
 
+    public function loadable()
+    {
+        return collect($this->resolve()->loadable);
+    }
+
     public function makeAll()
     {
         $this->all();
@@ -201,7 +206,6 @@ abstract class ModelCollection extends EloquentCollection
         $this->loadable = $loadable;
         return $this;
     }
-
 
 
 }

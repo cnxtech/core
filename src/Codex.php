@@ -6,7 +6,10 @@ use Codex\Addons\AddonCollection;
 use Codex\Addons\Extensions\ExtensionCollection;
 use Codex\Api\GraphQL\GraphQL;
 use Codex\Attributes\AttributeDefinitionRegistry;
+use Codex\Contracts\Documents\Document;
 use Codex\Contracts\Mergable\ParentInterface;
+use Codex\Contracts\Projects\Project;
+use Codex\Contracts\Revisions\Revision;
 use Codex\Exceptions\NotFoundException;
 use Codex\Mergable\Concerns\HasChildren;
 use Codex\Mergable\Model;
@@ -73,26 +76,16 @@ class Codex extends Model implements ParentInterface
 
     public function url($projectKey = null, $revisionKey = null, $documentKey = null)
     {
-        $parts = [];
-        if ($this[ 'http.prefix' ] !== null) {
-            $parts[] = $this[ 'http.prefix' ];
+        if ($projectKey instanceof Project) {
+            $projectKey = $projectKey->getKey();
         }
-        if ($this[ 'http.documentation_prefix' ] !== null) {
-            $parts[] = $this[ 'http.documentation_prefix' ];
+        if ($revisionKey instanceof Revision) {
+            $revisionKey = $revisionKey->getKey();
         }
-        if ($projectKey !== null) {
-            $parts[] = $projectKey;
+        if ($documentKey instanceof Document) {
+            $documentKey = $documentKey->getKey();
         }
-        if ($projectKey !== null && $revisionKey !== null) {
-            $parts[] = $revisionKey;
-        }
-        if ($revisionKey !== null && $documentKey !== null) {
-            $parts[] = $documentKey;
-        }
-
-        $uri = implode('/', $parts);
-
-        return url()->to($uri);
+        return route('codex.documentation', compact('projectKey', 'revisionKey', 'documentKey'));
     }
 
     public function projects()

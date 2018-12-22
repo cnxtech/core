@@ -1,0 +1,20 @@
+/**
+ * Copyright (c) 2018. Codex Project
+ *
+ * The license can be found in the package and online at https://codex-project.mit-license.org.
+ *
+ * @copyright 2018 Codex Project
+ * @author Robin Radic
+ * @license https://codex-project.mit-license.org MIT License
+ */
+
+// Horizontal dividers
+//
+// Dividers (basically an hr) within dropdowns and nav lists
+
+@mixin nav-divider($color: #e5e5e5) {
+  height: 0;
+  margin: ($spacer / 2) 0;
+  overflow: hidden;
+  border-top: 1px solid $color;
+}

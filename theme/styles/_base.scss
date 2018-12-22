@@ -1,0 +1,21 @@
+@import "~bootstrap/scss/functions";
+
+
+//@formatter:off
+$enable-caret:                                true;
+$enable-rounded:                              false;
+$enable-shadows:                              false;
+$enable-gradients:                            false;
+$enable-transitions:                          true;
+$enable-prefers-reduced-motion-media-query:   true;
+$enable-hover-media-query:                    false;
+$enable-grid-classes:                         true;
+$enable-print-styles:                         true;
+$enable-validation-icons:                     false;
+
+
+@import "variables";
+
+@import "~bootswatch/dist/superhero/variables";
+@import "~bootstrap/scss/variables";
+@import "~bootstrap/scss/mixins";

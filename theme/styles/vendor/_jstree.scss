@@ -1,0 +1,29 @@
+/**
+ * Copyright (c) 2018. Codex Project
+ *
+ * The license can be found in the package and online at https://codex-project.mit-license.org.
+ *
+ * @copyright 2018 Codex Project
+ * @author Robin Radic
+ * @license https://codex-project.mit-license.org MIT License
+ */
+
+$plugin-checkbox: true !default;
+$plugin-contextmenu: true !default;
+$plugin-dnd: true !default;
+$plugin-search: true !default;
+$plugin-wholerow: true !default;
+$plugin-conditionalselect: true !default;
+
+@import "jstree/base";
+@import "jstree/mixins";
+@import "jstree/themes/codex";
+@import "jstree/main";
+//
+//
+//.jstree-codex {
+//    .jstree-node {
+//        margin-left: 0;
+//        font-size: 0.9rem;
+//    }
+//}

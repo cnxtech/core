@@ -42,6 +42,9 @@ return [
     'links'      => [
         'prefix'  => 'codex',
         'actions' => [
+            'project'  => \Codex\Documents\Processors\Links\CodexLinks::class . '@project',
+            'revision' => \Codex\Documents\Processors\Links\CodexLinks::class . '@revision',
+            'document' => \Codex\Documents\Processors\Links\CodexLinks::class . '@document',
         ],
     ],
     'macro'      => [

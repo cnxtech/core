@@ -11,7 +11,6 @@
 
 namespace Codex\Documents\Processors\Links;
 
-use Codex\Addons\Annotations as CA;
 
 class CodexLinks
 {
@@ -20,19 +19,18 @@ class CodexLinks
      *
      * @CA\Link(name="project", description="Creates a link to a project")
      *
-     * @param \Codex\Processors\Links\Link $link
+     * @param \Codex\Documents\Processors\Links\Link $link
      *
      * @throws \Codex\Exceptions\Exception
      */
     public function project(Link $link)
     {
         $projects = codex()->getProjects();
-        $key = $link->param(0);
+        $key      = $link->param(0);
         if (false === $projects->has($key)) {
             return;
         }
         $link->setElementUrl(codex()->url($key));
-
         $this->handleModifiers('project', $link);
     }
 
@@ -41,7 +39,7 @@ class CodexLinks
      *
      * @CA\Link(name="revision", description="Creates a link to a revision")
      *
-     * @param \Codex\Processors\Links\Link $link
+     * @param \Codex\Documents\Processors\Links\Link $link
      *
      * @throws \Codex\Exceptions\Exception
      */
@@ -61,7 +59,7 @@ class CodexLinks
      *
      * @CA\Link("document", description="Creates a link to a document")
      *
-     * @param \Codex\Processors\Links\Link $link
+     * @param \Codex\Documents\Processors\Links\Link $link
      *
      * @throws \Codex\Exceptions\Exception
      */
@@ -75,7 +73,6 @@ class CodexLinks
         } elseif (3 === $i) {
             $link->setElementUrl(codex()->url($link->param(0), $link->param(1), $link->param(2)));
         }
-
         $this->handleModifiers('document', $link);
     }
 
@@ -90,12 +87,17 @@ class CodexLinks
             $action = 'modal';
         }
 
-        $to = $link->getUrl()->getPath();
-        $styling = $link->hasModifier('!styling') ? false : true;
-        $icon = $link->hasModifier('!icon') ? false : true;
+        $to        = $link->getUrl()->getPath();
+        $styling   = $link->hasModifier('!styling') ? false : true;
+        $icon      = $link->hasModifier('!icon') ? false : true;
+        $modifiers = compact('type', 'action', 'to', 'styling', 'icon');
+        $el        = $link->getElement();
+        foreach ($modifiers as $key => $value) {
+            $el->setAttribute('data-' . $key, (string) $value);
+        }
 
-        $link->replaceElement('c-link', $link->getElement()->textContent, [
-            'props' => json_encode(compact('type', 'action', 'to', 'styling', 'icon')),
-        ]);
+//        $link->replaceElement('c-link', $link->getElement()->textContent, [
+//            'props' => json_encode(compact('type', 'action', 'to', 'styling', 'icon')),
+//        ]);
     }
 }

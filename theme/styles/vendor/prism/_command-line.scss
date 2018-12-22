@@ -1,0 +1,44 @@
+/**
+ * Copyright (c) 2018. Codex Project
+ *
+ * The license can be found in the package and online at https://codex-project.mit-license.org.
+ *
+ * @copyright 2018 Codex Project
+ * @author Robin Radic
+ * @license https://codex-project.mit-license.org MIT License
+ */
+
+.command-line-prompt {
+	border-right: none;
+	display: block;
+	float: left;
+	font-size: 100%;
+	letter-spacing: -1px;
+	margin-right: 2px;
+	padding-right: 2px;
+	pointer-events: none;
+
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+}
+
+.command-line-prompt > span:before {
+	color: #999;
+	content: ' ';
+	display: block;
+	margin-right: 1px;
+}
+
+.command-line-prompt > span[data-user]:before {
+	content: "[" attr(data-user) "@" attr(data-host) "] $ ";
+}
+
+.command-line-prompt > span[data-user="root"]:before {
+	content: "[" attr(data-user) "@" attr(data-host) "] # ";
+}
+
+.command-line-prompt > span[data-prompt]:before {
+	content: attr(data-prompt);
+}

@@ -4,7 +4,7 @@ namespace Codex\Documents\Processors;
 
 use Codex\Attributes\AttributeDefinition;
 use Codex\Contracts\Documents\Document;
-use Codex\Documents\Commands\AssignClassDocumentProperties;
+use Codex\Documents\Processors\Links\Link;
 use Codex\Documents\Processors\Links\Url;
 use FluentDOM\DOM\Element;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -12,7 +12,8 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 class LinksProcessorExtension extends ProcessorExtension implements ProcessorInterface
 {
     use DispatchesJobs;
-//    protected $defaultConfig = 'codex.processors-defaults.links';
+
+    protected $defaultConfig = 'codex.processor-defaults.links';
 
     protected $depends = [ 'parser' ];
 
@@ -23,7 +24,8 @@ class LinksProcessorExtension extends ProcessorExtension implements ProcessorInt
 
     public function defineConfigAttributes(AttributeDefinition $definition)
     {
-        // TODO: Implement defineConfigAttributes() method.
+        $definition->add('prefix', 'string')->setDefault(null);
+        $definition->add('actions', 'array.scalarPrototype');
     }
 
     public function process(Document $document)
@@ -37,32 +39,46 @@ class LinksProcessorExtension extends ProcessorExtension implements ProcessorInt
             /** @var Element $parent */
             $link = new Links\Link($this, $element);
 
-            $this->dispatch(new AssignClassDocumentProperties($this->document, $link));
-
-            // Modify the url of the link if it points to a document
-            // If vue router is used, replace the element with a <router-link>
-            if ($link->isDocumentPath()) {
-                $link->checkFixRouterLink();
-                $link->setElementUrl($this->getDocumentUrl($link));
-            }
-
             if ($link->isAction()) {
-                $actions = array_merge(config('codex.processors.links.actions', []), $link->getDocument()->attr('processors.links.actions', []));
+                $actions = $this->config('actions', []);
 
                 // Check if link id is bound to a action/handler and set it to the link config before calling the handler
                 if (\array_key_exists($link->getId(), $actions)) {
-                    $action = $actions[$link->getId()];
-                    $class = $action;
+                    $action = $actions[ $link->getId() ];
+                    $class  = $action;
                     $method = 'handle';
                     if (false !== \strpos($action, '@')) {
                         list($class, $method) = explode('@', $action);
                     }
                     $instance = app()->make($class);
-                    app()->call([$instance, $method], ['link' => $link]);
+                    app()->call([ $instance, $method ], [ 'link' => $link ]);
                 }
+            } elseif ($link->isInternal()) {
+                $this->handleInternal($link);
             }
         });
         $document->setDom($d);
+    }
+
+    protected function handleInternal(Link $link)
+    {
+        $current     = Url::createFromString($this->document->url());
+        $currentPath = $current->getPath();
+
+        $path       = $link->getUrl()->getPath();
+        $isDotted   = starts_with($path, '.');
+        $isFilename = ends_with($path, $link->getAllowedExtensions(true));
+        if ($isFilename) {
+            $path = preg_replace('/\.\w+$/m', '', $path);
+        }
+        $path = str_ensure_left($path, '/../');
+        if ($isDotted) {
+            $path = str_ensure_left($path, '/../../');
+        }
+
+        $path = $currentPath . str_ensure_left($path, '/');
+        $url  = (string)$current->withPath($path)->normalize();
+        $link->setElementUrl($url);
     }
 
     /**
@@ -85,7 +101,7 @@ class LinksProcessorExtension extends ProcessorExtension implements ProcessorInt
 
         // endfix
         $currentRequestUrl = codex()->url($link->getProject()->getKey(), $link->getRevision()->getKey(), $link->getDocument()->getKey());
-        $url = $currentRequestUrl.str_ensure_left(path_without_extension($link->getUrl()->toString()), '/');
+        $url               = $currentRequestUrl . str_ensure_left(path_without_extension($link->getUrl()->toString()), '/');
 
         return Url::createFromString($url)->normalize();
     }

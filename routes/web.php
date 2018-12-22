@@ -2,7 +2,7 @@
 
 
 Route::get("{projectKey?}/{revisionKey?}/{documentPath?}")
-    ->name('documentation')
+    ->name('codex.documentation')
     ->prefix(codex()->getAttribute('http.documentation_prefix'))
     ->uses('DocumentController@getDocument')
     ->where('documentPath', '^(.*)');

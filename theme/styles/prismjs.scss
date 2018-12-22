@@ -1,0 +1,310 @@
+/**
+ * Copyright (c) 2018. Codex Project
+ *
+ * The license can be found in the package and online at https://codex-project.mit-license.org.
+ *
+ * @copyright 2018 Codex Project
+ * @author Robin Radic
+ * @license https://codex-project.mit-license.org MIT License
+ */
+
+@import "base";
+
+#{$code-selector} {
+    -moz-tab-size: $code-tab-size;
+    -o-tab-size: $code-tab-size;
+    tab-size: $code-tab-size;
+    -webkit-hyphens: $code-hyphens;
+    -moz-hyphens: $code-hyphens;
+    -ms-hyphens: $code-hyphens;
+    hyphens: $code-hyphens;
+    // whitespace management
+    white-space: pre; // fallback
+    white-space: pre-wrap;
+    word-break: break-all;
+    //word-wrap: break-word;
+    //word-wrap: normal !important;;
+    white-space: pre !important;
+    //font-family: $font-family-monospace;
+    //font-size: 	$code-font-size;
+    line-height: $code-line-height;
+    color: $code-color;
+    text-shadow: $code-text-shadow;
+    background: none;
+    text-align: left;
+    word-spacing: normal;
+    overflow: auto;
+    background: $code-background;
+
+    &::-moz-selection {
+        text-shadow: none;
+        text-shadow: none;
+        background: #b3d4fc;
+        background: #b3d4fc;
+    }
+    &::selection {
+        text-shadow: none;
+        text-shadow: none;
+        background: #b3d4fc;
+        background: #b3d4fc;
+    }
+
+}
+
+:not(pre) > code {
+    color: $code-color;
+    font-size: 12px;
+    padding: 1px 5px;
+    border: $code-border;
+    background: $code-background;
+}
+
+#{$code-selector-block} {
+    padding: 6px;
+    margin: .5em 0 1rem 0;
+
+    &:not(.no-border) {
+        border: $code-border;
+    }
+}
+
+table :not(pre) > code {
+    padding: 2px 5px ;
+    display: block;
+}
+
+:not(pre) {
+    > code[class*="language-"] {
+        background: $code-background;
+        padding: .1em;
+        //border-radius: .3em;
+        white-space: normal;
+    }
+}
+
+.token.class-name { color: $code-color-class-name !important; }
+
+.token.comment { color: $code-color-comment !important; }
+
+.token.delimiter { color: $code-color-delimiter !important; }
+
+.token.prolog { color: $code-color-prolog !important; }
+
+.token.doctype { color: $code-color-doctype !important; }
+
+.token.cdata { color: $code-color-cdata !important; }
+
+.token.punctuation { color: $code-color-punctuation !important; }
+
+.namespace {
+    opacity: .7;
+}
+
+.token.property { color: $code-color-property !important; }
+
+.token.package { color: $code-color-package !important; }
+
+.token.tag { color: $code-color-tag !important; }
+
+.token.tag-id { color: $code-color-tag !important; }
+
+.token.boolean { color: $code-color-boolean !important; }
+
+.token.number { color: $code-color-number !important; }
+
+.token.constant { color: $code-color-constant !important; }
+
+.token.symbol { color: $code-color-symbol !important; }
+
+.token.deleted { color: $code-color-deleted !important; }
+
+.token.selector { color: $code-color-selector !important; }
+
+.token.attr-name { color: $code-color-attr-name !important; }
+
+.token.string { color: $code-color-string !important; }
+
+.token.char { color: $code-color-char !important; }
+
+.token.builtin { color: $code-color-builtin !important; }
+
+.token.inserted { color: $code-color-inserted !important; }
+
+.token.operator {
+    color: $code-color-operator !important;
+    //background: hsla(0, 0%, 100%, .5);
+}
+
+.token.entity {
+    color: $code-color-operator !important;
+    background: hsla(0, 0%, 100%, .5);
+    cursor: help;
+}
+
+.token.url {
+    color: $code-color-operator !important;
+    background: hsla(0, 0%, 100%, .5);
+}
+
+.language-css {
+    .token.string {
+        color: $code-color-operator !important;
+        background: hsla(0, 0%, 100%, .5);
+    }
+}
+
+.style {
+    .token.string {
+        color: $code-color-operator;
+        background: hsla(0, 0%, 100%, .5);
+    }
+}
+
+.token.atrule { color: $code-color-atrule !important; }
+
+.token.attr-value { color: $code-color-atrule !important; }
+
+.token.keyword { color: $code-color-keyword !important; }
+
+.token.function { color: $code-color-function !important; }
+
+.token.regex { color: $code-color-regex !important; }
+
+.token.important {
+    color: $code-color-regex;
+    font-weight: bold;
+}
+
+.token.variable { color: $code-color-variable; }
+
+.token.bold {
+    font-weight: bold;
+}
+
+.token.italic {
+    font-style: italic;
+}
+
+@media print {
+    code[class*="language-"] {
+        text-shadow: none;
+    }
+    pre[class*="language-"] {
+        text-shadow: none;
+    }
+}
+
+@import "vendor/prism/autolinker";
+@import "vendor/prism/command-line";
+//@import "vendor/prism/line-highlight";
+@import "vendor/prism/line-numbers";
+@import "vendor/prism/show-language";
+@import "vendor/prism/toolbar";
+@import "vendor/prism/wpd";
+
+//@import '../vendor/prism/autolinker';
+//@import '../vendor/prism/line-numbers';
+//@import '../vendor/prism/show-language';
+//@import '../vendor/prism/wpd';
+//@import '../vendor/prism/command-line';
+//@import '../vendor/prism/line-highlight';
+//
+//
+//
+div.prism-show-language {
+    background-color: transparent;
+    //test:
+    position: relative;
+    //top: 22px;
+    text-align: right;
+    width: 20%;
+    left: 80%;
+    //margin-top: -15px;
+    //endtest
+
+    div.prism-show-language-label {
+        //color: #82a7c7;
+        color: #b0bec5;
+        font-size: 12px;
+        padding: 6px 10px 0 0;
+        background-color: transparent;;
+    }
+}
+
+.prism-show-language + pre[class*="language-"] {
+    //   padding-top: 0;
+    margin-top: 0;
+}
+
+.line-numbers-rows > span {
+    //margin-bottom: 2px;
+}
+
+.line-numbers .line-numbers-rows {
+
+    > span:before {
+        color: $code-color-line-numbers;
+        text-align: left;
+        padding-left: 0.8em;
+        white-space: nowrap;
+    }
+
+    > span.highlight {
+        // width of the parent pre element is applied by javascript
+        // by making overflow hidden while the "before" child is very wide, no scroll-bar will be shown
+        overflow: hidden;
+
+        &:before {
+            width: 9000px;
+            background: rgba(darken($code-background, 20), 0.5)
+        }
+    }
+
+}
+
+div.code-toolbar {
+    > .toolbar {
+        opacity: 1;
+
+        > .toolbar-item {
+            &:first-child {
+                border-left: none;
+            }
+        }
+
+        a, button, span {
+            color: #bbbbbb;
+            font-size: .8rem;
+            padding: 0.2rem .7rem;
+            //background: #f5f2f0;
+            background: white;
+            box-shadow: 0 2px 0 0 rgba(0, 0, 0, 0.2);
+            border-radius: 0;
+        }
+
+        a, button {
+            transition: opacity 0.3s ease-in-out;
+            opacity: 0;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+        span {
+            box-shadow: none;
+        }
+    }
+    &:hover > .toolbar {
+        opacity: 1;
+        a, button {
+            opacity: 1;
+        }
+    }
+}
+
+// reset quasar .token
+code, pre {
+    .token {
+        background: none;
+        border-radius: 0;
+        padding: 0;
+        font-size: 100%;
+    }
+}
