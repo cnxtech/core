@@ -6,11 +6,9 @@ use Codex\Attributes\AttributeDefinition;
 use Codex\Contracts\Documents\Document;
 use Symfony\Component\Yaml\Yaml;
 
-class AttributeProcessorExtension extends ProcessorExtension
+class AttributeProcessorExtension extends ProcessorExtension implements PreProcessorInterface
 {
     protected $defaultConfig = 'codex.processor-defaults.attributes';
-
-    protected $pre = true;
 
     public function getName()
     {
@@ -24,8 +22,11 @@ class AttributeProcessorExtension extends ProcessorExtension
         $tags->add('close', 'string');
     }
 
-    public function process(Document $document)
+    public function preProcess(Document $document)
     {
+        // As this is a PRE processor, this operation is executed for each new instance of Document.
+        // So instead of reading the whole file which is uneccesary, we only read until the close tag position
+        // Using that position, we will override the document's content resolver and make that start reading from there untill EOF
         $stream      = $document->getFiles()->readStream($document->getPath());
         $headContent = trim(fread($stream, 10));
         if ( ! $this->checkHasOpenTag($headContent)) {
@@ -33,22 +34,29 @@ class AttributeProcessorExtension extends ProcessorExtension
         }
         $close = $this->mapPregQuote($this->config('tags.*.close'));
         $done  = false;
-        while (($buffer = fgets($stream, 4096)) !== false && $done === false) {
+        while ( ! feof($stream) && ($buffer = fgets($stream, 4096)) !== false && $done === false) {
             $headContent .= $buffer;
             $count       = preg_match('/^(?:' . implode('|', $close) . ')/', $buffer);
             $done        = $count > 0;
         }
+        $pointerPosition = ftell($stream);
+        fclose($stream);
+
         $attributes = $this->getAttributes($headContent);
-//        $document->setAttribute('attributes', $attributes);
         foreach (array_dot($attributes) as $key => $value) {
             $document->setAttribute($key, $value);
         }
-        $bodyContent = '';
-        while ( ! feof($stream) && ($buffer = fread($stream, 4096)) !== false) {
-            $bodyContent .= $buffer;
-        }
-        fclose($stream);
-        $document->setContent($bodyContent);
+
+        $document->setContentResolver(function (Document $document) use ($pointerPosition) {
+            $stream = $document->getFiles()->readStream($document->getPath());
+            fseek($stream, $pointerPosition, SEEK_SET);
+            $bodyContent = '';
+            while ( ! feof($stream) && ($buffer = fread($stream, 4096)) !== false) {
+                $bodyContent .= $buffer;
+            }
+            fclose($stream);
+            return $bodyContent;
+        });
     }
 
     public function checkHasOpenTag(string $str)

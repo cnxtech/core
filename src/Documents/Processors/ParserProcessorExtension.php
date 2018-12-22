@@ -5,13 +5,9 @@ namespace Codex\Documents\Processors;
 use Codex\Attributes\AttributeDefinition;
 use Codex\Contracts\Documents\Document;
 
-class ParserProcessorExtension extends ProcessorExtension
+class ParserProcessorExtension extends ProcessorExtension implements PostProcessorInterface
 {
     protected $defaultConfig = 'codex.processor-defaults.parser';
-
-    protected $pre = true;
-
-    protected $depends = [ 'attributes' ];
 
     public function getName()
     {
@@ -20,15 +16,13 @@ class ParserProcessorExtension extends ProcessorExtension
 
     public function defineConfigAttributes(AttributeDefinition $definition)
     {
-//        AttributeDefinitionFactory::attribute()
-
         $parser = $definition->add('markdown', 'dictionary');
         $parser->add('parser', 'string');
         $parser->add('file_types', 'array.scalarPrototype');
         $parser->add('options', 'array.scalarPrototype');
     }
 
-    public function process(Document $document)
+    public function postProcess(Document $document)
     {
         $ext    = $document->getExtension();
         $parser = $this->getDocumentParser($document);

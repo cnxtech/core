@@ -15,26 +15,14 @@ abstract class ProcessorExtension extends Extension implements Dependable
 
     protected $depends = [];
 
-    protected $pre = false; // resolved, read_content
-
-//    protected $provides = 'codex/core::processor.'
-
-
     /** @var Document */
     protected $document = null;
 
+//    protected $provides = 'codex/core::processor.'
+
     abstract public function getName();
 
-    abstract public function process(Document $document);
-
     abstract public function defineConfigAttributes(AttributeDefinition $definition);
-
-    public function handle(Document $document)
-    {
-        $this->document = $document;
-        $this->process($document);
-        $this->document = null;
-    }
 
     public function onRegistered(Repository $config, AttributeDefinitionRegistry $registry)
     {
@@ -54,11 +42,6 @@ abstract class ProcessorExtension extends Extension implements Dependable
         return in_array($this->getName(), $document[ 'processors.enabled' ], true);
     }
 
-    public function getProvides()
-    {
-        return 'codex/core::processor.' . $this->getName();
-    }
-
     public function config($key = null, $default = null, Document $document = null)
     {
         if ($document === null) {
@@ -71,6 +54,11 @@ abstract class ProcessorExtension extends Extension implements Dependable
         return data_get($config, $key, $default);
     }
 
+    public function getProvides()
+    {
+        return 'codex/core::processor.' . $this->getName();
+    }
+
     public function getDependencies()
     {
         return $this->depends;
@@ -79,24 +67,6 @@ abstract class ProcessorExtension extends Extension implements Dependable
     public function getHandle()
     {
         return $this->getName();
-    }
-
-    public function isPre()
-    {
-        return $this->pre;
-    }
-
-    /**
-     * Set the pre value
-     *
-     * @param bool $pre
-     *
-     * @return ProcessorExtension
-     */
-    public function setPre(bool $pre)
-    {
-        $this->pre = $pre;
-        return $this;
     }
 
     /**
@@ -132,5 +102,28 @@ abstract class ProcessorExtension extends Extension implements Dependable
         $this->depends = $depends;
         return $this;
     }
+
+    /**
+     * @return \Codex\Contracts\Documents\Document
+     */
+    public function getDocument()
+    {
+        return $this->document;
+    }
+
+    /**
+     * Set the document value
+     *
+     * @param \Codex\Contracts\Documents\Document $document
+     *
+     * @return ProcessorExtension
+     */
+    public function setDocument($document)
+    {
+        $this->document = $document;
+        return $this;
+    }
+
+
 
 }

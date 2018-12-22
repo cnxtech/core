@@ -4,7 +4,6 @@ namespace Codex\Documents;
 
 use Codex\Documents\Commands\FindDocuments;
 use Codex\Documents\Commands\MakeDocument;
-use Codex\Documents\Events\ResolvedDocument;
 use Codex\Mergable\ModelCollection;
 
 /**

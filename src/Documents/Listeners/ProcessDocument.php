@@ -4,6 +4,8 @@ namespace Codex\Documents\Listeners;
 
 use Codex\Addons\Extensions\ExtensionCollection;
 use Codex\Documents\Events\ResolvedDocument;
+use Codex\Documents\Processors\PostProcessorInterface;
+use Codex\Documents\Processors\PreProcessorInterface;
 use Laradic\DependencySorter\Sorter;
 
 class ProcessDocument
@@ -31,10 +33,20 @@ class ProcessDocument
             /** @var \Codex\Documents\Processors\ProcessorExtension $extension */
             $extension = $this->extensions->find('codex/core::processor.' . $name);
             if ($extension->isEnabledForDocument($document)) {
-                $on = ($extension->isPre() ? 'pre' : 'post') . '_process';
-                $document->on($on, function () use ($extension, $document) {
-                    $extension->handle($document);
-                });
+                if ($extension instanceof PreProcessorInterface) {
+                    $document->on('pre_process', function () use ($extension, $document) {
+                        $extension->setDocument($document);
+                        $extension->preProcess($document);
+                        $extension->setDocument(null);
+                    });
+                }
+                if ($extension instanceof PostProcessorInterface) {
+                    $document->on('post_process', function () use ($extension, $document) {
+                        $extension->setDocument($document);
+                        $extension->postProcess($document);
+                        $extension->setDocument(null);
+                    });
+                }
             }
         }
     }
