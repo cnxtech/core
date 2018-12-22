@@ -30,12 +30,6 @@ class Document extends Model implements DocumentContract, ChildInterface
     }
 
     const DEFAULTS_PATH = 'codex.documents';
-    /** @var array */
-//    public $mergePaths = [
-//        Mergable::CASTS_PATH    => 'codex.documents.casts',
-//        Mergable::DEFAULTS_PATH => 'codex.documents.defaults',
-//        Mergable::INHERITS_PATH => 'codex.documents.inherits',
-//    ];
 
     /** @var Revision */
     protected $parent;
@@ -55,15 +49,16 @@ class Document extends Model implements DocumentContract, ChildInterface
     {
         $this->setParent($revision);
         $this->setFiles($revision->getFiles());
-        $definitions = $this->getCodex()->getRegistry()->resolveGroup('documents');
+        $registry = $this->getCodex()->getRegistry()->resolveGroup('documents');
+        $registry->add($this->primaryKey, $this->keyType)->setApiType('ID!');
         $attributes[ 'extension' ] = path_get_extension($attributes[ 'path' ]);
-        $this->init($attributes, $definitions);
+        $this->init($attributes, $registry);
         $this->addGetMutator('content', 'getContent', true, true);
         $this->addGetMutator('last_modified', 'getLastModified', true, true);
         $this->addGetMutator('attributes', 'getAttributes', true, true);
-        $definitions->add('extension', 'string');
-        $definitions->add('content', 'string');
-        $definitions->add('last_modified', 'integer');
+        $registry->add('extension', 'string');
+        $registry->add('content', 'string');
+        $registry->add('last_modified', 'integer');
     }
 
     /**

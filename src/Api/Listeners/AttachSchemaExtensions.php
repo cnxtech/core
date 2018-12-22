@@ -28,9 +28,9 @@ class AttachSchemaExtensions
 //        $extensions = $this->extensions->search('codex/api::schema.*')->all();
 
         return $this->extensions
-            ->search('codex/api::schema.*')
+            ->search('codex/core::schema.*')
             ->map(function (SchemaExtension $extension) {
-                return $extension->getSchemaExtension();
+                return app()->call([$extension, 'getSchemaExtension']);
             })
             ->implode("\n");
     }

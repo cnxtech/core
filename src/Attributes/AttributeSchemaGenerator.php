@@ -25,7 +25,7 @@ class AttributeSchemaGenerator
         $this->types = [];
         foreach ($this->registry->keys() as $groupName) {
             $group                     = $this->registry->resolveGroup($groupName);
-            $groupType                 = 'type ' . studly_case(str_singular($group->name));
+            $groupType                 = 'extend type ' . studly_case(str_singular($group->name));
             $this->types[ $groupType ] = [];
             $this->generateChildren($group->children, $this->types[ $groupType ]);
         }

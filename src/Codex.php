@@ -4,6 +4,7 @@ namespace Codex;
 
 use Codex\Addons\AddonCollection;
 use Codex\Addons\Extensions\ExtensionCollection;
+use Codex\Api\GraphQL\GraphQL;
 use Codex\Attributes\AttributeDefinitionRegistry;
 use Codex\Contracts\Mergable\ParentInterface;
 use Codex\Exceptions\NotFoundException;
@@ -39,6 +40,9 @@ class Codex extends Model implements ParentInterface
     /** @var \Codex\Addons\Extensions\ExtensionCollection */
     protected $extensions;
 
+    /** @var \Codex\Api\GraphQL\GraphQL */
+    protected $api;
+
     /**
      * Codex constructor.
      *
@@ -47,17 +51,21 @@ class Codex extends Model implements ParentInterface
      * @param \Codex\Attributes\AttributeDefinitionRegistry $registry
      * @param \Codex\Addons\AddonCollection                 $addons
      * @param \Codex\Addons\Extensions\ExtensionCollection  $extensions
+     * @param \Codex\Api\GraphQL\GraphQL                    $api
      */
     public function __construct(
         Config $config,
         ProjectCollection $projects,
         AttributeDefinitionRegistry $registry,
         AddonCollection $addons,
-        ExtensionCollection $extensions)
+        ExtensionCollection $extensions,
+        GraphQL $api)
     {
         $this->registry   = $registry;
         $this->addons     = $addons;
         $this->extensions = $extensions;
+        $this->api        = $api;
+
         $this->setChildren($projects->setParent($this));
         $attributes = array_except($config->get('codex', []), [ 'projects', 'revisions', 'documents' ]);
         $this->init($attributes, $registry->resolveGroup('codex'))->rehide();
@@ -115,6 +123,11 @@ class Codex extends Model implements ParentInterface
     public function getExtensions()
     {
         return $this->extensions;
+    }
+
+    public function getApi()
+    {
+        return $this->api;
     }
 
     public function getDocsPath()

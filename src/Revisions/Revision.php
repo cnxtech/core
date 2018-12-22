@@ -4,9 +4,7 @@ namespace Codex\Revisions;
 
 use Codex\Concerns;
 use Codex\Contracts\Mergable\ChildInterface;
-use Codex\Contracts\Mergable\Mergable;
 use Codex\Contracts\Mergable\ParentInterface;
-use Codex\Contracts\Projects\Project;
 use Codex\Contracts\Revisions\Revision as RevisionContract;
 use Codex\Documents\DocumentCollection;
 use Codex\Mergable\Concerns\HasChildren;
@@ -33,13 +31,6 @@ class Revision extends Model implements RevisionContract, ChildInterface, Parent
     }
     const DEFAULTS_PATH = 'codex.revisions';
 
-    /** @var array */
-//    public $mergePaths = [
-//        Mergable::CASTS_PATH    => 'codex.revisions.casts',
-//        Mergable::DEFAULTS_PATH => 'codex.revisions.defaults',
-//        Mergable::INHERITS_PATH => 'codex.revisions.inherits',
-//    ];
-
     protected $parent;
 
     /** @var \Codex\Documents\DocumentCollection */
@@ -54,7 +45,9 @@ class Revision extends Model implements RevisionContract, ChildInterface, Parent
     public function __construct(array $attributes, DocumentCollection $documents)
     {
         $this->setChildren($documents->setParent($this));
-        $this->init($attributes, $this->getCodex()->getRegistry()->resolveGroup('revisions'));
+        $registry = $this->getCodex()->getRegistry()->resolveGroup('revisions');
+        $registry->add($this->primaryKey, $this->keyType)->setApiType('ID!');
+        $this->init($attributes, $registry);
         $this->addGetMutator('default_document', 'getDefaultDocumentKey', true, true);
     }
 

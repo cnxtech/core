@@ -1,8 +1,4 @@
 #import ./constraints.graphqls
-#import ./menu.graphqls
-#import ./layout.graphqls
-#import ./meta.graphqls
-#import ./structure.graphqls
 
 scalar Mixed
 scalar Assoc
@@ -25,9 +21,6 @@ type User {
 }
 
 type Codex {
-    display_name: String!
-    description: String!
-    default_project: String!
     projects: [Project!]!
 }
 
@@ -38,4 +31,19 @@ type Config {
     timezone:String!
     locale:String!
     fallback_locale:String!
+}
+
+type Project {
+    revisions: [Revision!]!
+}
+
+
+type Revision {
+    documents: [Document!]!
+    project: Project!
+}
+
+
+type Document {
+    revision: Revision!
 }

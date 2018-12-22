@@ -8,11 +8,11 @@ interface Mergable
     const DEFAULTS_PATH = 'defaults';
     const INHERITS_PATH = 'inherits';
 
-    public function getMergableAttributesCasts();
+//    public function getMergableAttributesCasts();
 
     public function getDefaultAttributes();
 
-    public function getInheritableKeys();
+//    public function getInheritableKeys();
 
     public function getParentAttributes();
 

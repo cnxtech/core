@@ -34,20 +34,20 @@ trait HasMergableAttributes
         return $this;
     }
 
-    public function getMergableAttributesCasts()
-    {
-        return $this->mergableDataProvider->get($this->mergePaths[ Mergable::CASTS_PATH ]);
-    }
+//    public function getMergableAttributesCasts()
+//    {
+//        return $this->mergableDataProvider->get($this->mergePaths[ Mergable::CASTS_PATH ]);
+//    }
 
     public function getDefaultAttributes()
     {
         return $this->mergableDataProvider->get($this::DEFAULTS_PATH);
     }
-
-    public function getInheritableKeys()
-    {
-        return $this->mergableDataProvider->get($this->mergePaths[ Mergable::INHERITS_PATH ]);
-    }
+//
+//    public function getInheritableKeys()
+//    {
+//        return $this->mergableDataProvider->get($this->mergePaths[ Mergable::INHERITS_PATH ]);
+//    }
 
     public function setMergedAttributes(array $attributes)
     {

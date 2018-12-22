@@ -59,6 +59,7 @@ class CodexServiceProvider extends ServiceProvider
     protected $extensions = [
         Documents\Processors\AttributeProcessorExtension::class,
         Documents\Processors\ParserProcessorExtension::class,
+        Attributes\AttributeSchemaExtension::class
     ];
 
     /**
@@ -207,7 +208,7 @@ class CodexServiceProvider extends ServiceProvider
         $revision->add('allow_php_config', 'string')->setDefault(false);
         $revision->add('allowed_config_files', 'array.scalarPrototype');
 
-        $document = $projects->add('document', 'dictionary')->setApiType('RevisionConfig', [ 'new' ]);
+        $document = $projects->add('document', 'dictionary')->setApiType('DocumentConfig', [ 'new' ]);
         $document->add('default', 'string')->setDefault('index');
         $document->add('extensions', 'array.scalarPrototype');
 

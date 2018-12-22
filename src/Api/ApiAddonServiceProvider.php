@@ -18,7 +18,7 @@ class ApiAddonServiceProvider extends EventServiceProvider
 
     public function register()
     {
-        $this->app[ 'config' ]->set('lighthouse.schema.register', __DIR__ . '/../routes/schema.graphqls');
+        $this->app[ 'config' ]->set('lighthouse.schema.register', __DIR__ . '/../../routes/schema.graphqls');
         $this->app[ 'config' ]->set('lighthouse.extensions', [ \App\TestGraphQLExtension::class ]);
         $this->app[ 'config' ]->set('lighthouse.namespaces', [
             'models'    => 'Codex\\Api\\GraphQL\\Models',
