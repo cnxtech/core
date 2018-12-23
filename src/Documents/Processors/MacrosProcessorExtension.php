@@ -26,7 +26,9 @@ use Codex\Documents\Processors\Macros\Macro;
  */
 class MacrosProcessorExtension extends ProcessorExtension implements ProcessorInterface
 {
-    public $defaultConfig = 'codex.processor-defaults.macros';
+    protected $defaultConfig = 'codex.processor-defaults.macros';
+
+    protected $depends = ['parser'];
 
     /** @var \Codex\Codex */
     public $codex;

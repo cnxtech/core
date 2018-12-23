@@ -1,5 +1,9 @@
 <?php
 
+use Codex\Documents\Processors\PostProcessorInterface;
+use Codex\Documents\Processors\PreProcessorInterface;
+use Codex\Documents\Processors\ProcessorInterface;
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -46,7 +50,7 @@ return [
         'documentation_view'   => 'codex::index',
     ],
 
-    'processors' => [
+    'processors'      => [
         'enabled'  => [],
         'disabled' => [],
     ],
