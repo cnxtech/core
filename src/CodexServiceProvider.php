@@ -237,7 +237,7 @@ class CodexServiceProvider extends ServiceProvider
 
 
         $revisions = $registry->revisions;
-        $revisions->addMergeKeys([ 'document' ]);
+        $revisions->addMergeKeys([  ]);
         $revisions->addInheritKeys([ 'processors', 'meta', 'layout', 'view', 'cache', 'document' ]);
         $revisions->add('key', 'string');
         $revisions->add('default_document', 'string');

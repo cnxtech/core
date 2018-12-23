@@ -31,41 +31,47 @@ class MergeAttributes
      */
     public function handle(AttributeConfigBuilderGenerator $generator)
     {
+        // 1 : gather all the arrays needed
         $defaultAttributes = $this->target->getDefaultAttributes();
         $parentAttributes  = $this->target->getParentAttributes();
         $attributes        = $this->target->getAttributes();
-
         if ($defaultAttributes instanceof Repository) {
             $defaultAttributes = $defaultAttributes->all();
         }
         $inherited = $this->getInheritedParentAttributes();
-        $result    = Arr::merge($inherited, $defaultAttributes);
-        $result    = Arr::merge($result, $attributes);
 
+
+        // 2 : merge all the gathered arrays
+        $result = Arr::merge($inherited, $defaultAttributes);
+        $result = Arr::merge($result, $attributes);
         foreach ($this->getMergeKeys() as $mergeKey) {
             $result = Arr::merge($result, data_get($parentAttributes, $mergeKey, []));
         }
-
         $result = Arr::merge($result, $this->attributes);
 
+
+        // 3 : Generate and build the Config tree from attribute definitions
         $builder   = $generator->generateGroup($this->target->getAttributeDefinitions()->name);
         $processor = new Processor();
-        $final     = $processor->process($builder->buildTree(), [ $result ]);
-
+        // 4 : Filter the merged result to only include nodes defined/accepted with the target
+        $final = $processor->process($builder->buildTree(), [ $result ]);
+        // 5 : Set the final result data on the target
         $this->target->setMergedAttributes($final);
 
-        $parent = array_dot($parentAttributes);
-//        $target  = array_dot(array_only($result, $this->getInheritKeys()));
-        $target  = array_dot(array_only($final, $this->getInheritKeys()));
-        $changes = [];
-
+        // 6 : Resolve what changes there have been to the data compared to the parent and let the kid know
+        $finalInherited = array_only($final, $this->getInheritKeys());
+        $parent         = array_dot($parentAttributes);
+        $target         = array_dot($finalInherited);
+        $changed        = [];
         foreach ($target as $key => $val) {
             if ( ! array_key_exists($key, $parent) || $parent[ $key ] !== $val) {
-                $changes[ $key ] = $val;
+                $k = head(preg_split('/\.\d/', $key));
+                if ( ! \in_array($k, $changed, true)) {
+                    $changed[] = $k;
+                }
             }
         }
-
-
+        $this->target->setChanged($changed);
         $a = 'a';
     }
 
