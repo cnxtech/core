@@ -16,7 +16,7 @@ class CacheProcessorExtension extends ProcessorExtension implements PreProcessor
     /** @var \Illuminate\Contracts\Cache\Repository */
     protected $cache;
 
-    protected $depends = [ 'attributes' ];
+    protected $after = [ 'attributes' ];
 
     public function __construct(Repository $cache)
     {

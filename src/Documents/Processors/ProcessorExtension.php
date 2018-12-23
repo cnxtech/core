@@ -7,13 +7,14 @@ use Codex\Attributes\AttributeDefinition;
 use Codex\Attributes\AttributeDefinitionRegistry;
 use Codex\Contracts\Documents\Document;
 use Illuminate\Contracts\Config\Repository;
-use Laradic\DependencySorter\Dependable;
 
-abstract class ProcessorExtension extends Extension implements Dependable
+abstract class ProcessorExtension extends Extension
 {
     protected $defaultConfig = null;
 
-    protected $depends = [];
+    protected $after = [];
+
+    protected $before = [];
 
     /** @var Document */
     protected $document = null;
@@ -59,15 +60,17 @@ abstract class ProcessorExtension extends Extension implements Dependable
         return 'codex/core::processor.' . $this->getName();
     }
 
-    public function getDependencies()
+    public function getAfter()
     {
-        return $this->depends;
+        return $this->after;
     }
 
-    public function getHandle()
+    public function getBefore()
     {
-        return $this->getName();
+        return $this->before;
     }
+
+
 
     /**
      * @return null
@@ -91,19 +94,6 @@ abstract class ProcessorExtension extends Extension implements Dependable
     }
 
     /**
-     * Set the depends value
-     *
-     * @param array $depends
-     *
-     * @return ProcessorExtension
-     */
-    public function setDepends($depends)
-    {
-        $this->depends = $depends;
-        return $this;
-    }
-
-    /**
      * @return \Codex\Contracts\Documents\Document
      */
     public function getDocument()
@@ -123,7 +113,6 @@ abstract class ProcessorExtension extends Extension implements Dependable
         $this->document = $document;
         return $this;
     }
-
 
 
 }

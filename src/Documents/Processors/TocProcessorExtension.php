@@ -31,7 +31,7 @@ class TocProcessorExtension extends ProcessorExtension implements ProcessorInter
 
     protected $defaultConfig = 'codex.processors.toc';
 
-    protected $depends = ['parser'];
+    protected $after = ['parser'];
 
     /** @var \Illuminate\Contracts\View\Factory */
     protected $view;

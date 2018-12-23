@@ -9,8 +9,22 @@ namespace Codex\Support;
  * @author  Robin Radic
  * @mixin \Illuminate\Support\Arr
  */
-class Arr
+class ArrMixin
 {
+    public function pushToValues()
+    {
+        return function (array &$array, $value) {
+            foreach (array_keys($array) as $key) {
+                if (is_array($array[ $key ])) {
+                    $array[ $key ][] = $value;
+                } else {
+                    $array[ $key ] = [ $value ];
+                }
+            }
+            return $array;
+        };
+    }
+
     public function explodeToPaths()
     {
         return function ($paths) {

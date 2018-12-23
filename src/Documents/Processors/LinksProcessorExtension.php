@@ -15,7 +15,7 @@ class LinksProcessorExtension extends ProcessorExtension implements ProcessorInt
 
     protected $defaultConfig = 'codex.processor-defaults.links';
 
-    protected $depends = [ 'parser' ];
+    protected $before = [ 'macros'];
 
     public function getName()
     {

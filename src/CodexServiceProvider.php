@@ -10,6 +10,7 @@ use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Laradic\ServiceProvider\ServiceProvider;
 use League\Flysystem\Filesystem as Flysystem;
 
@@ -106,7 +107,8 @@ class CodexServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        Arr::mixin(new Support\Arr());
+        Arr::mixin(new Support\ArrMixin());
+        Collection::mixin(new Support\CollectionMixin());
         $app = parent::register();
         $this->registerDefaultFilesystem();
         return $app;

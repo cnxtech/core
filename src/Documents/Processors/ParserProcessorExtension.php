@@ -9,7 +9,9 @@ class ParserProcessorExtension extends ProcessorExtension implements ProcessorIn
 {
     protected $defaultConfig = 'codex.processor-defaults.parser';
 
-    protected $depends = ['attributes', 'cache' ,'toc'];
+    protected $after = ['attributes', 'cache'];
+
+    protected $before = ['*'];
 
     public function getName()
     {

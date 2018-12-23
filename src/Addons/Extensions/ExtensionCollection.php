@@ -15,7 +15,7 @@ class ExtensionCollection extends Collection
      * @param  mixed $pattern
      * @param  bool  $strict
      *
-     * @return ExtensionCollection|\Codex\Addons\Extensions\Extension[]
+     * @return static
      */
     public function search($pattern, $strict = false)
     {

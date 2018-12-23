@@ -28,7 +28,7 @@ class MacrosProcessorExtension extends ProcessorExtension implements ProcessorIn
 {
     protected $defaultConfig = 'codex.processor-defaults.macros';
 
-    protected $depends = ['parser'];
+    protected $after = [];
 
     /** @var \Codex\Codex */
     public $codex;
