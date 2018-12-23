@@ -6,7 +6,9 @@ use ArrayAccess;
 use Codex\Attributes\AttributeDefinitionGroup;
 use Codex\Concerns\HasCallbacks;
 use Codex\Concerns\HasContainer;
+use Codex\Contracts\Mergable\ChildInterface;
 use Codex\Contracts\Mergable\Mergable;
+use Codex\Contracts\Mergable\ParentInterface;
 use Codex\Mergable\Concerns\HasMergableAttributes;
 use Codex\Mergable\Concerns\HasRelations;
 use Illuminate\Contracts\Support\Arrayable;
@@ -601,6 +603,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
     public function newCollection(array $models = [])
     {
+        if ($this instanceof ChildInterface) {
+            $parent = $this->getParent();
+            if ($parent instanceof ParentInterface) {
+                $class = get_class($parent->getChildren());
+                return new $class($models, $parent);
+            }
+        }
         return new Collection($models);
     }
 

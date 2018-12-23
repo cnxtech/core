@@ -79,17 +79,10 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
         return $this;
     }
 
-    /**
-     * newCollection method
-     *
-     * @param array $models
-     *
-     * @return \Codex\Projects\ProjectCollection|\Illuminate\Database\Eloquent\Collection
-     */
-    public function newCollection(array $models = [])
-    {
-        return new ProjectCollection($this->getParent() || codex(), $models);
-    }
+//    public function newCollection(array $models = [])
+//    {
+//        return new ProjectCollection($models, $this->getCodex());
+//    }
 
     /**
      * getRevisions method

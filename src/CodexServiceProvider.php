@@ -68,6 +68,7 @@ class CodexServiceProvider extends ServiceProvider
         Documents\Processors\ParserProcessorExtension::class,
         Documents\Processors\CacheProcessorExtension::class,
         Documents\Processors\LinksProcessorExtension::class,
+        Documents\Processors\MacrosProcessorExtension::class,
         Attributes\AttributeSchemaExtension::class,
     ];
 

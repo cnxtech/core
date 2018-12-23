@@ -71,17 +71,10 @@ class Revision extends Model implements RevisionContract, ChildInterface, Parent
         return $this->getParent();
     }
 
-    /**
-     * newCollection method
-     *
-     * @param array $models
-     *
-     * @return \Codex\Revisions\RevisionCollection|\Illuminate\Database\Eloquent\Collection
-     */
-    public function newCollection(array $models = [])
-    {
-        return new RevisionCollection($this->getProject(), $models);
-    }
+//    public function newCollection(array $models = [])
+//    {
+//        return new RevisionCollection($models,$this->getProject());
+//    }
 
     /**
      * @return \Codex\Documents\DocumentCollection

@@ -101,17 +101,10 @@ class Document extends Model implements DocumentContract, ChildInterface
         return $this->getRevision()->getProject();
     }
 
-    /**
-     * newCollection method
-     *
-     * @param array $models
-     *
-     * @return \Codex\Documents\DocumentCollection|\Illuminate\Database\Eloquent\Collection
-     */
-    public function newCollection(array $models = [])
-    {
-        return new DocumentCollection($models, $this->getParent());
-    }
+//    public function newCollection(array $models = [])
+//    {
+//        return new DocumentCollection($models, $this->getParent());
+//    }
 
     /**
      * getKeyFromPath method

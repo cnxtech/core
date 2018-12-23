@@ -114,7 +114,7 @@ abstract class ProcessorExtension extends Extension implements Dependable
     /**
      * Set the document value
      *
-     * @param \Codex\Contracts\Documents\Document $document
+     * @param \Codex\Contracts\Documents\Document|null $document
      *
      * @return ProcessorExtension
      */

@@ -25,19 +25,17 @@ return [
             'document' => \Codex\Documents\Processors\Links\CodexLinks::class . '@document',
         ],
     ],
-    'macro'      => [
-        'macros' => [
-            'table:responsive'        => 'Codex\Processors\Macros\Table@responsive',
-            'layout:row'              => 'Codex\Processors\Macros\Layout@row',
-            'layout:column'           => 'Codex\Processors\Macros\Layout@column',
-            'general:hide'            => 'Codex\Processors\Macros\General@hide',
-            'attribute:print'         => 'Codex\Processors\Macros\Attribute@printValue',
-            'phpdoc:method:signature' => 'Codex\Addon\Phpdoc\PhpdocMacros@methodSignature',
-            'phpdoc:method'           => 'Codex\Addon\Phpdoc\PhpdocMacros@method',
-            'phpdoc:entity'           => 'Codex\Addon\Phpdoc\PhpdocMacros@entity',
-            'phpdoc:list:method'      => 'Codex\Addon\Phpdoc\PhpdocMacros@listMethod',
-            'phpdoc:list:property'    => 'Codex\Addon\Phpdoc\PhpdocMacros@listProperty',
-        ],
+    'macros'     => [
+        'table:responsive' => 'Codex\Documents\Processors\Macros\Table@responsive',
+        'layout:row'       => 'Codex\Documents\Processors\Macros\Layout@row',
+        'layout:column'    => 'Codex\Documents\Processors\Macros\Layout@column',
+        'general:hide'     => 'Codex\Documents\Processors\Macros\General@hide',
+        'attribute:print'  => 'Codex\Documents\Processors\Macros\Attribute@printValue',
+//        'phpdoc:method:signature' => 'Codex\Addon\Phpdoc\PhpdocMacros@methodSignature',
+//        'phpdoc:method'           => 'Codex\Addon\Phpdoc\PhpdocMacros@method',
+//        'phpdoc:entity'           => 'Codex\Addon\Phpdoc\PhpdocMacros@entity',
+//        'phpdoc:list:method'      => 'Codex\Addon\Phpdoc\PhpdocMacros@listMethod',
+//        'phpdoc:list:property'    => 'Codex\Addon\Phpdoc\PhpdocMacros@listProperty',
     ],
     'parser'     => [
 //        'parser'   => 'Codex\Processors\Parser\MarkdownParser', // the parser with name 'markdown'
