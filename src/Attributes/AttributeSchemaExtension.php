@@ -21,6 +21,5 @@ class AttributeSchemaExtension extends SchemaExtension
         $generated = $this->generator->generate();
 
         return $generated;
-        // TODO: Implement getSchemaExtension() method.
     }
 }

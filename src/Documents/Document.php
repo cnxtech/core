@@ -63,15 +63,12 @@ class Document extends Model implements DocumentContract, ChildInterface
             return $document->getFiles()->get($document->getPath());
         };
         $registry              = $this->getCodex()->getRegistry()->resolveGroup('documents');
-        $registry->add($this->primaryKey, $this->keyType)->setApiType('ID!');
         $attributes[ 'extension' ] = path_get_extension($attributes[ 'path' ]);
         $this->init($attributes, $registry);
         $this->addGetMutator('content', 'getContent', true, true);
         $this->addGetMutator('last_modified', 'getLastModified', true, true);
         $this->addGetMutator('attributes', 'getAttributes', true, true);
-        $registry->add('extension', 'string');
-        $registry->add('content', 'string');
-        $registry->add('last_modified', 'integer');
+        $this->addGetMutator('changed', 'getChanged', true, true);
     }
 
     public function url()

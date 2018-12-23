@@ -56,8 +56,6 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
         $this->setParent($this->getCodex());
         $this->setChildren($revisions->setParent($this));
         $registry = $this->getCodex()->getRegistry()->resolveGroup('projects');
-        $registry->add($this->primaryKey, $this->keyType)->setApiType('ID!');
-        $registry->add('default_revision', 'string');
         $this->init($attributes, $registry);
         $this->addGetMutator('default_revision', 'getDefaultRevisionKey', true, true);
     }

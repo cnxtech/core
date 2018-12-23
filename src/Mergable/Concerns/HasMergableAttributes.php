@@ -51,6 +51,10 @@ trait HasMergableAttributes
         $this->changed = $keys;
         return $this;
     }
+    public function getChanged()
+    {
+        return $this->changed;
+    }
 
     public function getParentAttributes()
     {

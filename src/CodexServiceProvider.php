@@ -208,7 +208,7 @@ class CodexServiceProvider extends ServiceProvider
 
         $projects = $registry->projects;
         $projects->addInheritKeys([ 'processors', 'layout' ]);
-        $projects->add('key', 'string');
+        $projects->add('key', 'string', 'ID!');
         $projects->add('path', 'string');
         $projects->add('display_name', 'string')->setDefault(null);
         $projects->add('description', 'string')->setDefault('');
@@ -242,14 +242,19 @@ class CodexServiceProvider extends ServiceProvider
         $revisions = $registry->revisions;
         $revisions->addMergeKeys([]);
         $revisions->addInheritKeys([ 'processors', 'meta', 'layout', 'view', 'cache', 'document' ]);
-        $revisions->add('key', 'string');
+        $revisions->add('key', 'string', 'ID!');
         $revisions->add('default_document', 'string');
+        $revisions->add('changed', 'array.scalarPrototype', '[String]');
 
         $documents = $registry->documents;
         $documents->addMergeKeys([]);
         $documents->addInheritKeys([ 'processors', 'meta', 'layout', 'view', 'cache' ]);
-        $documents->add('key', 'string');
+        $documents->add('key', 'string', 'ID!');
         $documents->add('path', 'string');
+        $documents->add('extension', 'string');
+        $documents->add('content', 'string');
+        $documents->add('last_modified', 'integer');
+        $documents->add('changed', 'array.scalarPrototype', '[String]');
         $documents->add('title', 'string')->setDefault('');
         $documents->add('subtitle', 'string')->setDefault('');
         $documents->add('description', 'string')->setDefault('');
