@@ -16,6 +16,51 @@ return [
             [ 'open' => '---', 'close' => '---' ], // markdown (frontmatter)
         ],
     ],
+    'links'      => [
+        'prefix'      => 'codex',// the prefix for actions, ex:  [Click me](#codex:project[my-awesome-project])
+        'replace_tag' => false,  // a string like 'div' will replace <a> to <div>. set to false to not replace
+        'actions'     => [
+            'project'  => \Codex\Documents\Processors\Links\CodexLinks::class . '@project',
+            'revision' => \Codex\Documents\Processors\Links\CodexLinks::class . '@revision',
+            'document' => \Codex\Documents\Processors\Links\CodexLinks::class . '@document',
+        ],
+    ],
+    'macro'      => [
+        'macros' => [
+            'table:responsive'        => 'Codex\Processors\Macros\Table@responsive',
+            'layout:row'              => 'Codex\Processors\Macros\Layout@row',
+            'layout:column'           => 'Codex\Processors\Macros\Layout@column',
+            'general:hide'            => 'Codex\Processors\Macros\General@hide',
+            'attribute:print'         => 'Codex\Processors\Macros\Attribute@printValue',
+            'phpdoc:method:signature' => 'Codex\Addon\Phpdoc\PhpdocMacros@methodSignature',
+            'phpdoc:method'           => 'Codex\Addon\Phpdoc\PhpdocMacros@method',
+            'phpdoc:entity'           => 'Codex\Addon\Phpdoc\PhpdocMacros@entity',
+            'phpdoc:list:method'      => 'Codex\Addon\Phpdoc\PhpdocMacros@listMethod',
+            'phpdoc:list:property'    => 'Codex\Addon\Phpdoc\PhpdocMacros@listProperty',
+        ],
+    ],
+    'parser'     => [
+//        'parser'   => 'Codex\Processors\Parser\MarkdownParser', // the parser with name 'markdown'
+        'markdown' => [ // refers to parser name
+            'parser'     => 'Codex\Documents\Processors\Parser\MarkdownParser',
+            'file_types' => [ 'md', 'markdown' ],
+            'options'    => [
+                'html5' => true,
+//                'table' => [
+//                    'class' => 'table stack',
+//                ],
+//                'code'  => [
+//                    'line_numbers' => true,
+//                    'command_line' => true,
+//                    'loader'       => false,
+//                ],
+            ],
+        ],
+        'rst'      => [ // refers to parser name
+//            'renderer' => 'Codex\Processors\Parser\Rst\RstRenderer',
+        ],
+
+    ],
     'buttons'    => [
         'buttons'                   => [
 //            'button-id' => [
@@ -38,51 +83,6 @@ return [
         'view'                 => 'codex::processors.header',
         'remove_from_document' => true,
         'remove_regex'         => '/<h1>(.*?)<\/h1>/',
-    ],
-    'links'      => [
-        'prefix'  => 'codex',
-        'actions' => [
-            'project'  => \Codex\Documents\Processors\Links\CodexLinks::class . '@project',
-            'revision' => \Codex\Documents\Processors\Links\CodexLinks::class . '@revision',
-            'document' => \Codex\Documents\Processors\Links\CodexLinks::class . '@document',
-        ],
-    ],
-    'macro'      => [
-        'macros' => [
-            'table:responsive'        => 'Codex\Processors\Macros\Table@responsive',
-            'layout:row'              => 'Codex\Processors\Macros\Layout@row',
-            'layout:column'           => 'Codex\Processors\Macros\Layout@column',
-            'general:hide'            => 'Codex\Processors\Macros\General@hide',
-            'attribute:print'         => 'Codex\Processors\Macros\Attribute@printValue',
-            'phpdoc:method:signature' => 'Codex\Addon\Phpdoc\PhpdocMacros@methodSignature',
-            'phpdoc:method'           => 'Codex\Addon\Phpdoc\PhpdocMacros@method',
-            'phpdoc:entity'           => 'Codex\Addon\Phpdoc\PhpdocMacros@entity',
-            'phpdoc:list:method'      => 'Codex\Addon\Phpdoc\PhpdocMacros@listMethod',
-            'phpdoc:list:property'    => 'Codex\Addon\Phpdoc\PhpdocMacros@listProperty',
-        ],
-    ],
-    'parser'     => [
-
-//        'parser'   => 'Codex\Processors\Parser\MarkdownParser', // the parser with name 'markdown'
-        'markdown' => [ // refers to parser name
-            'parser'     => 'Codex\Documents\Processors\Parser\MarkdownParser',
-            'file_types' => [ 'md', 'markdown' ],
-            'options'    => [
-                'html5' => true,
-//                'table' => [
-//                    'class' => 'table stack',
-//                ],
-//                'code'  => [
-//                    'line_numbers' => true,
-//                    'command_line' => true,
-//                    'loader'       => false,
-//                ],
-            ],
-        ],
-        'rst'      => [ // refers to parser name
-//            'renderer' => 'Codex\Processors\Parser\Rst\RstRenderer',
-        ],
-
     ],
     'toc'        => [
         'disable'           => [ 1 ],

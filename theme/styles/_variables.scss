@@ -19,13 +19,13 @@ $code-border-radius : 5px;
 
 $code-border : 1px solid #c5d0dc;
 //$code-border: 			                                                1px solid #e1e1e8 	;
-$code-background : #fdf7f5;
+$code-background : #7f8892;
 $code-color-fade : #bebec5;
 $code-text-shadow : none;
 $code-box-shadow : 1px 1px .3em -.1em #000000 inset;
 
 // prism tokens
-$code-color : black;
+$code-color : #0a3b52;
 $code-color-comment : #77b767;
 $code-color-delimiter : $code-color;
 $code-color-class-name : $code-color;
@@ -56,4 +56,3 @@ $code-color-variable : #78909c;
 $code-color-line-numbers : $code-color;
 
 
-$font-size-base:              0.9rem;

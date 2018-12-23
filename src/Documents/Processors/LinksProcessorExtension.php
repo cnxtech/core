@@ -24,6 +24,7 @@ class LinksProcessorExtension extends ProcessorExtension implements ProcessorInt
 
     public function defineConfigAttributes(AttributeDefinition $definition)
     {
+        $definition->add('replace_tag', 'mixed')->setDefault(false);
         $definition->add('prefix', 'string')->setDefault(null);
         $definition->add('actions', 'array.scalarPrototype');
     }
