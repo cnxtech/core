@@ -85,12 +85,13 @@ return [
     'toc'        => [
         'disable'           => [ 1 ],
         'regex'             => '/<h(\d)>([\w\W]*?)<\/h\d>/',
-        'list_class'        => 'c-toc-list',
-        'header_link_class' => 'c-toc-header-link',
+//        'list_class'        => 'c-toc-list',
+//        'header_link_class' => 'c-toc-header-link',
         'header_link_show'  => false,
         'header_link_text'  => '#',
         'minimum_nodes'     => 2,
         'view'              => 'codex::processors.toc',
+        'header_view'       => 'codex::processors.toc-header',
     ],
 ];
 

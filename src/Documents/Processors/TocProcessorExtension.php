@@ -5,8 +5,8 @@
  * The license can be found in the package and online at https://codex-project.mit-license.org.
  *
  * @copyright 2018 Codex Project
- * @author Robin Radic
- * @license https://codex-project.mit-license.org MIT License
+ * @author    Robin Radic
+ * @license   https://codex-project.mit-license.org MIT License
  */
 
 namespace Codex\Documents\Processors;
@@ -15,6 +15,7 @@ use Codex\Attributes\AttributeDefinition;
 use Codex\Contracts\Documents\Document;
 use Codex\Processors\Toc\Header;
 use Illuminate\Contracts\View\Factory;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 /**
  * This is the class TocFilter.
@@ -29,9 +30,9 @@ class TocProcessorExtension extends ProcessorExtension implements ProcessorInter
     /** @var \Codex\Codex */
     public $codex;
 
-    protected $defaultConfig = 'codex.processors.toc';
+    protected $defaultConfig = 'codex.processor-defaults.toc';
 
-    protected $after = ['parser'];
+    protected $after = [];
 
     /** @var \Illuminate\Contracts\View\Factory */
     protected $view;
@@ -50,25 +51,34 @@ class TocProcessorExtension extends ProcessorExtension implements ProcessorInter
         $this->view = $view;
     }
 
-    public function handle(Document $document)
+    public function getName()
+    {
+        return 'toc';
+    }
+
+    public function defineConfigAttributes(AttributeDefinition $definition)
+    {
+        $definition->add('disable', 'array.scalarPrototype', '[Int]!');           //=> [ 1 ],
+        $definition->add('regex', 'string')->setDefault('/<h(\d)>([\w\W]*?)<\/h\d>/');
+        $definition->add('header_link_show', 'boolean')->setDefault(false);
+        $definition->add('header_link_text', 'string')->setDefault('#');
+        $definition->add('minimum_nodes', 'integer')->setDefault(2);
+        $definition->add('header_view', 'string')->setDefault('codex::processors.toc-header');
+        $definition->add('view', 'string')->setDefault('codex::processors.toc');
+    }
+
+    public function proces3s(Document $document)
     {
         $content = $document->getContent();
-        $total = preg_match_all($this->config['regex'], $content, $matches);
-//         create root
-//         for each header
-//         create node
-//         if header nr is same as previous, assign to same parent as previous
-//         if header nr is lower then previous, check parent header nr, if header nr lower then parent nr, check parent, etc
-//         if header nr is higher then previous, assign as previous child
-
-        // Generate TOC Tree from HTML
+        $dom      = $document->getDOM();
         $prevSize = 0;
         $prevNode = $rootNode = $this->createHeaderNode(0, 'root');
-        for ($h = 0; $h < $total; ++$h) {
-            $original = $matches[0][$h];
-            $size = (int) $matches[1][$h];
-            $text = $matches[2][$h];
-            if (\in_array($size, $this->config['disable'], true)) {
+        $elements = $dom->query('h1, h2, h3, h4, h5, h6');
+        foreach ($elements as $h => $element) {
+            $original = $element->saveHtml();
+            $size     = (int)preg_replace('/^.*(\d).*$/m', '$1', $element->tagName);
+            $text     = $element->nodeValue;
+            if (\in_array($size, $this->config('disable'), true)) {
                 continue;
             }
             $node = $this->createHeaderNode($size, $text);
@@ -93,29 +103,95 @@ class TocProcessorExtension extends ProcessorExtension implements ProcessorInter
                 $node->setParent($prevNode);
             }
 
+            $node->getValue()->setSlug($slug = $this->makeSlug($text));
+            $replacement = $this->view
+                ->make($this->config('header_view'), $this->config())
+                ->with(compact('text', 'size', 'slug'))
+                ->render();
+            $content     = str_replace($original, $replacement, $content);
+
+            $prevSize = $size;
+            $prevNode = $node;
+        }
+        if (\count($this->nodes) >= (int)$this->config('minimum_nodes')) {
+            $toc = $this->view
+                ->make($this->config('view'), $this->config())
+                ->with('items', $rootNode->getChildren())
+                ->render();
+            $document->setContent($toc . $content);
+        }
+
+//        $dom->saveToDocument();
+    }
+
+    public function process(Document $document)
+    {
+        $content = $document->getContent();
+        $total   = preg_match_all($this->config('regex'), $content, $matches);
+//         create root
+//         for each header
+//         create node
+//         if header nr is same as previous, assign to same parent as previous
+//         if header nr is lower then previous, check parent header nr, if header nr lower then parent nr, check parent, etc
+//         if header nr is higher then previous, assign as previous child
+
+        // Generate TOC Tree from HTML
+        $prevSize = 0;
+        $prevNode = $rootNode = $this->createHeaderNode(0, 'root');
+        for ($h = 0; $h < $total; ++$h) {
+            $original = $matches[ 0 ][ $h ];
+            $size     = (int)$matches[ 1 ][ $h ];
+            $text     = $matches[ 2 ][ $h ];
+            if (\in_array($size, $this->config('disable'), true)) {
+                continue;
+            }
+            $node = $this->createHeaderNode($size, $text);
+            if ($size === $prevSize) {
+                try {
+                    $prevNode->getParent()->addChild($node);
+                } catch (\Throwable $e){
+                    //@todo fix this
+                    return;
+                }
+                $node->setParent($prevNode->getParent());
+            } elseif ($size < $prevSize) {
+                $parentNode = $prevNode->getParent();
+                while (true) {
+                    if ($size === $parentNode->getValue()->getSize()) {
+                        $parentNode->getParent()->addChild($node);
+                        $node->setParent($parentNode->getParent());
+                        break;
+                    }
+                    if ($parentNode === $rootNode) {
+                        break;
+                    }
+                    $parentNode = $parentNode->getParent();
+                }
+            } elseif ($size > $prevSize) {
+                $prevNode->addChild($node);
+                $node->setParent($prevNode);
+            }
+
             $node->getValue()->setSlug(
                 $slug = $this->makeSlug($text)
             );
 
-//            $link = '';
-//            if (true === $this->config['header_link_show']) {
-//                $link = "<a href='#{$slug}' class='{$this->config['header_link_class']}'>#</a>";
-//            }
-//            $replacement = "<h{$size} id='{$slug}'><span>{$text}</span>{$link}</h{$size}>";
-            $replacement = "<toc-header title='{$text}' size='{$size}' slug='{$slug}' link-class='{$this->config['header_link_class']}'></toc-header>";
-            $content = str_replace($original, $replacement, $content);
+            $replacement = $this->view
+                ->make($this->config('header_view'), $this->config())
+                ->with(compact('text', 'size', 'slug'))
+                ->render();
+            $content     = str_replace($original, $replacement, $content);
 
             $prevSize = $size;
             $prevNode = $node;
         }
 
-        $toc = $this->view
-            ->make($this->config['view'], $this->config)
-            ->with('items', $rootNode->getChildren())
-            ->render();
-
-        if (\count($this->nodes) >= (int) $this->config['minimum_nodes']) {
-            $document->setContent("<toc-list class=\"{$this->config['list_class']}\">{$toc}</toc-list>".$content);
+        if (\count($this->nodes) >= (int)$this->config('minimum_nodes')) {
+            $toc = $this->view
+                ->make($this->config('view'), $this->config())
+                ->with('items', $rootNode->getChildren())
+                ->render();
+            $document->setContent($toc . $content);
         }
     }
 
@@ -126,31 +202,17 @@ class TocProcessorExtension extends ProcessorExtension implements ProcessorInter
 
     protected function isAllowedHeader($header)
     {
-        return isset($this->config['headers'][(int) $header]) && true === $this->config['headers'][(int) $header];
+        return isset($this->config('headers')[ (int)$header ]) && true === $this->config('headers.' . (int)$header);
     }
 
     protected function makeSlug($text)
     {
         $slug = str_slug($text);
         if (\in_array($slug, $this->slugs, true)) {
-            return $this->makeSlug($text.'_'.str_random(1));
+            return $this->makeSlug($text . '_' . str_random(1));
         }
 
         return $this->slugs[] = $slug;
     }
 
-    public function getName()
-    {
-        // TODO: Implement getName() method.
-    }
-
-    public function defineConfigAttributes(AttributeDefinition $definition)
-    {
-        // TODO: Implement defineConfigAttributes() method.
-    }
-
-    public function process(Document $document)
-    {
-        // TODO: Implement process() method.
-    }
 }

@@ -13,6 +13,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Laradic\ServiceProvider\ServiceProvider;
 use League\Flysystem\Filesystem as Flysystem;
+use Radic\BladeExtensions\BladeExtensionsServiceProvider;
 
 class CodexServiceProvider extends ServiceProvider
 {
@@ -45,6 +46,7 @@ class CodexServiceProvider extends ServiceProvider
     public $providers = [
         Api\ApiServiceProvider::class,
         Http\HttpServiceProvider::class,
+        BladeExtensionsServiceProvider::class
     ];
 
     public $bindings = [
@@ -70,6 +72,7 @@ class CodexServiceProvider extends ServiceProvider
         Documents\Processors\CacheProcessorExtension::class,
         Documents\Processors\LinksProcessorExtension::class,
         Documents\Processors\MacrosProcessorExtension::class,
+        Documents\Processors\TocProcessorExtension::class,
         Attributes\AttributeSchemaExtension::class,
     ];
 
@@ -237,7 +240,7 @@ class CodexServiceProvider extends ServiceProvider
 
 
         $revisions = $registry->revisions;
-        $revisions->addMergeKeys([  ]);
+        $revisions->addMergeKeys([]);
         $revisions->addInheritKeys([ 'processors', 'meta', 'layout', 'view', 'cache', 'document' ]);
         $revisions->add('key', 'string');
         $revisions->add('default_document', 'string');

@@ -8,8 +8,6 @@ use Codex\Contracts\Mergable\ChildInterface;
 use Codex\Contracts\Revisions\Revision;
 use Codex\Mergable\Concerns\HasParent;
 use Codex\Mergable\Model;
-use FluentDOM;
-use Illuminate\Contracts\Cache\Repository;
 
 /**
  * This is the class Document.
@@ -51,18 +49,14 @@ class Document extends Model implements DocumentContract, ChildInterface
     /** @var bool */
     protected $postProcessed = false;
 
-    /** @var \Illuminate\Contracts\Cache\Repository */
-    protected $cache;
-
     /**
      * Document constructor.
      *
      * @param array    $attributes
      * @param Revision $revision
      */
-    public function __construct(array $attributes, Revision $revision, Repository $cache)
+    public function __construct(array $attributes, Revision $revision)
     {
-        $this->cache = $cache;
         $this->setParent($revision);
         $this->setFiles($revision->getFiles());
         $this->contentResolver = function (Document $document) {
@@ -101,27 +95,12 @@ class Document extends Model implements DocumentContract, ChildInterface
         return $this->getRevision()->getProject();
     }
 
-//    public function newCollection(array $models = [])
-//    {
-//        return new DocumentCollection($models, $this->getParent());
-//    }
-
-    /**
-     * getKeyFromPath method
-     *
-     * @param $path
-     *
-     * @return string
-     */
-    public static function getKeyFromPath($path)
-    {
-        return implode('/', \array_slice(explode('/', path_without_extension($path)), 1));
-    }
-
     public function getLastModified()
     {
         return $this->getFiles()->lastModified($this->getPath());
     }
+
+    //region: Content methods and processing
 
     public function getContent($triggerProcessing = true)
     {
@@ -158,16 +137,27 @@ class Document extends Model implements DocumentContract, ChildInterface
         return $this;
     }
 
-    public function getDom(): \FluentDOM\Query
+    /** @return DOMQueryDecorator */
+    public function getDOM()
     {
+        // uses https://github.com/ThomasWeinert/PhpCss for css queries
+        $content                              = $this->getContent();
+        $query                                = \FluentDOM::QueryCss($content, 'html', [
+            \FluentDOM\Loader\Options::ENCODING       => 'UTF-8',
+            \FluentDOM\Loader\Options::FORCE_ENCODING => false,
+//            \FluentDOM\Loader\Xml::LIBXML_OPTIONS => LIBXML_ERR_NONE | LIBXML_NOERROR | LIBXML_HTML_NODEFDTD
+        ]);
+        $query->document->strictErrorChecking = false;
+        return new DOMQueryDecorator($query, $this);
         // https://stackoverflow.com/questions/23426745/case-sensitivity-with-getelementbytagname-and-getattribute-php
-        return FluentDOM::Query($this->getContent(), 'text/html'); //, [FluentDOM\Loader\Xml::LIBXML_OPTIONS => LIBXML_ERR_NONE | LIBXML_NOERROR]);
+//        return FluentDOM::Query(, 'text/html'); //, [FluentDOM\Loader\Xml::LIBXML_OPTIONS => LIBXML_ERR_NONE | LIBXML_NOERROR]);
     }
 
     /** @param \FluentDOM\Query $dom */
-    public function setDom($dom)
+    public function saveDOM($dom)
     {
-        $this->content = $dom->find('//body')->first()->html();
+        $this->content = urldecode($dom->find('body')->html());
+//        $this->content = $dom->find('//body')->first()->html();
     }
 
     public function setProcessed(bool $value, string $type = null)
@@ -211,7 +201,6 @@ class Document extends Model implements DocumentContract, ChildInterface
         return $this->triggerProcess('post');
     }
 
-
     /**
      * @return \Closure
      */
@@ -231,6 +220,21 @@ class Document extends Model implements DocumentContract, ChildInterface
     {
         $this->contentResolver = $contentResolver;
         return $this;
+    }
+
+    //endregion
+
+
+    /**
+     * getKeyFromPath method
+     *
+     * @param $path
+     *
+     * @return string
+     */
+    public static function getKeyFromPath($path)
+    {
+        return implode('/', \array_slice(explode('/', path_without_extension($path)), 1));
     }
 
 }

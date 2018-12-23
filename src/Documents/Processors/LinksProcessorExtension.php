@@ -35,8 +35,8 @@ class LinksProcessorExtension extends ProcessorExtension implements ProcessorInt
             return; // prevents ErrorException in Html.php line 42: DOMDocument::loadHTMLFile(): Empty string supplied as input
         }
 
-        $d = $document->getDom();
-        $d->find('//a')->each(function (Element $element) {
+        $d = $document->getDOM();
+        $d->find('a')->each(function (Element $element) {
             /** @var Element $parent */
             $link = new Links\Link($this, $element);
 
@@ -58,7 +58,7 @@ class LinksProcessorExtension extends ProcessorExtension implements ProcessorInt
                 $this->handleInternal($link);
             }
         });
-        $document->setDom($d);
+        $document->saveDOM($d);
     }
 
     protected function handleInternal(Link $link)
