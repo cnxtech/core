@@ -9,9 +9,9 @@ class ParserProcessorExtension extends ProcessorExtension implements ProcessorIn
 {
     protected $defaultConfig = 'codex.processor-defaults.parser';
 
-    protected $after = ['attributes', 'cache'];
+    protected $after = [ 'attributes', 'cache' ];
 
-    protected $before = ['*'];
+    protected $before = [ '*' ];
 
     public function getName()
     {
@@ -35,16 +35,21 @@ class ParserProcessorExtension extends ProcessorExtension implements ProcessorIn
         $document->setContent($content);
     }
 
-    protected function getDocumentParser(Document $document)
+    public function getDocumentParser(Document $document)
     {
         $ext    = $document->getExtension();
         $parser = collect($this->config())
             ->filter(function ($item) use ($ext) {
                 return \in_array($ext, data_get($item, 'file_types', []), false);
-            })->first();
+            })->keys()->first();
         if ($parser === null) {
             return null;
         }
+        return $this->makeParser($this->config($parser));
+    }
+
+    public function makeParser(array $parser)
+    {
         $class   = $parser[ 'parser' ];
         $options = data_get($parser, 'options', []);
         /** @var \Codex\Documents\Processors\Parser\ParserInterface $instance */
