@@ -48,17 +48,15 @@ trait HasCallbacks
      *
      * @return $this
      */
-    public function listen($trigger, $callback)
+    public static function listen($trigger, $callback)
     {
-        $trigger = get_class($this) . '::' . $trigger;
+        $trigger = static::class . '::' . $trigger;
 
         if ( ! isset(self::$listeners[ $trigger ])) {
             self::$listeners[ $trigger ] = [];
         }
 
         self::$listeners[ $trigger ][] = $callback;
-
-        return $this;
     }
 
     /**
@@ -74,9 +72,7 @@ trait HasCallbacks
 
         $container = Container::getInstance();
 
-        /*
-         * First, fire global listeners.
-         */
+        // First, fire global listeners.
         $classes = array_merge(class_parents($this), [ get_class($this) => get_class($this) ]);
         foreach (array_keys($classes) as $caller) {
 
@@ -92,20 +88,14 @@ trait HasCallbacks
             }
         }
 
-        /*
-         * Next, check if the method
-         * exists and run it if it does.
-         */
+        // Next, check if the method exists and run it if it does.
         $method = camel_case('on_' . $trigger);
 
         if (method_exists($this, $method)) {
             $container->call([ $this, $method ], $parameters);
         }
 
-        /*
-         * Finally, run through all of
-         * the registered callbacks.
-         */
+        // Finally, run through all of the registered callbacks.
         foreach (array_get($this->callbacks, $trigger, []) as $callback) {
 
             if (is_string($callback) || $callback instanceof \Closure) {

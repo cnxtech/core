@@ -45,4 +45,14 @@ trait WithAttributeDefinitionChildren
         return $this->children[ $name ];
     }
 
+    /**
+     * @return \Codex\Attributes\AttributeDefinition[]
+     */
+    public function getChildren()
+    {
+        return $this->children;
+    }
+
+
+
 }

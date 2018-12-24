@@ -1,4 +1,4 @@
-<?php
+<?php /** @noinspection PhpInconsistentReturnPointsInspection */
 
 namespace Codex\Mergable;
 
@@ -6,12 +6,12 @@ use ArrayAccess;
 use Codex\Attributes\AttributeDefinitionGroup;
 use Codex\Concerns\HasCallbacks;
 use Codex\Concerns\HasContainer;
+use Codex\Concerns\HasEvents;
 use Codex\Contracts\Mergable\ChildInterface;
 use Codex\Contracts\Mergable\Mergable;
 use Codex\Contracts\Mergable\ParentInterface;
 use Codex\Mergable\Concerns\HasMergableAttributes;
 use Codex\Mergable\Concerns\HasRelations;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\Eloquent\Collection;
@@ -26,7 +26,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     use HasContainer;
     use HasRelations;
     use HidesAttributes;
-//    use HasEvents;
+    use HasEvents;
     use HasCallbacks;
     use HasMergableAttributes;
     use Macroable {
@@ -70,7 +70,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         if ($recursive) {
             foreach ($this->getRelations() as $key => $relation) {
-                $relation->rehide($recursive);
+                if (method_exists($relation, 'rehide')) {
+                    $relation->rehide($recursive);
+                }
                 $this->makeHidden($key);
             }
         }
@@ -85,44 +87,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         return $data;
     }
 
+    public function attr($key, $default = null)
+    {
+        $this->show($key);
+        $data = data_get($this, $key, $default);
+        $this->rehide(true);
+        return $data;
+    }
+
 
     //region: Init
 
     public static $snakeAttributes = true;
-
-    /** @var Dispatcher */
-    protected static $dispatcher;
-
-    public function setDispatcher(Dispatcher $dispatcher)
-    {
-        static::$dispatcher = $dispatcher;
-    }
-
-    public function getDispatcher()
-    {
-        if ( ! isset(static::$dispatcher)) {
-            static::$dispatcher = $this->getContainer()->make(Dispatcher::class);
-        }
-        return static::$dispatcher;
-    }
-
-    protected $eventNamespace;
-
-    protected function getEventNamespace()
-    {
-        if ( ! isset($this->eventNamespace)) {
-            $name                 = snake_case(last(explode('\\', get_called_class())));
-            $this->eventNamespace = "codex.{$name}";
-        }
-        return $this->eventNamespace;
-    }
-
-    protected function fireEvent($name, ...$params)
-    {
-        $namespace = $this->getEventNamespace();
-        $this->getDispatcher()->dispatch("{$namespace}.{$name}", $params);
-        return $this;
-    }
 
     protected static $booted = [];
 
@@ -159,10 +135,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if ( ! isset(static::$booted[ static::class ])) {
             static::$booted[ static::class ] = true;
 
-//            $this->fireEvent('booting', false);
+            $this->fireEvent('booting', $this);
 
             static::boot();
-//            $this->fireEvent('booted', false);
+
+            $this->fireEvent('booted', $this);
         }
     }
 
@@ -208,6 +185,31 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public static function clearBootedModels()
     {
         static::$booted = [];
+    }
+
+    //endregion
+
+
+    //region: Events
+
+    public static function initialized(callable $callback)
+    {
+        return static::onEvent('initialized', $callback);
+    }
+
+    public static function booting(callable $callback)
+    {
+        return static::onEvent('initialized', $callback);
+    }
+
+    public static function booted(callable $callback)
+    {
+        return static::onEvent('initialized', $callback);
+    }
+
+    public static function resolved(callable $callback)
+    {
+        return static::onEvent('resolved', $callback);
     }
 
     //endregion
@@ -343,6 +345,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     //endregion
+
 
     //region: Relations
 

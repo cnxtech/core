@@ -2,7 +2,7 @@
 
 namespace Codex\Attributes;
 
-class AttributeDefinition
+class AttributeDefinition implements AttributeDefinitionParent
 {
     use WithAttributeDefinitionChildren;
 

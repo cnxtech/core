@@ -56,8 +56,8 @@ class MakeRevision
         $revision->setParent($project);
         $revision->setFiles($project->getFiles());
         $this->dispatch(new MergeAttributes($revision));
+        $revision->fireEvent('resolved', $revision);
         ResolvedRevision::dispatch($revision);
-
         return $revision;
     }
 

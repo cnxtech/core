@@ -2,10 +2,13 @@
 
 namespace Codex\Addons;
 
+use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\ServiceProvider;
 
 class AddonServiceProvider extends ServiceProvider
 {
+    use DispatchesJobs;
+
     /**
      * The provider class names.
      *

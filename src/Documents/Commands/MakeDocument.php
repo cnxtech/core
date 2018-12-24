@@ -44,6 +44,7 @@ class MakeDocument
         $attributes = compact('key', 'path');
         $document   = app(DocumentContract::class, compact('attributes', 'revision'));
         $this->dispatch(new MergeAttributes($document));
+        $document->fireEvent('resolved');
         ResolvedDocument::dispatch($document);
         $document->preprocess();
         $document->fire('resolved', [ 'document' => $document ]);

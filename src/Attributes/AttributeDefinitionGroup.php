@@ -4,7 +4,7 @@ namespace Codex\Attributes;
 
 use Illuminate\Support\Arr;
 
-class AttributeDefinitionGroup
+class AttributeDefinitionGroup implements AttributeDefinitionParent
 {
     use WithAttributeDefinitionChildren;
 

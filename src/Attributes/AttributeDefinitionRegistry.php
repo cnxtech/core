@@ -22,7 +22,7 @@ class AttributeDefinitionRegistry
         $documents = $this->addGroup('documents')->setParentGroup($revisions);
     }
 
-    protected function addGroup(string $name)
+    public function addGroup(string $name)
     {
         return $this->groups[ $name ] = AttributeDefinitionFactory::group($name);
     }

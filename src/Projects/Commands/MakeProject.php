@@ -34,8 +34,8 @@ class MakeProject
         $attributes[ 'path' ] = dirname($path);
         $project              = app(Project::class, compact('attributes'));
         $this->dispatch(new MergeAttributes($project));
+        $project->fireEvent('resolved', $project);
         ResolvedProject::dispatch($project);
-
         return $project;
     }
 
