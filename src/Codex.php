@@ -150,7 +150,7 @@ class Codex extends Model implements ParentInterface
         return $this->api;
     }
 
-    /** @return \Psr\Log\LoggerInterface */
+    /** @return \Codex\Contracts\Log\Log */
     public function getLog()
     {
         return $this->getContainer()->make('codex.log');

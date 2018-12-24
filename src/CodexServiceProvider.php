@@ -6,6 +6,7 @@ use Codex\Addons\Extensions\RegisterExtension;
 use Codex\Attributes\AttributeDefinitionFactory;
 use Codex\Documents\Events\ResolvedDocument;
 use Codex\Documents\Listeners\ProcessDocument;
+use Codex\Log\Log;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -13,9 +14,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Laradic\ServiceProvider\ServiceProvider;
 use League\Flysystem\Filesystem as Flysystem;
-use Monolog\Formatter\LineFormatter;
-use Monolog\Handler\StreamHandler;
-use Monolog\Logger;
 use Radic\BladeExtensions\BladeExtensionsServiceProvider;
 
 class CodexServiceProvider extends ServiceProvider
@@ -124,19 +122,10 @@ class CodexServiceProvider extends ServiceProvider
     public function registerLogger()
     {
         $this->app->singleton('codex.log', function () {
-            $manager       = $this->app->make('log');
-            $formatter     = tap(new LineFormatter(null, null, true, true), function ($formatter) {
-                $formatter->includeStacktraces();
-            });
-            $streamHandler = new StreamHandler(
-                $this->app[ 'config' ][ 'codex.paths.log' ],
-                Logger::DEBUG
-            );
-//            $artisanHandler = new ArtisanHandler('debug')
-            $logger = new Logger('codex', [
-                $streamHandler,
-            ]);
-
+            $logger = new Log();
+            $logger->useFiles($this->app['config']['codex.paths.log']);
+            $logger->useFirePHP();
+            $logger->useChromePHP();
             return $logger;
         });
     }

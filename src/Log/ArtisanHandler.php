@@ -20,10 +20,16 @@ class ArtisanHandler extends AbstractHandler
     /** @var \Illuminate\Console\Command */
     protected $command;
 
-    public function __construct($level = Logger::DEBUG, Command $command, $bubble = true)
+    public function __construct(Command $command, $level = Logger::DEBUG, $bubble = true)
     {
         parent::__construct($level, $bubble);
         $this->command = $command;
+    }
+
+    public function setCommand(Command $command)
+    {
+        $this->command = $command;
+        return $this;
     }
 
     /**
@@ -43,7 +49,7 @@ class ArtisanHandler extends AbstractHandler
      */
     public function handle(array $record)
     {
-        $channel = $record['channel'];
+        $channel = $record[ 'channel' ];
         $message = "{$record['level_name']} :: {$record['message']}";
         if ('error' === $channel) {
             $this->command->error($message);
