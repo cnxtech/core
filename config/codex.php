@@ -1,9 +1,5 @@
 <?php
 
-use Codex\Documents\Processors\PostProcessorInterface;
-use Codex\Documents\Processors\PreProcessorInterface;
-use Codex\Documents\Processors\ProcessorInterface;
-
 return [
     /*
     |--------------------------------------------------------------------------
@@ -37,6 +33,7 @@ return [
 
     'paths' => [
         'docs' => resource_path('docs'),
+        'log'  => storage_path('logs/codex.log'),
     ],
 
     'http' => [
@@ -50,7 +47,7 @@ return [
         'documentation_view'   => 'codex::index',
     ],
 
-    'processors'      => [
+    'processors' => [
         'enabled'  => [],
         'disabled' => [],
     ],

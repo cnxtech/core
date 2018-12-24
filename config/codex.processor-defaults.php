@@ -38,26 +38,24 @@ return [
 //        'phpdoc:list:property'    => 'Codex\Addon\Phpdoc\PhpdocMacros@listProperty',
     ],
     'parser'     => [
-//        'parser'   => 'Codex\Processors\Parser\MarkdownParser', // the parser with name 'markdown'
         'markdown' => [ // refers to parser name
             'parser'     => 'Codex\Documents\Processors\Parser\MarkdownParser',
             'file_types' => [ 'md', 'markdown' ],
             'options'    => [
                 'html5' => true,
-//                'table' => [
-//                    'class' => 'table stack',
-//                ],
-//                'code'  => [
-//                    'line_numbers' => true,
-//                    'command_line' => true,
-//                    'loader'       => false,
-//                ],
             ],
         ],
-        'rst'      => [ // refers to parser name
-//            'renderer' => 'Codex\Processors\Parser\Rst\RstRenderer',
-        ],
+        'rst'      => [], // refers to parser name
 
+    ],
+    'toc'        => [
+        'disable'          => [ 1 ],
+        'regex'            => '/<h(\d)>([\w\W]*?)<\/h\d>/',
+        'header_link_show' => false,
+        'header_link_text' => '#',
+        'minimum_nodes'    => 2,
+        'view'             => 'codex::processors.toc',
+        'header_view'      => 'codex::processors.toc-header',
     ],
     'buttons'    => [
         'buttons'                   => [
@@ -81,17 +79,6 @@ return [
         'view'                 => 'codex::processors.header',
         'remove_from_document' => true,
         'remove_regex'         => '/<h1>(.*?)<\/h1>/',
-    ],
-    'toc'        => [
-        'disable'           => [ 1 ],
-        'regex'             => '/<h(\d)>([\w\W]*?)<\/h\d>/',
-//        'list_class'        => 'c-toc-list',
-//        'header_link_class' => 'c-toc-header-link',
-        'header_link_show'  => false,
-        'header_link_text'  => '#',
-        'minimum_nodes'     => 2,
-        'view'              => 'codex::processors.toc',
-        'header_view'       => 'codex::processors.toc-header',
     ],
 ];
 

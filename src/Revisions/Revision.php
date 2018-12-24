@@ -47,7 +47,7 @@ class Revision extends Model implements RevisionContract, ChildInterface, Parent
         $this->setChildren($documents->setParent($this));
         $registry = $this->getCodex()->getRegistry()->resolveGroup('revisions');
         $this->init($attributes, $registry);
-        $this->addGetMutator('default_document', 'getDefaultDocumentKey', true, true);
+//        $this->addGetMutator('default_document', 'getDefaultDocumentKey', true, true);
         $this->addGetMutator('changed', 'getChanged', true, true);
     }
 
@@ -70,11 +70,6 @@ class Revision extends Model implements RevisionContract, ChildInterface, Parent
     {
         return $this->getParent();
     }
-
-//    public function newCollection(array $models = [])
-//    {
-//        return new RevisionCollection($models,$this->getProject());
-//    }
 
     /**
      * @return \Codex\Documents\DocumentCollection

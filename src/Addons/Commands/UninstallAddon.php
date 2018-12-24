@@ -7,9 +7,12 @@ use Codex\Addons\AddonManager;
 use Codex\Addons\AddonRegistry;
 use Codex\Addons\Events\AddonWasUninstalled;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 
 class UninstallAddon
 {
+    use DispatchesJobs;
+
     /** @var \Codex\Addons\Addon */
     protected $addon;
 
@@ -29,9 +32,12 @@ class UninstallAddon
         Dispatcher $dispatcher
     )
     {
+        if ($this->addon->isEnabled()) {
+            $this->dispatch(new DisableAddon($this->addon));
+        }
         $this->addon->fire('uninstall');
 
-        $registry->setInstalled($this->addon->getName(), false);
+        $registry->setUninstalled($this->addon->getName());
 
         $this->addon->setInstalled(false);
 

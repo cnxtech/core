@@ -6,6 +6,7 @@ use Codex\Addons\Addon;
 use Codex\Addons\AddonManager;
 use Codex\Addons\AddonRegistry;
 use Codex\Addons\Events\AddonWasInstalled;
+use Codex\Exceptions\Exception;
 use Illuminate\Contracts\Events\Dispatcher;
 
 class InstallAddon
@@ -29,9 +30,12 @@ class InstallAddon
         Dispatcher $dispatcher
     )
     {
+        if ($this->addon->isInstalled()) {
+            throw Exception::make("Could not install addon [{$this->addon->getName()}] because its already installed");
+        }
         $this->addon->fire('install');
 
-        $registry->setInstalled($this->addon->getName(), true);
+        $registry->setInstalled($this->addon->getName());
 
         $this->addon->setInstalled(true);
 

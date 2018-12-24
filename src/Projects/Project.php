@@ -57,8 +57,13 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
         $this->setChildren($revisions->setParent($this));
         $registry = $this->getCodex()->getRegistry()->resolveGroup('projects');
         $this->init($attributes, $registry);
-        $this->addGetMutator('default_revision', 'getDefaultRevisionKey', true, true);
+//        $this->addGetMutator('revision.default', 'resolveBranchType', true, true);
     }
+
+//    public function resolveBranchType(...$params)
+//    {
+//        $a='a';
+//    }
 
     public function url($revisionKey = null, $documentKey = null)
     {
@@ -76,11 +81,6 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
         $this->updateDisk();
         return $this;
     }
-
-//    public function newCollection(array $models = [])
-//    {
-//        return new ProjectCollection($models, $this->getCodex());
-//    }
 
     /**
      * getRevisions method

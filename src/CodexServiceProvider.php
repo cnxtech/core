@@ -13,6 +13,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Laradic\ServiceProvider\ServiceProvider;
 use League\Flysystem\Filesystem as Flysystem;
+use Monolog\Formatter\LineFormatter;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use Radic\BladeExtensions\BladeExtensionsServiceProvider;
 
 class CodexServiceProvider extends ServiceProvider
@@ -46,7 +49,7 @@ class CodexServiceProvider extends ServiceProvider
     public $providers = [
         Api\ApiServiceProvider::class,
         Http\HttpServiceProvider::class,
-        BladeExtensionsServiceProvider::class
+        BladeExtensionsServiceProvider::class,
     ];
 
     public $bindings = [
@@ -113,10 +116,31 @@ class CodexServiceProvider extends ServiceProvider
         Arr::mixin(new Support\ArrMixin());
         Collection::mixin(new Support\CollectionMixin());
         $app = parent::register();
+        $this->registerLogger();
         $this->registerDefaultFilesystem();
         return $app;
     }
 
+    public function registerLogger()
+    {
+        $this->app->singleton('codex.log', function () {
+            $manager       = $this->app->make('log');
+            $formatter     = tap(new LineFormatter(null, null, true, true), function ($formatter) {
+                $formatter->includeStacktraces();
+            });
+            $streamHandler = new StreamHandler(
+                $this->app[ 'config' ][ 'codex.paths.log' ],
+                Logger::DEBUG
+            );
+//            $artisanHandler = new ArtisanHandler('debug')
+            $logger = new Logger('codex', [
+                $streamHandler,
+            ]);
+
+            return $logger;
+        });
+        $this->app->alias('codex.log', Contracts\Log\Log::class);
+    }
 
     protected function registerDefaultFilesystem()
     {
@@ -212,7 +236,7 @@ class CodexServiceProvider extends ServiceProvider
         $projects->add('path', 'string');
         $projects->add('display_name', 'string')->setDefault(null);
         $projects->add('description', 'string')->setDefault('');
-        $projects->add('default_revision', 'string');
+//        $projects->add('default_revision', 'string');
         $projects->add('disk', 'string')->setDefault(null);
         $projects->add('view', 'string')->setDefault('codex::document');
 
@@ -243,7 +267,7 @@ class CodexServiceProvider extends ServiceProvider
         $revisions->addMergeKeys([]);
         $revisions->addInheritKeys([ 'processors', 'meta', 'layout', 'view', 'cache', 'document' ]);
         $revisions->add('key', 'string', 'ID!');
-        $revisions->add('default_document', 'string');
+//        $revisions->add('default_document', 'string');
         $revisions->add('changed', 'array.scalarPrototype', '[String]');
 
         $documents = $registry->documents;

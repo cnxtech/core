@@ -92,6 +92,7 @@ class AddonRegistry
     {
         return $this->set($name, 'enabled', true);
     }
+
     public function setDisabled(string $name)
     {
         return $this->set($name, 'enabled', false);
@@ -101,6 +102,7 @@ class AddonRegistry
     {
         return $this->set($name, 'installed', true);
     }
+
     public function setUninstalled(string $name)
     {
         return $this->set($name, 'installed', false);

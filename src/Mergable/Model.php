@@ -11,6 +11,7 @@ use Codex\Contracts\Mergable\Mergable;
 use Codex\Contracts\Mergable\ParentInterface;
 use Codex\Mergable\Concerns\HasMergableAttributes;
 use Codex\Mergable\Concerns\HasRelations;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\Eloquent\Collection;
@@ -89,7 +90,39 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
     public static $snakeAttributes = true;
 
+    /** @var Dispatcher */
     protected static $dispatcher;
+
+    public function setDispatcher(Dispatcher $dispatcher)
+    {
+        static::$dispatcher = $dispatcher;
+    }
+
+    public function getDispatcher()
+    {
+        if ( ! isset(static::$dispatcher)) {
+            static::$dispatcher = $this->getContainer()->make(Dispatcher::class);
+        }
+        return static::$dispatcher;
+    }
+
+    protected $eventNamespace;
+
+    protected function getEventNamespace()
+    {
+        if ( ! isset($this->eventNamespace)) {
+            $name                 = snake_case(last(explode('\\', get_called_class())));
+            $this->eventNamespace = "codex.{$name}";
+        }
+        return $this->eventNamespace;
+    }
+
+    protected function fireEvent($name, ...$params)
+    {
+        $namespace = $this->getEventNamespace();
+        $this->getDispatcher()->dispatch("{$namespace}.{$name}", $params);
+        return $this;
+    }
 
     protected static $booted = [];
 
@@ -115,6 +148,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $this->setRawAttributes($attributes);
 
         $this->initialized = true;
+
+        $this->fireEvent('initialized', $this);
 
         return $this;
     }

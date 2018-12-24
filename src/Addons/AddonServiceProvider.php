@@ -48,6 +48,8 @@ class AddonServiceProvider extends ServiceProvider
 
     public $extensions = [];
 
+    public $mapConfig = [];
+
     /** @var \Codex\Addons\Addon */
     protected $addon;
 

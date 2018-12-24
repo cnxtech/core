@@ -2,11 +2,9 @@
 
 namespace Codex\Revisions;
 
-use Codex\Contracts\Projects\Project;
 use Codex\Mergable\ModelCollection;
 use Codex\Revisions\Commands\FindRevisions;
 use Codex\Revisions\Commands\MakeRevision;
-use Codex\Revisions\Events\ResolvedRevision;
 
 /**
  * This is the class RevisionCollection.
@@ -55,6 +53,6 @@ class RevisionCollection extends ModelCollection
      */
     public function getDefaultKey()
     {
-        return $this->getProject()->revision[ 'default' ];
+        return $this->getProject()['revision.default' ];
     }
 }

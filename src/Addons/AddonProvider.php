@@ -69,6 +69,7 @@ class AddonProvider
         $this->application->register($provider);
         $this->bindAliases($provider);
         $this->registerConfig($provider);
+        $this->mapConfig($provider);
         $this->registerEvents($provider);
         $this->registerCommands($provider);
         $this->dispatch(new RegisterExtension($provider->extensions, $addon));
@@ -81,6 +82,15 @@ class AddonProvider
     protected function registerConfig(AddonServiceProvider $provider)
     {
         $provider->registerConfig();
+    }
+
+    protected function mapConfig(AddonServiceProvider $provider)
+    {
+        foreach ($provider->mapConfig as $from => $to) {
+            foreach ($this->application[ 'config' ]->get($from, []) as $key => $value) {
+                $this->application[ 'config' ]->set($to . '.' . $key, $value);
+            }
+        }
     }
 
     protected function registerProviders(AddonServiceProvider $provider)

@@ -10,7 +10,6 @@ class DocumentController extends Controller
     public function getDocument($projectKey = null, $revisionKey = null, $documentPath = null)
     {
         $codex = codex();
-//        [$projectKey, $revisionKey, $documentPath] = explode('/', $path);
 
         if (null === $projectKey) {
             return redirect($codex->url($codex->getProjects()->getDefaultKey()));

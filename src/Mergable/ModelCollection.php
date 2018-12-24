@@ -19,7 +19,6 @@ abstract class ModelCollection extends EloquentCollection
 
     protected $loadable = [];
 
-
     public function __construct(array $items = [], ParentInterface $parent = null)
     {
         $this->setParent($parent);
@@ -133,7 +132,6 @@ abstract class ModelCollection extends EloquentCollection
     protected function hasModel($key)
     {
         return ! $this->where('key', '=', $key)->isEmpty();
-//        return parent::has($key);
     }
 
     /**
