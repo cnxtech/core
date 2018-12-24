@@ -7,6 +7,7 @@ use Codex\Addons\Extensions\ExtensionCollection;
 use Codex\Api\GraphQL\GraphQL;
 use Codex\Attributes\AttributeDefinitionRegistry;
 use Codex\Contracts\Documents\Document;
+use Codex\Contracts\Log\Log;
 use Codex\Contracts\Mergable\ParentInterface;
 use Codex\Contracts\Projects\Project;
 use Codex\Contracts\Revisions\Revision;
@@ -55,6 +56,7 @@ class Codex extends Model implements ParentInterface
      * @param \Codex\Addons\AddonCollection                 $addons
      * @param \Codex\Addons\Extensions\ExtensionCollection  $extensions
      * @param \Codex\Api\GraphQL\GraphQL                    $api
+     * @param \Codex\Contracts\Log\Log                      $log
      */
     public function __construct(
         Config $config,
@@ -62,7 +64,8 @@ class Codex extends Model implements ParentInterface
         AttributeDefinitionRegistry $registry,
         AddonCollection $addons,
         ExtensionCollection $extensions,
-        GraphQL $api)
+        GraphQL $api
+    )
     {
         $this->registry   = $registry;
         $this->addons     = $addons;
@@ -145,6 +148,12 @@ class Codex extends Model implements ParentInterface
     public function getApi()
     {
         return $this->api;
+    }
+
+    /** @return \Psr\Log\LoggerInterface */
+    public function getLog()
+    {
+        return $this->getContainer()->make('codex.log');
     }
 
     public function getDocsPath()
@@ -241,5 +250,11 @@ class Codex extends Model implements ParentInterface
             throw NotFoundException::document($documentKey);
         }
         return $revision->getDocument($documentKey);
+    }
+
+    public function log(string $string, $message, array $context = [])
+    {
+        $this->getLog()->log($string, $message, $context);
+        return $this;
     }
 }

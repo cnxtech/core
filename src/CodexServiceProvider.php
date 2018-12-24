@@ -139,7 +139,6 @@ class CodexServiceProvider extends ServiceProvider
 
             return $logger;
         });
-        $this->app->alias('codex.log', Contracts\Log\Log::class);
     }
 
     protected function registerDefaultFilesystem()
