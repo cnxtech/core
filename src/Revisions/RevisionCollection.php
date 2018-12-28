@@ -53,6 +53,6 @@ class RevisionCollection extends ModelCollection
      */
     public function getDefaultKey()
     {
-        return $this->getProject()['revision.default' ];
+        return $this->getProject()->attr('default_revision');
     }
 }

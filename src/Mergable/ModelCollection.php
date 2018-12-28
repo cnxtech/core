@@ -51,6 +51,11 @@ abstract class ModelCollection extends EloquentCollection
         return collect($this->resolve()->loadable);
     }
 
+    /**
+     * makeAll method
+     *
+     * @return $this
+     */
     public function makeAll()
     {
         $this->all();

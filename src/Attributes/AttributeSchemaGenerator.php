@@ -44,6 +44,9 @@ class AttributeSchemaGenerator
     protected function generateChildren(array $children, array &$parent)
     {
         foreach ($children as $child) {
+            if($child->noApi === true){
+                continue;
+            }
             $apiType                = $child->apiType;
             $parent[ $child->name ] = $this->toFieldTypeString($apiType);
             if ($apiType->new || $apiType->extend) {

@@ -12,6 +12,7 @@ use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Values\FieldValue;
 use Nuwave\Lighthouse\Support\Contracts\FieldManipulator;
 use Nuwave\Lighthouse\Support\Contracts\FieldResolver;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class ConstraintsDirective extends BaseDirective implements FieldManipulator, FieldResolver
 {
@@ -50,8 +51,6 @@ class ConstraintsDirective extends BaseDirective implements FieldManipulator, Fi
     {
         $connectionArguments                           = PartialParser::inputValueDefinitions([
             'query: QueryConstraints',
-            'page: Int',
-            'count: Int',
         ]);
 
         $fieldDefinition->arguments = ASTHelper::mergeNodeList($fieldDefinition->arguments, $connectionArguments);
@@ -71,17 +70,15 @@ class ConstraintsDirective extends BaseDirective implements FieldManipulator, Fi
             $directiveResolver = \Closure::fromCallable([ app($class), $method ]);
         }
 
-        return $value->setResolver(function ($root, array $args, $context = null, ResolveInfo $info = null) use ($directiveResolver) {
+        return $value->setResolver(function ($rootValue, array $args, GraphQLContext $context = null, ResolveInfo $resolveInfo) use ($directiveResolver) {
             $query = data_get($args, 'query', null);
-            $page  = $this->argument('page', 1);
-            $count = $this->argument('count', 15);
 
             $constraints = $this->makeQueryConstraints($query);
 
             $resolverReflection = new \ReflectionFunction($directiveResolver);
             list($className, $methodName) = array_values($resolverReflection->getStaticVariables());
             $instance = app()->make($className);
-            $value = app()->call([$instance,$methodName], compact('constraints', 'query', 'root', 'args', 'context', 'info'));
+            $value = app()->call([$instance,$methodName], compact('constraints', 'query', 'rootValue', 'args', 'context', 'resolveInfo'));
             return $value;
         });
     }

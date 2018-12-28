@@ -88,16 +88,12 @@ return [
             'minutes' => 7,
         ],
 
-        'revision' => [
-            'default'              => 'master',
-            'allow_php_config'     => false,
-            'allowed_config_files' => [ 'revision.yml' ],
-        ],
+        'default_revision'              => 'master',
+        'allow_revision_php_config'     => false,
+        'allowed_revision_config_files' => [ 'revision.yml', 'revision.yaml', 'config.yml', 'config.yaml' ],
 
-        'document' => [
-            'default'    => 'index',
-            'extensions' => [ 'md', 'markdown' ],
-        ],
+        'default_document'    => 'index',
+        'document_extensions' => [ 'md', 'markdown' ],
     ],
 
     'revisions' => [],

@@ -18,6 +18,9 @@ class AttributeDefinition implements AttributeDefinitionParent
     /** @var AttributeDefinitionApiType */
     public $apiType;
 
+    /** @var bool */
+    public $noApi;
+
     /**
      * Attribute constructor.
      *
@@ -26,12 +29,14 @@ class AttributeDefinition implements AttributeDefinitionParent
      * @param null|string|AttributeDefinitionApiType $apiType
      * @param callable|mixed|null                    $default
      *
+     * @param bool                                   $noApi
+     *
      * @throws \Exception
      */
-    public function __construct(string $name, $type, $apiType = null, $default = null)
+    public function __construct(string $name, $type, $apiType = null, $default = null, $noApi = false)
     {
-        $this->name    = $name;
-        if($default !== null) {
+        $this->name = $name;
+        if ($default !== null) {
             $this->default = $default;
         }
         if ( ! $type instanceof AttributeDefinitionType) {
@@ -48,6 +53,7 @@ class AttributeDefinition implements AttributeDefinitionParent
         }
         $this->type    = $type;
         $this->apiType = $apiType;
+        $this->noApi   = $noApi;
     }
 
 
@@ -74,6 +80,12 @@ class AttributeDefinition implements AttributeDefinitionParent
     public function setApiType($name, array $opts = [])
     {
         $this->apiType = new AttributeDefinitionApiType($name, $opts);
+        return $this;
+    }
+
+    public function noApi()
+    {
+        $this->noApi = true;
         return $this;
     }
 

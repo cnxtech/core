@@ -54,6 +54,6 @@ class DocumentCollection extends ModelCollection
      */
     public function getDefaultKey()
     {
-        return $this->getRevision()->document[ 'default' ];
+        return $this->getRevision()->attr('default_document', 'index');
     }
 }

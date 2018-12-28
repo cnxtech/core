@@ -69,6 +69,7 @@ class Document extends Model implements DocumentContract, ChildInterface
         $this->addGetMutator('last_modified', 'getLastModified', true, true);
         $this->addGetMutator('attributes', 'getAttributes', true, true);
         $this->addGetMutator('changed', 'getChanged', true, true);
+        $this->addGetMutator('changes', 'getChanges', true, true);
     }
 
     public function url()

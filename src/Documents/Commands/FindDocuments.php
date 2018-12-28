@@ -46,7 +46,7 @@ class FindDocuments
                 return array_merge($pathInfo, compact('path', 'key'));
             })
             ->filter(function ($pathInfo) { // filter not allowed extensions
-                return in_array($pathInfo[ 'extension' ], $this->revision[ 'document' ][ 'extensions' ]);
+                return in_array($pathInfo[ 'extension' ], $this->revision[ 'document_extensions' ]);
             })
             ->keyBy('key')
             ->transform(function ($pathInfo) {

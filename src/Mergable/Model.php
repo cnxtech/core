@@ -222,6 +222,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
     protected $attributes = [];
 
+    /** @return  AttributeDefinitionGroup */
     public function getAttributeDefinitions()
     {
         return $this->attributeDefinitions;

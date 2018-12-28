@@ -19,9 +19,9 @@ trait WithAttributeDefinitionChildren
      *
      * @return AttributeDefinition
      */
-    public function add(string $name, $type, $apiType = null, $default = null)
+    public function add(string $name, $type, $apiType = null, $default = null, $noApi = false)
     {
-        return $this->addChild(AttributeDefinitionFactory::attribute($name, $type, $apiType, $default));
+        return $this->addChild(AttributeDefinitionFactory::attribute($name, $type, $apiType, $default, $noApi));
     }
 
     public function addChild(AttributeDefinition $attribute)

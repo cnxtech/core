@@ -11,7 +11,6 @@ use GraphQL\Language\Parser;
 use GraphQL\Language\Visitor;
 use GraphQL\Validator\DocumentValidator;
 use Nuwave\Lighthouse\Schema\AST\ASTHelper;
-use Nuwave\Lighthouse\Schema\AST\PartialParser;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRegistry;
 use Nuwave\Lighthouse\Schema\SchemaBuilder;
 use Nuwave\Lighthouse\Schema\Source\SchemaSourceProvider;
@@ -35,84 +34,6 @@ class GraphQL extends \Nuwave\Lighthouse\GraphQL
         $this->queryDirectiveRegistry = $queryDirectiveRegistry;
     }
 
-
-    protected function prepSchemaWithQuery(string $query)
-    {
-        if (empty($this->executableSchema)) {
-            $document = $this->documentAST();
-            $parsed   = Parser::parse($query);
-
-            Visitor::visit($parsed, [
-                'Directive' => [
-                    'leave' => function ($node, $key, $parent, $path, $ancestors) use ($document) {
-                        if ( ! $this->queryDirectiveRegistry->has($node->name->value)) {
-                            return null;
-                        }
-                        $directive = $this->queryDirectiveRegistry->get($node->name->value);
-
-                        $parentType = $document->objectTypeDefinition($ancestors[ 0 ]->kind);
-                        if ( ! $parentType) {
-                            throw new \Exception('parent type not found');
-                        }
-
-                        /** @var \Illuminate\Support\Collection|FieldDefinitionNode[] $fields */
-                        $fields = collect($parentType->fields)->keyBy(function (FieldDefinitionNode $fieldDefinitionNode) {
-                            return $fieldDefinitionNode->name->value;
-                        });
-
-                        /** @var \Illuminate\Support\Collection|\GraphQL\Language\AST\FieldNode[] $ancestorFieldNodes */
-                        $ancestorFieldNodes = collect($ancestors)->filter(function ($ancestor) {
-                            return $ancestor instanceof FieldNode;
-                        })->values();
-
-                        $field = $fields[ $ancestorFieldNodes[ 1 ]->name->value ];
-
-                        if ($directive instanceof QueryFieldManipulator) {
-                            $directive->manipulateSchema($field, $parentType, $document);
-                        }
-
-
-
-                        /** @var FieldDefinitionNode $fieldDef */
-//                    $fieldDef         = Utils::find($document->queryTypeDefinition()->fields, function (FieldDefinitionNode $value) use ($fields) {
-//                        return $value->name->value === $fields[ 0 ]->name->value;
-//                    });
-//                    $fieldDefTypeName = ASTHelper::getFieldTypeName($fieldDef);
-//                    $parentType     = $document->objectTypeDefinition($node->kind);
-//
-//
-//                    /** @var \GraphQL\Language\AST\FieldNode $field */
-//                    $field = last($ancestors);
-//                    $document->objectTypeDefinitions();
-//                    $queryDef = $document->queryTypeDefinition()->fields;
-//                    $fieldDef = $document->queryTypeDefinition()->fields[ 0 ];
-////                    $fieldDef = $schema->getQueryType()->getField($fields[ 0 ]->name->value);
-//                    $type = $fieldDef->type;
-//                    if ($type instanceof WrappingType) {
-//                        $wrapped     = $type->getWrappedType(true);
-//                        $wrappedType = $schema->getType($wrapped->name);
-//                        $subField    = $wrapped->getField($fields[ 1 ]->name->value);
-//
-//                        $partial      = PartialParser::fieldDefinition('layout: Assoc!');
-//                        $revisionType = $schema->getType('Revision');
-//                        $assocType    = $schema->getType('Assoc');
-//                    }
-                        // return
-                        //   null: no action
-                        //   Visitor::stop(): stop visiting altogether
-                        //   Visitor::removeNode(): delete this node
-                        //   any value: replace this node with the returned value
-                        return null;
-                    },
-                ],
-            ]);
-            $this->executableSchema = $this->schemaBuilder->build(
-                $document
-            );
-        }
-
-        return $this->executableSchema;
-    }
 
     public function executeQuery(string $query, $context = null, $variables = [], $rootValue = null): ExecutionResult
     {
@@ -157,6 +78,98 @@ class GraphQL extends \Nuwave\Lighthouse\GraphQL
         );
 
         return $result;
+    }
+
+    protected function prepSchemaWithQuery(string $query)
+    {
+        if (empty($this->executableSchema)) {
+            $document = $this->documentAST();
+            $parsed   = Parser::parse($query);
+            Visitor::visit($parsed, [
+                'Directive' => [
+                    'leave' => function ($node, $key, $parent, $path, $ancestors) use ($document, $parsed) {
+                        if ( ! $this->queryDirectiveRegistry->has($node->name->value)) {
+                            return null;
+                        }
+                        $directive = $this->queryDirectiveRegistry->get($node->name->value);
+                        $queryType = $document->queryTypeDefinition();
+                        /** @var \Illuminate\Support\Collection|\GraphQL\Language\AST\FieldNode[] $ancestorFieldNodes */
+                        $ancestorFieldNodes = collect($ancestors)->filter(function ($ancestor) {
+                            return $ancestor instanceof FieldNode;
+                        })->values();
+
+                        $fieldNode = $ancestorFieldNodes->pop();
+
+                        $parentType = $queryType;
+                        foreach ($ancestorFieldNodes as $i => $ancestorFieldNode) {
+                            $parentFields = collect($parentType->fields)->keyBy(function (FieldDefinitionNode $fieldDefinitionNode) {
+                                return $fieldDefinitionNode->name->value;
+                            });
+                            if ( ! $parentFields->has($ancestorFieldNode->name->value)) {
+                                break;
+                            }
+                            $field           = $parentFields->get($ancestorFieldNode->name->value);
+                            $fieldType       = ASTHelper::getUnderlyingNamedTypeNode($field);
+                            $parentType = $document->objectTypeDefinition($fieldType->name->value);
+                        }
+
+                        if ( ! $parentType) {
+                            throw new \Exception('parent type not found');
+                        }
+
+                        /** @var \Illuminate\Support\Collection|FieldDefinitionNode[] $fields */
+                        $fields = collect($parentType->fields)->keyBy(function (FieldDefinitionNode $fieldDefinitionNode) {
+                            return $fieldDefinitionNode->name->value;
+                        });
+
+                        if ( ! $fields->has($fieldNode->name->value)) {
+                            return;
+                        }
+                        $field = $fields->get($fieldNode->name->value);
+                        if ($directive instanceof QueryFieldManipulator) {
+                            $directive->manipulateSchema($field, $parentType, $document);
+                        }
+
+
+                        /** @var FieldDefinitionNode $fieldDef */
+//                    $fieldDef         = Utils::find($document->queryTypeDefinition()->fields, function (FieldDefinitionNode $value) use ($fields) {
+//                        return $value->name->value === $fields[ 0 ]->name->value;
+//                    });
+//                    $fieldDefTypeName = ASTHelper::getFieldTypeName($fieldDef);
+//                    $parentType     = $document->objectTypeDefinition($node->kind);
+//
+//
+//                    /** @var \GraphQL\Language\AST\FieldNode $field */
+//                    $field = last($ancestors);
+//                    $document->objectTypeDefinitions();
+//                    $queryDef = $document->queryTypeDefinition()->fields;
+//                    $fieldDef = $document->queryTypeDefinition()->fields[ 0 ];
+////                    $fieldDef = $schema->getQueryType()->getField($fields[ 0 ]->name->value);
+//                    $type = $fieldDef->type;
+//                    if ($type instanceof WrappingType) {
+//                        $wrapped     = $type->getWrappedType(true);
+//                        $wrappedType = $schema->getType($wrapped->name);
+//                        $subField    = $wrapped->getField($fields[ 1 ]->name->value);
+//
+//                        $partial      = PartialParser::fieldDefinition('layout: Assoc!');
+//                        $revisionType = $schema->getType('Revision');
+//                        $assocType    = $schema->getType('Assoc');
+//                    }
+                        // return
+                        //   null: no action
+                        //   Visitor::stop(): stop visiting altogether
+                        //   Visitor::removeNode(): delete this node
+                        //   any value: replace this node with the returned value
+                        return null;
+                    },
+                ],
+            ]);
+            $this->executableSchema = $this->schemaBuilder->build(
+                $document
+            );
+        }
+
+        return $this->executableSchema;
     }
 
 

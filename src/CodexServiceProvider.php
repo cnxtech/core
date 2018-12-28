@@ -148,7 +148,7 @@ class CodexServiceProvider extends ServiceProvider
         $codex->add('display_name', 'string')->setDefault('Codex');
         $codex->add('description', 'string')->setDefault('');
         $codex->add('default_project', 'string', 'ID')->setDefault(null);
-        $processors = $codex->add('processors', 'dictionary')->setApiType('Processors', [ 'new' ]);
+        $processors = $codex->add('processors', 'dictionary')->noApi(); //->setApiType('Processors', [ 'new' ]);
         $processors->add('enabled', 'array.scalarPrototype');
 
         $http = $codex->add('http', 'dictionary')->setApiType('HttpConfig', [ 'new' ]);
@@ -220,11 +220,12 @@ class CodexServiceProvider extends ServiceProvider
 
         $projects = $registry->projects;
         $projects->addInheritKeys([ 'processors', 'layout' ]);
+        $projects->add('changed', 'array.scalarPrototype', '[String]');
+        $projects->add('changes', 'dictionary', 'Assoc');
         $projects->add('key', 'string', 'ID!');
         $projects->add('path', 'string');
         $projects->add('display_name', 'string')->setDefault(null);
         $projects->add('description', 'string')->setDefault('');
-//        $projects->add('default_revision', 'string');
         $projects->add('disk', 'string')->setDefault(null);
         $projects->add('view', 'string')->setDefault('codex::document');
 
@@ -241,32 +242,33 @@ class CodexServiceProvider extends ServiceProvider
         $meta->add('styles', 'array.scalarPrototype');
         $meta->add('scripts', 'array.scalarPrototype');
 
-        $revision = $projects->add('revision', 'dictionary')->setApiType('RevisionConfig', [ 'new' ]);
-        $revision->add('default', 'string')->setDefault('master');
-        $revision->add('allow_php_config', 'string')->setDefault(false);
-        $revision->add('allowed_config_files', 'array.scalarPrototype');
+//        $revision = $projects->add('revision', 'dictionary')->setApiType('RevisionConfig', [ 'new' ]);
+        $projects->add('default_revision', 'string')->setDefault('master');
+        $projects->add('allow_revision_php_config', 'string')->setDefault(false);
+        $projects->add('allowed_revision_config_files', 'array.scalarPrototype');
 
-        $document = $projects->add('document', 'dictionary')->setApiType('DocumentConfig', [ 'new' ]);
-        $document->add('default', 'string')->setDefault('index');
-        $document->add('extensions', 'array.scalarPrototype');
+//        $document = $projects->add('document', 'dictionary')->setApiType('DocumentConfig', [ 'new' ]);
+        $projects->add('default_document', 'string')->setDefault('index');
+        $projects->add('document_extensions', 'array.scalarPrototype');
 
 
         $revisions = $registry->revisions;
         $revisions->addMergeKeys([]);
-        $revisions->addInheritKeys([ 'processors', 'meta', 'layout', 'view', 'cache', 'document' ]);
-        $revisions->add('key', 'string', 'ID!');
-//        $revisions->add('default_document', 'string');
+        $revisions->addInheritKeys([ 'processors', 'meta', 'layout', 'view', 'cache', 'default_document', 'document_extensions' ]);
         $revisions->add('changed', 'array.scalarPrototype', '[String]');
+        $revisions->add('changes', 'dictionary', 'Assoc');
+        $revisions->add('key', 'string', 'ID!');
 
         $documents = $registry->documents;
         $documents->addMergeKeys([]);
         $documents->addInheritKeys([ 'processors', 'meta', 'layout', 'view', 'cache' ]);
+        $documents->add('changed', 'array.scalarPrototype', '[String]');
+        $documents->add('changes', 'dictionary', 'Assoc');
         $documents->add('key', 'string', 'ID!');
         $documents->add('path', 'string');
         $documents->add('extension', 'string');
         $documents->add('content', 'string');
         $documents->add('last_modified', 'integer');
-        $documents->add('changed', 'array.scalarPrototype', '[String]');
         $documents->add('title', 'string')->setDefault('');
         $documents->add('subtitle', 'string')->setDefault('');
         $documents->add('description', 'string')->setDefault('');

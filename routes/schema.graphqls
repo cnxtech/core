@@ -6,12 +6,14 @@ directive @assoc on FIELD
 
 type Query {
     me: User @auth
-    codex: Codex!
+    codex: Codex! @field(resolver: "Codex\\Api\\GraphQL\\CodexQueries@resolve")
     config: Config!
-    projects:[Project!]! @constraints(resolver: "Codex\\Api\\GraphQL\\Queries\\Projects@resolve")
-    project(key:ID):Project! @constraints(resolver: "Codex\\Api\\GraphQL\\Queries\\Project@resolve")
-    revisions(projectKey: ID) : [Revision!]!  @constraints(resolver: "Codex\\Api\\GraphQL\\Queries\\Revisions@resolve")
-    revision(projectKey: ID!, revisionKey: ID!) : Revision!  @constraints(resolver: "Codex\\Api\\GraphQL\\Queries\\Revision@resolve")
+    projects:[Project!]! @constraints(resolver: "Codex\\Api\\GraphQL\\Queries\\Projects@all")
+    project(key:ID):Project! @field(resolver: "Codex\\Api\\GraphQL\\Queries\\Projects@get")
+
+    revisions(projectKey: ID) : [Revision!]!  @constraints(resolver: "Codex\\Api\\GraphQL\\Queries\\Revisions@all")
+    revision(projectKey: ID!, revisionKey: ID!) : Revision!  @field(resolver: "Codex\\Api\\GraphQL\\Queries\\Revisions@get")
+
     documents(projectKey: ID, revisionKey: ID) : [Document!]!  @constraints(resolver: "Codex\\Api\\GraphQL\\Queries\\Documents@resolve")
     document(projectKey: ID!, revisionKey: ID!, documentKey: ID!) : Document!  @constraints(resolver: "Codex\\Api\\GraphQL\\Queries\\Document@resolve")
 }
@@ -21,7 +23,15 @@ type User {
 }
 
 type Codex {
-    projects: [Project!]!
+    projects:[Project!]! @constraints(resolver: "Codex\\Api\\GraphQL\\CodexQueries@projects")
+    project(key:ID):Project! @field(resolver: "Codex\\Api\\GraphQL\\CodexQueries@project")
+
+    revisions(projectKey: ID) : [Revision!]!  @constraints(resolver: "Codex\\Api\\GraphQL\\CodexQueries@revisions")
+    revision(projectKey: ID!, revisionKey: ID!) : Revision!  @field(resolver: "Codex\\Api\\GraphQL\\CodexQueries@revision")
+
+    documents(projectKey: ID, revisionKey: ID) : [Document!]!  @constraints(resolver: "Codex\\Api\\GraphQL\\CodexQueries@documents")
+    document(projectKey: ID!, revisionKey: ID!, documentKey: ID!) : Document!  @constraints(resolver: "Codex\\Api\\GraphQL\\CodexQueries@document")
+
 }
 
 type Config {
@@ -34,12 +44,14 @@ type Config {
 }
 
 type Project {
-    revisions: [Revision!]!
+    revisions: [Revision!]! @constraints(resolver: "Codex\\Api\\GraphQL\\CodexQueries@revisions")
+    revision(revisionKey: ID!): Revision! @field(resolver: "Codex\\Api\\GraphQL\\CodexQueries@revision")
 }
 
 
 type Revision {
-    documents: [Document!]!
+    documents: [Document!]! @constraints(resolver: "Codex\\Api\\GraphQL\\CodexQueries@documents")
+    document(documentKey: ID!): Document! @field(resolver: "Codex\\Api\\GraphQL\\CodexQueries@document")
     project: Project!
 }
 

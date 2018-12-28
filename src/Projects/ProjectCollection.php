@@ -53,6 +53,6 @@ class ProjectCollection extends ModelCollection
      */
     public function getDefaultKey()
     {
-        return $this->getCodex()->default_project;
+        return $this->getCodex()->attr('default_project');
     }
 }

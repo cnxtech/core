@@ -81,8 +81,8 @@ class FindRevisions
      */
     protected function getAllowedNames()
     {
-        return array_filter($this->project[ 'revision.allowed_config_files' ], function ($fileName) {
-            if ($this->project[ 'revision.allow_php_config' ] !== true && ends_with($fileName, '.php')) {
+        return array_filter($this->project[ 'allowed_revision_config_files' ], function ($fileName) {
+            if ($this->project[ 'allow_revision_php_config' ] !== true && ends_with($fileName, '.php')) {
                 return false;
             }
             return true;

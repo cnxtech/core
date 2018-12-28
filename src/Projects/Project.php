@@ -57,13 +57,9 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
         $this->setChildren($revisions->setParent($this));
         $registry = $this->getCodex()->getRegistry()->resolveGroup('projects');
         $this->init($attributes, $registry);
-//        $this->addGetMutator('revision.default', 'resolveBranchType', true, true);
+        $this->addGetMutator('changed', 'getChanged', true, true);
+        $this->addGetMutator('changes', 'getChanges', true, true);
     }
-
-//    public function resolveBranchType(...$params)
-//    {
-//        $a='a';
-//    }
 
     public function url($revisionKey = null, $documentKey = null)
     {

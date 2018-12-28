@@ -51,6 +51,7 @@ trait HasMergableAttributes
         $this->changed = $keys;
         return $this;
     }
+
     public function getChanged()
     {
         return $this->changed;
@@ -59,5 +60,37 @@ trait HasMergableAttributes
     public function getParentAttributes()
     {
         return $this->getParent()->getAttributes();
+    }
+
+    public function getChanges()
+    {
+        $changes = [];
+        $changed = $this->getChanged();
+        foreach ($changed as $attr) {
+            $definitions = $this->getAttributeDefinitions();
+            $segments    = explode('.', $attr);
+            $segment     = head($segments);
+            if ( ! $definitions->hasChild($segment)) {
+                continue;
+            }
+            $definition = $definitions->getChild($segment);
+            if ($definition->noApi === true) {
+                continue;
+            }
+            data_set($changes, $attr, $this->attr($attr));
+        }
+//            foreach ($segments as $i => $segment) {
+//                if(!$definitions->hasChild($segment)){
+//                    break;
+//                }
+//                $definition = $definitions->getChild($segment);
+//                $key        = implode('.', array_slice($segments, 0, $i +1));
+//                if ($definition->noApi === true) {
+//                    break;
+//                }
+//                data_set($changes, $key, $this->attr($key));
+//                $definitions = $definition;
+//            }
+        return $changes;
     }
 }

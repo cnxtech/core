@@ -66,7 +66,7 @@ class AttributeDefinitionRegistry
 
     protected function addSourceToTarget($target, $targetKey, $source)
     {
-        $targetChild = $target->add($targetKey, $source->type->getValue(), $source->apiType->name, $source->default);
+        $targetChild = $target->add($targetKey, $source->type->getValue(), $source->apiType->name, $source->default, $source->noApi);
         if ($source->hasChildren()) {
             foreach ($source->children as $child) {
                 $this->addSourceToTarget($targetChild, $child->name, $child);
