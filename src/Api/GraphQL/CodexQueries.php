@@ -4,6 +4,7 @@ namespace Codex\Api\GraphQL;
 
 use Codex\Api\GraphQL\Directives\QueryConstraints;
 use Codex\Codex;
+use Codex\Exceptions\NotFoundException;
 use GraphQL\Error\Error;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -35,7 +36,7 @@ class CodexQueries
         $defaultKey = $codex->getProjects()->getDefaultKey();
         $key        = data_get($args, 'key', $defaultKey);
         if ( ! $codex->hasProject($key)) {
-            throw new Error("Project [{$key}] was not found");
+            throw NotFoundException::project($key)->toApiError();
         }
         $project = $codex->getProject($key);
         $show    = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
@@ -48,8 +49,12 @@ class CodexQueries
         if ($rootValue instanceof \Codex\Contracts\Projects\Project) {
             $project = $rootValue;
         } else {
-            $projectKey = data_get($args, 'projectKey', codex()->getProjects()->getDefault());
-            $project    = codex()->getProject($projectKey);
+            $codex      = codex();
+            $projectKey = data_get($args, 'projectKey', $codex->getProjects()->getDefault());
+            $project    = $codex->getProject($projectKey);
+            if ( ! $codex->hasProject($projectKey)) {
+                throw NotFoundException::project($projectKey)->toApiError();
+            }
         }
 
         $revisions = $project->getRevisions()->makeAll();
@@ -65,12 +70,18 @@ class CodexQueries
             $project = $rootValue;
         } else {
             $codex      = codex();
-            $projectKey = data_get($args, 'projectKey', codex()->getProjects()->getDefault());
-            $project    = $codex->getProject($projectKey);
+            $projectKey = data_get($args, 'projectKey', $codex->getProjects()->getDefault());
+            if ( ! $codex->hasProject($projectKey)) {
+                throw NotFoundException::project($projectKey)->toApiError();
+            }
+            $project = $codex->getProject($projectKey);
         }
         $revisionKey = data_get($args, 'revisionKey', $project->getRevisions()->getDefaultKey());
-        $revision    = $project->getRevision($revisionKey);
-        $show        = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
+        if ( ! $project->hasRevision($revisionKey)) {
+            throw NotFoundException::revision($revisionKey)->toApiError();
+        }
+        $revision = $project->getRevision($revisionKey);
+        $show     = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
         $revision->show($show);
         return $revision;
     }
@@ -81,11 +92,17 @@ class CodexQueries
         if ($rootValue instanceof \Codex\Contracts\Revisions\Revision) {
             $revision = $rootValue;
         } else {
-            $codex       = codex();
-            $projectKey  = data_get($args, 'projectKey', codex()->getProjects()->getDefault());
+            $codex      = codex();
+            $projectKey = data_get($args, 'projectKey', $codex->getProjects()->getDefault());
+            if ( ! $codex->hasProject($projectKey)) {
+                throw NotFoundException::project($projectKey)->toApiError();
+            }
             $project     = $codex->getProject($projectKey);
             $revisionKey = data_get($args, 'revisionKey', $project->getRevisions()->getDefaultKey());
-            $revision    = $project->getRevision($revisionKey);
+            if ( ! $project->hasRevision($revisionKey)) {
+                throw NotFoundException::revision($revisionKey)->toApiError();
+            }
+            $revision = $project->getRevision($revisionKey);
         }
         $documents = $revision->getDocuments()->makeAll(); // makeAll() ?
         $documents = $constraints->applyConstraints($documents);
@@ -100,15 +117,24 @@ class CodexQueries
         if ($rootValue instanceof \Codex\Contracts\Revisions\Revision) {
             $revision = $rootValue;
         } else {
-            $codex       = codex();
-            $projectKey  = data_get($args, 'projectKey', codex()->getProjects()->getDefault());
+            $codex      = codex();
+            $projectKey = data_get($args, 'projectKey', $codex->getProjects()->getDefault());
+            if ( ! $codex->hasProject($projectKey)) {
+                throw NotFoundException::project($projectKey)->toApiError();
+            }
             $project     = $codex->getProject($projectKey);
             $revisionKey = data_get($args, 'revisionKey', $project->getRevisions()->getDefaultKey());
-            $revision    = $project->getRevision($revisionKey);
+            if ( ! $project->hasRevision($revisionKey)) {
+                throw NotFoundException::revision($revisionKey)->toApiError();
+            }
+            $revision = $project->getRevision($revisionKey);
         }
         $documentKey = data_get($args, 'documentKey', $revision->getDocuments()->getDefaultKey());
-        $document    = $revision->getDocument($documentKey);
-        $show        = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
+        if ( ! $revision->hasDocument($documentKey)) {
+            throw NotFoundException::document($documentKey)->toApiError();
+        }
+        $document = $revision->getDocument($documentKey);
+        $show     = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
         $document->show($show);
         return $document;
     }

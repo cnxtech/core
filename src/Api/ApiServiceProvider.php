@@ -26,7 +26,9 @@ class ApiServiceProvider extends EventServiceProvider
             ],
             'controller'      => \Codex\Http\Controllers\ApiController::class . '@query',
             'schema.register' => __DIR__ . '/../../routes/schema.graphqls',
-            'extensions'      => [ \App\TestGraphQLExtension::class ],
+            'extensions'      => [
+//                \Nuwave\Lighthouse\Schema\Extensions\TracingExtension::class,
+            ],
             'error_handlers'  => [ \Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class ],
             'namespaces'      => [
                 'models'    => 'Codex\\Api\\GraphQL\\Models',

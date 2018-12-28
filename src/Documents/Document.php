@@ -59,10 +59,10 @@ class Document extends Model implements DocumentContract, ChildInterface
     {
         $this->setParent($revision);
         $this->setFiles($revision->getFiles());
-        $this->contentResolver = function (Document $document) {
+        $this->contentResolver     = function (Document $document) {
             return $document->getFiles()->get($document->getPath());
         };
-        $registry              = $this->getCodex()->getRegistry()->resolveGroup('documents');
+        $registry                  = $this->getCodex()->getRegistry()->resolveGroup('documents');
         $attributes[ 'extension' ] = path_get_extension($attributes[ 'path' ]);
         $this->init($attributes, $registry);
         $this->addGetMutator('content', 'getContent', true, true);
@@ -100,9 +100,9 @@ class Document extends Model implements DocumentContract, ChildInterface
 
     //region: Content methods and processing
 
-    public function getContent($triggerProcessing = true)
+    public function getContent($skipProcessing = false)
     {
-        if ($triggerProcessing) {
+        if ( ! $skipProcessing) {
             $this->preprocess();
         }
         // resolve the content and postprocess it without caching
@@ -114,7 +114,7 @@ class Document extends Model implements DocumentContract, ChildInterface
         if ('' === $this->content) {
             $this->content = ' ';
         }
-        if ($triggerProcessing) {
+        if ( ! $skipProcessing) {
             $this->process();
 
             $this->postprocess();

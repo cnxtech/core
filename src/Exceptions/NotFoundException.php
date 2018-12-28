@@ -11,6 +11,7 @@
 
 namespace Codex\Exceptions;
 
+use GraphQL\Error\Error;
 use Illuminate\Contracts\Support\Responsable;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -30,6 +31,11 @@ class NotFoundException extends Exception implements Responsable
         return $request->expectsJson() ?
             response()->json(['error' => $this->getMessage()], $this->status) :
             response()->make($this->getMessage(), $this->status);
+    }
+
+    public function toApiError()
+    {
+        return new Error($this->getMessage());
     }
 
     public function setStatus($status)

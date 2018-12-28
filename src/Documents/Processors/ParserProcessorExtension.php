@@ -30,7 +30,7 @@ class ParserProcessorExtension extends ProcessorExtension implements ProcessorIn
     {
         $ext     = $document->getExtension();
         $parser  = $this->getDocumentParser($document);
-        $parsed  = $parser->parse($document->getContent(false));
+        $parsed  = $parser->parse($document->getContent(true));
         $content = view($document->getAttribute('view'), [ 'content' => $parsed, 'document' => $document ])->render();
         $document->setContent($content);
     }
