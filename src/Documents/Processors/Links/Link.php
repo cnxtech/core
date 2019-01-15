@@ -156,9 +156,9 @@ class Link
     public function getAllowedExtensions($withDotPrefix = false)
     {
         if ( ! $withDotPrefix) {
-            return $this->revision[ 'document.extensions' ];
+            return $this->revision[ 'document_extensions' ];
         }
-        return collect($this->revision[ 'document.extensions' ])->map(function ($extension) {
+        return collect($this->revision[ 'document_extensions' ])->map(function ($extension) {
             return str_ensure_left($extension, '.');
         })->toArray();
     }

@@ -88,6 +88,18 @@ class ConfigResolver
         $node->ignoreExtraKeys(true);
         return $node;
     }
+    public function dictionaryPrototype(AttributeDefinition $attribute, ArrayNodeDefinition $target)
+    {
+        $target->attribute('attribute', $attribute);
+        $target->addDefaultsIfNotSet();
+        $target->ignoreExtraKeys(true);
+        $node = $target->children()->arrayNode($attribute->name);
+        $arrayProto = $node->arrayPrototype();
+        $scalarProto = $arrayProto->scalarPrototype();
+        $arrayProto->ignoreExtraKeys(true);
+
+        return $scalarProto;
+    }
 
     public function arrayDictionary(AttributeDefinition $attribute, ArrayNodeDefinition $target)
     {
@@ -103,9 +115,11 @@ class ConfigResolver
     public function arrayScalar(AttributeDefinition $attribute, ArrayNodeDefinition $target)
     {
         $target->attribute('attribute', $attribute);
+        $target->normalizeKeys(false);
         $target->addDefaultsIfNotSet();
         $target->ignoreExtraKeys(true);
         $node = $target->children()->arrayNode($attribute->name);
+        $node->normalizeKeys(false);
         if (isset($attribute->default) && is_array($attribute->default)) {
             $node->defaultValue($attribute->default);
         }

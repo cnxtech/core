@@ -4,7 +4,7 @@
 {{--</toc-header>--}}
 
 
-<h{{$size}} id="{{$slug}}"><span>{{$text}}</span>
+<h{{$size}} id="{{$slug}}"  class='c-toc-header'><span>{{$text}}</span>
 @if (true === $header_link_show)
     <a href='#{{$slug}}' class='c-toc-header-link'>#</a>
     @else

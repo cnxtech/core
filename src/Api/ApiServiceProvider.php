@@ -19,12 +19,11 @@ class ApiServiceProvider extends EventServiceProvider
     public function register()
     {
         $overrides = [
-            'route_name'      => $this->app[ 'config' ][ 'codex.http.api_prefix' ],
             'cache'           => [
                 'enable' => env('LIGHTHOUSE_CACHE_ENABLE', false),
                 'key'    => env('LIGHTHOUSE_CACHE_KEY', 'lighthouse-schema'),
             ],
-            'controller'      => \Codex\Http\Controllers\ApiController::class . '@query',
+            'controller'      => false, //\Codex\Http\Controllers\ApiController::class . '@query',
             'schema.register' => __DIR__ . '/../../routes/schema.graphqls',
             'extensions'      => [
 //                \Nuwave\Lighthouse\Schema\Extensions\TracingExtension::class,
@@ -45,6 +44,7 @@ class ApiServiceProvider extends EventServiceProvider
         $this->app->bind(\Nuwave\Lighthouse\Schema\SchemaBuilder::class, GraphQL\SchemaBuilder::class);
         $this->app->register(\Nuwave\Lighthouse\Providers\LighthouseServiceProvider::class, true);
         $this->app->singleton(GraphQL\GraphQL::class);
+        $this->app->singleton(\Nuwave\Lighthouse\GraphQL::class, GraphQL\GraphQL::class);
         $this->app->alias(GraphQL\GraphQL::class, 'graphql');
         $this->app->register(\DeInternetJongens\LighthouseUtils\ServiceProvider::class);
     }

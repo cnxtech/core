@@ -18,5 +18,10 @@ class HttpServiceProvider extends RouteServiceProvider
             ->namespace($this->namespace)
             ->prefix($codex[ 'http.prefix' ])
             ->group(__DIR__ . '/../../routes/web.php');
+
+        $router
+            ->namespace($this->namespace)
+            ->prefix($codex[ 'http.prefix' ])
+            ->group(__DIR__ . '/../../routes/api.php');
     }
 }

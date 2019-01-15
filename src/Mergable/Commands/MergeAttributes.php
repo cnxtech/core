@@ -5,12 +5,14 @@ namespace Codex\Mergable\Commands;
 use Codex\Attributes\AttributeConfigBuilderGenerator;
 use Codex\Contracts\Mergable\Mergable;
 use Illuminate\Contracts\Config\Repository;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\Arr;
-use Symfony\Component\Config\Definition\Processor;
 
 
 class MergeAttributes
 {
+    use DispatchesJobs;
+
     protected $target;
 
     /** @var array */
@@ -51,28 +53,10 @@ class MergeAttributes
 
 
         // 3 : Generate and build the Config tree from attribute definitions
-        $builder   = $generator->generateGroup($this->target->getAttributeDefinitions()->name);
-        $processor = new Processor();
         // 4 : Filter the merged result to only include nodes defined/accepted with the target
-        $final = $processor->process($builder->buildTree(), [ $result ]);
+        $final = $this->dispatch(new ProcessAttributes($this->target, $result));
         // 5 : Set the final result data on the target
         $this->target->setMergedAttributes($final);
-
-        // 6 : Resolve what changes there have been to the data compared to the parent and let the kid know
-        $finalInherited = array_only($final, $this->getInheritKeys());
-        $parent         = array_dot($parentAttributes);
-        $target         = array_dot($finalInherited);
-        $changed        = [];
-        foreach ($target as $key => $val) {
-            if ( ! array_key_exists($key, $parent) || $parent[ $key ] !== $val) {
-                $k = head(preg_split('/\.\d/', $key));
-                if ( ! \in_array($k, $changed, true)) {
-                    $changed[] = $k;
-                }
-            }
-        }
-        $this->target->setChanged($changed);
-        $a = 'a';
     }
 
     protected function getInheritKeys()
@@ -102,5 +86,4 @@ class MergeAttributes
         }
         return $attributes;
     }
-
 }

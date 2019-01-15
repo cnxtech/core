@@ -10,6 +10,7 @@ use Codex\Concerns\HasEvents;
 use Codex\Contracts\Mergable\ChildInterface;
 use Codex\Contracts\Mergable\Mergable;
 use Codex\Contracts\Mergable\ParentInterface;
+use Codex\Mergable\Commands\GetChangedAttributes;
 use Codex\Mergable\Concerns\HasMergableAttributes;
 use Codex\Mergable\Concerns\HasRelations;
 use Illuminate\Contracts\Support\Arrayable;
@@ -17,12 +18,14 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HidesAttributes;
 use Illuminate\Database\Eloquent\JsonEncodingException;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, Mergable
 {
+    use DispatchesJobs;
     use HasContainer;
     use HasRelations;
     use HidesAttributes;
@@ -93,6 +96,20 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $data = data_get($this, $key, $default);
         $this->rehide(true);
         return $data;
+    }
+
+    public function set($key, $value)
+    {
+        data_set($this->attributes, $key, $value);
+        return $this;
+    }
+
+    public function push($key, $value)
+    {
+        $data   = $this->attr($key, []);
+        $data[] = $value;
+        data_set($this->attributes, $key, $data);
+        return $this;
     }
 
 
@@ -222,10 +239,23 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
     protected $attributes = [];
 
+    public function getChanges()
+    {
+        if($this instanceof ChildInterface) {
+            return $this->dispatch(new GetChangedAttributes($this, true, [ 'changes' ]));
+        }
+        return [];
+    }
+
     /** @return  AttributeDefinitionGroup */
     public function getAttributeDefinitions()
     {
         return $this->attributeDefinitions;
+    }
+
+    public function getInheritKeys()
+    {
+        return $this->attributeDefinitions->inheritKeys;
     }
 
     public function setRawAttributes(array $attributes)
@@ -337,7 +367,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
     public function getAttributeKeys()
     {
-        return array_merge(array_keys($this->attributes), $this->appends, $this->getMutatedAttributes());
+        return array_unique(array_merge(array_keys($this->attributes), $this->appends, $this->getMutatedAttributes()));
     }
 
     public function getAttributes()

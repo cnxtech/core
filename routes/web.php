@@ -6,3 +6,7 @@ Route::get("{projectKey?}/{revisionKey?}/{documentKey?}")
     ->prefix(codex()->getAttribute('http.documentation_prefix'))
     ->uses('DocumentController@getDocument')
     ->where('documentKey', '^(.*)');
+
+Route::get('/', function () {
+    return redirect()->route('codex.documentation');
+})->name('codex');

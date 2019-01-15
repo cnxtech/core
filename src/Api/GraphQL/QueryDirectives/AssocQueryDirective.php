@@ -39,6 +39,7 @@ class AssocQueryDirective implements QueryDirective, QueryFieldManipulator
             $newDefinition .= '!';
         }
         $partial            = PartialParser::fieldDefinition($newDefinition);
+        $partial->arguments = $partial->arguments->merge($fieldDefinition->arguments);
         $parentType->fields = ASTHelper::mergeUniqueNodeList($parentType->fields, [ $partial ], true);
         $document->setDefinition($parentType);
         return $document;

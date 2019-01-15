@@ -1,47 +1,81 @@
 <?php
 
 return [
-    'header' => [
-        'color'           => 'blue-grey-9',
-        'show'            => false,
-        'static'          => true,
-        'class'           => [ 'c-header' => true ],
-        'style'           => [],
-        'menu'            => [],
-        'title'           => config('codex.display_name', config('app.name')),
-        'revealOnScroll'  => true,
-        'showTitle'       => true,
-        'showLeftToggle'  => true,
-        'showRightToggle' => false,
+    'header'    => [
+        'color'             => 'blue-grey-9',
+        'show'              => true,
+        'show_left_toggle'  => true,
+        'show_right_toggle' => false,
+        'fixed'             => false,
+        'class'             => [ 'c-layout-header' => true ],
+        'style'             => [],
+        'menu'              => [
+            [
+                'label'    => 'Projects',
+                'sublabel' => '<%= store.project.display_name || "" %>',
+                'projects' => true,
+                'type'     => 'side-menu',
+                'side'     => 'right',
+                'icon'     => 'book',
+                'renderer' => 'big',
+            ],
+            [
+                'label'     => 'Revisions',
+                'sublabel'  => '<%= store.revision.key || "" %>',
+                'revisions' => true,
+                'type'      => 'side-menu',
+                'side'      => 'right',
+                'icon'      => 'code-fork',
+                'renderer'  => 'big',
+            ],
+        ],
+        'height'            => 64,
     ],
-    'left'   => [
-        'show'         => true,
-        'static'       => false,
-        'below_header' => true,
-        'aboveFooter'  => true,
-        'class'        => [ 'c-left' => true ],
-        'style'        => [],
-        'menu'         => [],
+    'left'      => [
+        'show'           => true,
+        'collapsed'      => false,
+        'outside'        => false,
+        'collapsedWidth' => 50,
+        'width'          => 250,
+        'class'          => [ 'c-layout-left' => true ],
+        'style'          => [],
+        'menu'           => [],
     ],
-    'right'  => [
-        'belowHeader' => true,
-        'aboveFooter' => true,
-        'class'       => [ 'c-right' => true ], //
-        'show'        => false, //
-        'static'      => true, //
-        'style'       => [], //
-        'menu'        => [], //
+    'right'     => [
+        'show'           => true,
+        'collapsed'      => true,
+        'outside'        => false,
+        'collapsedWidth' => 0,
+        'width'          => 250,
+        'class'          => [ 'c-layout-right' => true ],
+        'style'          => [],
+        'menu'           => [],
     ],
-    'page'   => [
-        'class' => [ 'c-page' => true ],
-        'style' => [ 'padding' => '24px', 'background' => '#FFFFFF' ],
-    ],
-    'footer' => [
-        'color'  => 'blue-grey-9',
-        'class'  => [ 'c-footer' => true ],
+    'footer'    => [
         'show'   => true,
-        'static' => false,
+        'fixed'  => false,
+        'height' => 64,
+        'color'  => 'blue-grey-9',
+        'class'  => [ 'c-layout-footer' => true ],
         'style'  => [],
         'menu'   => [],
+    ],
+    'container' => [
+        'class'   => [ 'c-layout-container' => true ],
+        'style'   => [],
+        'stretch' => true,
+    ],
+    'middle'    => [
+        'class'   => [ 'c-layout-middle' => true ],
+        'style'   => [],
+        'padding' => 0,
+        'margin'  => 0,
+    ],
+    'content'   => [
+        'class'   => [ 'c-layout-content' => true ],
+        'style'   => [],
+        'color'   => 'grey-1',
+        'padding' => '12px 24px',
+        'margin'  => 24,
     ],
 ];

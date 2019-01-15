@@ -21,6 +21,7 @@ class AttributeDefinitionType extends Enum
 {
     const MIXED = 'mixed';
     const DICTIONARY = 'dictionary';
+    const DICTIONARY_ARRAY = 'dictionaryPrototype';
     const ARRAY_DICTIONARY = 'array.dictionaryPrototype';
     const ARRAY_ARRAY = 'array.arrayPrototype';
     const ARRAY_SCALAR = 'array.scalarPrototype';
@@ -34,6 +35,7 @@ class AttributeDefinitionType extends Enum
     public static $apiTypeMap = [
         self::MIXED            => 'Mixed',
         self::DICTIONARY       => 'Assoc',
+        self::DICTIONARY_ARRAY => '[Assoc]',
         self::ARRAY_DICTIONARY => 'Assoc',
         self::ARRAY_ARRAY      => 'Assoc',
         self::ARRAY_SCALAR     => 'Assoc',
@@ -53,6 +55,7 @@ class AttributeDefinitionType extends Enum
     public static $nodeTypeMap = [
         self::MIXED            => 'scalar',
         self::DICTIONARY       => 'dictionary',
+        self::DICTIONARY_ARRAY => 'dictionaryPrototype',
         self::ARRAY_DICTIONARY => 'array.dictionaryPrototype',
         self::ARRAY_ARRAY      => 'array.arrayPrototype',
         self::ARRAY_SCALAR     => 'array.scalarPrototype',

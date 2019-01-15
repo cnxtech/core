@@ -13,6 +13,7 @@ class ConfigResolverRegistry
         'integer'                   => ConfigResolver::class . '@integer',
         'array'                     => ConfigResolver::class . '@array',
         'dictionary'                => ConfigResolver::class . '@dictionary',
+        'dictionaryPrototype'                => ConfigResolver::class . '@dictionaryPrototype',
         'array.dictionaryPrototype' => ConfigResolver::class . '@arrayDictionary',
         'array.scalarPrototype'     => ConfigResolver::class . '@arrayScalar',
         'array.arrayPrototype'      => ConfigResolver::class . '@arrayArray',

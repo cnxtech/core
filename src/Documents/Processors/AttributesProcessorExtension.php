@@ -32,10 +32,11 @@ class AttributesProcessorExtension extends ProcessorExtension implements PreProc
         // So instead of reading the whole file which is uneccesary, we only read until the close tag position
         // Using that position, we will override the document's content resolver and make that start reading from there untill EOF
         $stream      = $document->getFiles()->readStream($document->getPath());
-        $headContent = trim(fread($stream, 10));
+        $headContent = head(preg_split('/\n/', trim(fread($stream, 20))));
         if ( ! $this->checkHasOpenTag($headContent)) {
             return;
         }
+        fseek($stream, strlen($headContent), SEEK_SET);
         $close = $this->mapPregQuote($this->config('tags.*.close'));
         $done  = false;
         while ( ! feof($stream) && ($buffer = fgets($stream, 4096)) !== false && $done === false) {

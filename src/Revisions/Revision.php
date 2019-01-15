@@ -47,7 +47,7 @@ class Revision extends Model implements RevisionContract, ChildInterface, Parent
         $this->setChildren($documents->setParent($this));
         $registry = $this->getCodex()->getRegistry()->resolveGroup('revisions');
         $this->init($attributes, $registry);
-        $this->addGetMutator('changed', 'getChanged', true, true);
+        $this->addGetMutator('inherits', 'getInheritKeys', true, true);
         $this->addGetMutator('changes', 'getChanges', true, true);
     }
 

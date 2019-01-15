@@ -5,11 +5,14 @@ namespace Codex\Api\GraphQL;
 use Codex\Api\GraphQL\Directives\QueryConstraints;
 use Codex\Codex;
 use Codex\Exceptions\NotFoundException;
-use GraphQL\Error\Error;
+use Codex\Mergable\Commands\GetChangedAttributes;
 use GraphQL\Type\Definition\ResolveInfo;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 
 class CodexQueries
 {
+    use DispatchesJobs;
+
     public function resolve($rootValue, array $args, $context, ResolveInfo $resolveInfo)
     {
         $codex = codex();
@@ -137,5 +140,21 @@ class CodexQueries
         $show     = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
         $document->show($show);
         return $document;
+    }
+
+    public function diff($rootValue, array $args, $context, ResolveInfo $resolveInfo)
+    {
+        $left = data_get($args, 'left', null);
+        if ($left !== null) {
+            $left = codex()->get($left);
+        }
+        $right = data_get($args, 'right', null);
+        if ($right !== null) {
+            $right = codex()->get($right);
+        }
+        $data = $this->dispatch(new GetChangedAttributes($left, $right));
+
+
+        return [ 'attributes' => $data ];
     }
 }

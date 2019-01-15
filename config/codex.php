@@ -42,7 +42,7 @@ return [
         // http://host.com/foobar/graphql
         // you can leave this to null to not have a base_route
         'prefix'               => env('CODEX_ROUTING_PREFIX', null),
-        'api_prefix'           => 'graphql',
+        'api_prefix'           => 'api',
         'documentation_prefix' => 'documentation',
         'documentation_view'   => 'codex::index',
     ],
@@ -71,7 +71,7 @@ return [
 
         'disk'         => null,
         'display_name' => null,
-        'description'  => '',
+        'description'  => null,
         'processors'   => [ 'enabled' => [], 'disabled' => [], ],
 
         'view'  => 'codex::partials.document',
@@ -99,8 +99,8 @@ return [
     'revisions' => [],
 
     'documents' => [
-        'title'       => '',
-        'subtitle'    => '',
-        'description' => '',
+        'title'       => null,
+        'subtitle'    => null,
+        'description' => null,
     ],
 ];

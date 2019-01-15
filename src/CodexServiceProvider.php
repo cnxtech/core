@@ -4,6 +4,7 @@ namespace Codex;
 
 use Codex\Addons\Extensions\RegisterExtension;
 use Codex\Attributes\AttributeDefinitionFactory;
+use Codex\Contracts\Documents\Document;
 use Codex\Documents\Events\ResolvedDocument;
 use Codex\Documents\Listeners\ProcessDocument;
 use Codex\Log\Log;
@@ -74,6 +75,7 @@ class CodexServiceProvider extends ServiceProvider
         Documents\Processors\LinksProcessorExtension::class,
         Documents\Processors\MacrosProcessorExtension::class,
         Documents\Processors\TocProcessorExtension::class,
+        Documents\Processors\HeaderProcessorExtension::class,
         Attributes\AttributeSchemaExtension::class,
     ];
 
@@ -86,7 +88,15 @@ class CodexServiceProvider extends ServiceProvider
     public function boot()
     {
         $app = parent::boot();
-
+        $app[ 'events' ]->listen(ResolvedDocument::class, function (ResolvedDocument $event) {
+            $document = $event->getDocument();
+            $document->on('process', function (Document $document) {
+                $document->push('meta.meta', [ 'name' => 'title', 'content' => $document->attr('title') ]);
+                $description = $document->attr('description', $document->getProject()->attr('description', $document->getCodex()->attr('description')));
+                $document->push('meta.meta', [ 'name' => 'description', 'content' => $description ]);
+                $document->push('meta.htmlAttributes.lang', config('app.locale'));
+            });
+        });
 
         return $app;
     }
@@ -123,7 +133,7 @@ class CodexServiceProvider extends ServiceProvider
     {
         $this->app->singleton('codex.log', function () {
             $logger = new Log();
-            $logger->useFiles($this->app['config']['codex.paths.log']);
+            $logger->useFiles($this->app[ 'config' ][ 'codex.paths.log' ]);
             $logger->useFirePHP();
             $logger->useChromePHP();
             return $logger;
@@ -145,9 +155,21 @@ class CodexServiceProvider extends ServiceProvider
     {
         $registry = $this->app->make(Attributes\AttributeDefinitionRegistry::class);
         $codex    = $registry->codex;
+        $codex->add('changes', 'dictionary', 'Assoc');
+
         $codex->add('display_name', 'string')->setDefault('Codex');
         $codex->add('description', 'string')->setDefault('');
         $codex->add('default_project', 'string', 'ID')->setDefault(null);
+
+        $urls = $codex->add('urls', 'dictionary')->setApiType('CodexUrls', [ 'new' ]);
+        $urls->add('api', 'string');
+        $urls->add('root', 'string');
+        $urls->add('documentation', 'string');
+
+        $paths = $codex->add('paths', 'dictionary')->noApi();
+        $paths->add('docs', 'string');
+        $paths->add('log', 'string');
+
         $processors = $codex->add('processors', 'dictionary')->noApi(); //->setApiType('Processors', [ 'new' ]);
         $processors->add('enabled', 'array.scalarPrototype');
 
@@ -161,11 +183,12 @@ class CodexServiceProvider extends ServiceProvider
         $menu->add('id', 'string', 'ID', function () {
             return md5(str_random());
         });
-        $menu->add('type', 'string')->setDefault('link');
+        $menu->add('type', 'string');
         $menu->add('side', 'string');
         $menu->add('target', 'string')->setDefault('self');
         $menu->add('href', 'string');
         $menu->add('path', 'string');
+        $menu->add('renderer', 'string');
         $menu->add('expand', 'boolean');
         $menu->add('selected', 'boolean');
         $menu->add('label', 'string');
@@ -183,7 +206,7 @@ class CodexServiceProvider extends ServiceProvider
         $addLayoutPart           = function (string $name, string $apiType) use ($layout) {
             $part = $layout->add($name, 'dictionary')->setApiType($apiType, [ 'new' ]);
             $part->add('class', 'array.scalarPrototype');
-            $part->add('style', 'array.scalarPrototype');
+            $part->add('style', 'array.scalarPrototype')->setDefault([]);
             $part->add('color', 'string')->setDefault(null);
             return $part;
         };
@@ -214,17 +237,22 @@ class CodexServiceProvider extends ServiceProvider
         $layoutMiddle    = $addLayoutPart('middle', 'LayoutMiddle');
         $layoutContent   = $addLayoutPart('content', 'LayoutContent');
 
+        $layoutHeader->add('show_left_toggle', 'boolean')->setDefault(false);
+        $layoutHeader->add('show_right_toggle', 'boolean')->setDefault(false);
         $layoutContainer->add('stretch', 'boolean')->setDefault(true);
-        $layoutMiddle->add('padding', 'integer')->setDefault(24);
+        $layoutMiddle->add('padding', 'mixed', 'Mixed', 0);
+        $layoutMiddle->add('margin', 'mixed', 'Mixed', 0);
+        $layoutContent->add('padding', 'mixed', 'Mixed', 0);
+        $layoutContent->add('margin', 'mixed', 'Mixed', 0);
 
 
         $projects = $registry->projects;
+        $projects->add('inherits', 'array.scalarPrototype', '[String]');
         $projects->addInheritKeys([ 'processors', 'layout' ]);
-        $projects->add('changed', 'array.scalarPrototype', '[String]');
         $projects->add('changes', 'dictionary', 'Assoc');
         $projects->add('key', 'string', 'ID!');
-        $projects->add('path', 'string');
-        $projects->add('display_name', 'string')->setDefault(null);
+        $projects->add('path', 'string')->noApi();
+        $projects->add('display_name', 'string')->setDefault('');
         $projects->add('description', 'string')->setDefault('');
         $projects->add('disk', 'string')->setDefault(null);
         $projects->add('view', 'string')->setDefault('codex::document');
@@ -237,10 +265,22 @@ class CodexServiceProvider extends ServiceProvider
         $meta->add('icon', 'string')->setDefault('fa-book');
         $meta->add('color', 'string')->setDefault('deep-orange');
         $meta->add('license', 'string')->setDefault('MIT');
-        $meta->add('stylesheets', 'array.scalarPrototype');
-        $meta->add('javascripts', 'array.scalarPrototype');
-        $meta->add('styles', 'array.scalarPrototype');
-        $meta->add('scripts', 'array.scalarPrototype');
+//        $meta->add('stylesheets', 'array.scalarPrototype');
+//        $meta->add('javascripts', 'array.scalarPrototype');
+//        $meta->add('styles', 'array.scalarPrototype');
+//        $meta->add('scripts', 'array.scalarPrototype');
+
+        $meta->add('defaultTitle', 'string');
+        $meta->add('title', 'string');
+        $meta->add('titleTemplate', 'string');
+        $meta->add('titleAttributes', 'dictionary', 'Assoc');
+        $meta->add('htmlAttributes', 'dictionary', 'Assoc');
+        $meta->add('bodyAttributes', 'dictionary', 'Assoc');
+        $metaLink   = $meta->add('link', 'dictionaryPrototype', '[Assoc]', []);
+        $metameta   = $meta->add('meta', 'dictionaryPrototype', '[Assoc]', []);
+        $metaScript = $meta->add('script', 'array.scalarPrototype', '[String]', []);
+        $metaStyle  = $meta->add('style', 'array.scalarPrototype', '[String]', []);
+
 
 //        $revision = $projects->add('revision', 'dictionary')->setApiType('RevisionConfig', [ 'new' ]);
         $projects->add('default_revision', 'string')->setDefault('master');
@@ -255,14 +295,14 @@ class CodexServiceProvider extends ServiceProvider
         $revisions = $registry->revisions;
         $revisions->addMergeKeys([]);
         $revisions->addInheritKeys([ 'processors', 'meta', 'layout', 'view', 'cache', 'default_document', 'document_extensions' ]);
-        $revisions->add('changed', 'array.scalarPrototype', '[String]');
+        $revisions->add('inherits', 'array.scalarPrototype', '[String]');
         $revisions->add('changes', 'dictionary', 'Assoc');
         $revisions->add('key', 'string', 'ID!');
 
         $documents = $registry->documents;
         $documents->addMergeKeys([]);
         $documents->addInheritKeys([ 'processors', 'meta', 'layout', 'view', 'cache' ]);
-        $documents->add('changed', 'array.scalarPrototype', '[String]');
+        $documents->add('inherits', 'array.scalarPrototype', '[String]');
         $documents->add('changes', 'dictionary', 'Assoc');
         $documents->add('key', 'string', 'ID!');
         $documents->add('path', 'string');

@@ -17,6 +17,7 @@ use Illuminate\Contracts\Filesystem\Factory;
  *
  * @package Codex\Projects
  * @author  Robin Radic
+ * @method \Codex\Codex getParent()
  */
 class Project extends Model implements ProjectContract, ChildInterface, ParentInterface
 {
@@ -57,7 +58,7 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
         $this->setChildren($revisions->setParent($this));
         $registry = $this->getCodex()->getRegistry()->resolveGroup('projects');
         $this->init($attributes, $registry);
-        $this->addGetMutator('changed', 'getChanged', true, true);
+        $this->addGetMutator('inherits', 'getInheritKeys', true, true);
         $this->addGetMutator('changes', 'getChanges', true, true);
     }
 

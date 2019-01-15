@@ -12,8 +12,6 @@ interface Mergable
 
     public function setMergedAttributes(array $attributes);
 
-    public function setChanged(array $keys);
-
     /** @return \Codex\Attributes\AttributeDefinitionGroup */
     public function getAttributeDefinitions();
 }

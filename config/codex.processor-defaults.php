@@ -43,6 +43,14 @@ return [
             'file_types' => [ 'md', 'markdown' ],
             'options'    => [
                 'html5' => true,
+                'table' => [
+                    'class' => 'table stack',
+                ],
+                'code'  => [
+                    'line_numbers' => true,
+                    'command_line' => true,
+                    'loader'       => false,
+                ],
             ],
         ],
         'rst'      => [], // refers to parser name
@@ -54,8 +62,8 @@ return [
         'header_link_show' => false,
         'header_link_text' => '#',
         'minimum_nodes'    => 2,
-        'view'             => 'codex::processors.toc',
-        'header_view'      => 'codex::processors.toc-header',
+        'view'             => 'codex::react.processors.toc',//'codex::processors.toc',
+        'header_view'      => 'codex::react.processors.toc-header',//'codex::processors.toc-header',
     ],
     'buttons'    => [
         'buttons'                   => [

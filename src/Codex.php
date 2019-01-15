@@ -7,15 +7,16 @@ use Codex\Addons\Extensions\ExtensionCollection;
 use Codex\Api\GraphQL\GraphQL;
 use Codex\Attributes\AttributeDefinitionRegistry;
 use Codex\Contracts\Documents\Document;
-use Codex\Contracts\Log\Log;
 use Codex\Contracts\Mergable\ParentInterface;
 use Codex\Contracts\Projects\Project;
 use Codex\Contracts\Revisions\Revision;
 use Codex\Exceptions\NotFoundException;
+use Codex\Mergable\Commands\ProcessAttributes;
 use Codex\Mergable\Concerns\HasChildren;
 use Codex\Mergable\Model;
 use Codex\Projects\ProjectCollection;
 use Illuminate\Contracts\Config\Repository as Config;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 
 /**
  * This is the class Codex.
@@ -26,6 +27,7 @@ use Illuminate\Contracts\Config\Repository as Config;
  */
 class Codex extends Model implements ParentInterface
 {
+    use DispatchesJobs;
     use HasChildren {
         _setChildrenProperty as setChildren;
     }
@@ -74,7 +76,20 @@ class Codex extends Model implements ParentInterface
 
         $this->setChildren($projects->setParent($this));
         $attributes = array_except($config->get('codex', []), [ 'projects', 'revisions', 'documents' ]);
-        $this->init($attributes, $registry->resolveGroup('codex'))->rehide();
+        $group      = $registry->resolveGroup('codex');
+        $attributes = $this->dispatch(new ProcessAttributes($group, $attributes));
+        $this->init($attributes, $group)->rehide();
+        $this->addGetMutator('urls', 'getUrls', true, true);
+        $this->addGetMutator('changes', 'getChanges', true, true);
+    }
+
+    public function getUrls()
+    {
+        return [
+            'root'          => url()->route('codex', [], false),
+            'api'           => url()->route('codex.api', [], false),
+            'documentation' => url()->route('codex.documentation', [], false),
+        ];
     }
 
     public function url($projectKey = null, $revisionKey = null, $documentKey = null)
