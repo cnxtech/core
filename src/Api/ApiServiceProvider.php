@@ -2,6 +2,7 @@
 
 namespace Codex\Api;
 
+use Codex\Api\GraphQL\Extensions\ETagExtension;
 use Codex\Api\GraphQL\QueryDirectiveRegistry;
 use Codex\Api\Listeners\AttachSchemaExtensions;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider;
@@ -26,6 +27,7 @@ class ApiServiceProvider extends EventServiceProvider
             'controller'      => false, //\Codex\Http\Controllers\ApiController::class . '@query',
             'schema.register' => __DIR__ . '/../../routes/schema.graphqls',
             'extensions'      => [
+                ETagExtension::class,
 //                \Nuwave\Lighthouse\Schema\Extensions\TracingExtension::class,
             ],
             'error_handlers'  => [ \Nuwave\Lighthouse\Execution\ExtensionErrorHandler::class ],
@@ -64,6 +66,7 @@ class ApiServiceProvider extends EventServiceProvider
             GraphQL\Directives\PagesDirective::class,
             GraphQL\Directives\ConstraintsDirective::class,
             GraphQL\Directives\DefaultValueDirective::class,
+            GraphQL\Directives\CacheMergableDirective::class,
         ];
         $registry = resolve(DirectiveRegistry::class);
         foreach ($classes as $directiveClass) {

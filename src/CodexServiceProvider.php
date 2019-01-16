@@ -7,6 +7,7 @@ use Codex\Attributes\AttributeDefinitionFactory;
 use Codex\Contracts\Documents\Document;
 use Codex\Documents\Events\ResolvedDocument;
 use Codex\Documents\Listeners\ProcessDocument;
+use Codex\Http\Middleware\AccessControlHeaders;
 use Codex\Log\Log;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Filesystem\FilesystemAdapter;

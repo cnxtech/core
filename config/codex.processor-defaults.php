@@ -44,7 +44,7 @@ return [
             'options'    => [
                 'html5' => true,
                 'table' => [
-                    'class' => 'table stack',
+                    'class' => 'table hover',
                 ],
                 'code'  => [
                     'line_numbers' => true,

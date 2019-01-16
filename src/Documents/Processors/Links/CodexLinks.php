@@ -126,13 +126,13 @@ class CodexLinks
         $this->props = array_merge($this->props, compact('type', 'action', 'to', 'styling', 'icon'));
 
         // Add modifiers as data-* attributes and as json string in data-prop
-        $el = $link->getElement();
-        $el->setAttribute('data-props', json_encode($this->props));
-        foreach ($this->props as $key => $value) {
-            if ($value === null) {
-                continue;
-            }
-            $el->setAttribute('data-' . $key, (string)$value);
-        }
+//        $el = $link->getElement();
+        $el = $link->replaceElement('c-link', $link->getElement()->textContent, [ 'props' => json_encode($this->props, JSON_UNESCAPED_SLASHES) ]);
+//        foreach ($this->props as $key => $value) {
+//            if ($value === null) {
+//                continue;
+//            }
+//            $el->setAttribute('data-' . $key, (string)$value);
+//        }
     }
 }
