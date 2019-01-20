@@ -832,7 +832,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function __toString()
     {
-        return $this->toJson();
+        return $this->getKey();
     }
 
     /**

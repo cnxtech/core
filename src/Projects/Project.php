@@ -67,11 +67,6 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
         return $this->getCodex()->url($this->getKey(), $revisionKey, $documentKey);
     }
 
-    public function revisions()
-    {
-        return $this->getRevisions()->toRelationship();
-    }
-
     public function setMergedAttributes(array $attributes)
     {
         parent::setMergedAttributes($attributes);
@@ -79,11 +74,13 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
         return $this;
     }
 
-    /**
-     * getRevisions method
-     *
-     * @return \Codex\Revisions\RevisionCollection
-     */
+    /** @return \Codex\Contracts\Revisions\Revision[]|\Codex\Mergable\EloquentCollection */
+    public function revisions()
+    {
+        return $this->getRevisions()->toRelationship();
+    }
+
+    /** @return \Codex\Contracts\Revisions\Revision[]|\Codex\Revisions\RevisionCollection */
     public function getRevisions()
     {
         return $this->children->resolve();

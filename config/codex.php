@@ -36,6 +36,8 @@ return [
         'log'  => storage_path('logs/codex.log'),
     ],
 
+    'cache' => config('app.debug') === false,
+
     'http' => [
         // run codex under a specific uri. For example, setting this to 'foobar' will result in urls like
         // http://host.com/foobar/documentation/$PROJECT/$REVISION/$DOCUMENT
@@ -44,7 +46,8 @@ return [
         'prefix'               => env('CODEX_ROUTING_PREFIX', null),
         'api_prefix'           => 'api',
         'documentation_prefix' => 'documentation',
-        'documentation_view'   => 'codex::index',
+//        'documentation_view'   => 'codex::index',
+        'documentation_view'   => 'codex::react.index',
     ],
 
     'processors' => [

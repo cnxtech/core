@@ -218,6 +218,7 @@ class CodexServiceProvider extends ServiceProvider
             $part->add('outside', 'boolean')->setDefault(true);
             $part->add('width', 'integer')->setDefault(200);
             $part->add('collapsedWidth', 'integer')->setDefault(50);
+            $part->add('fixed', 'boolean')->setDefault(false);
             $part->addChild($menu);
             return $part;
         };

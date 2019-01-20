@@ -106,6 +106,11 @@ class Codex extends Model implements ParentInterface
         return route('codex.documentation', compact('projectKey', 'revisionKey', 'documentKey'));
     }
 
+    /**
+     * projects method
+     *
+     * @return \Codex\Mergable\EloquentCollection|\Codex\Contracts\Projects\Project[]
+     */
     public function projects()
     {
         return $this->getProjects()->toRelationship();
