@@ -36,6 +36,9 @@ class Revision extends Model implements RevisionContract, ChildInterface, Parent
     /** @var \Codex\Documents\DocumentCollection */
     protected $children;
 
+    /** @var string */
+    protected $configFilePath;
+
     /**
      * Revision constructor.
      *
@@ -113,4 +116,19 @@ class Revision extends Model implements RevisionContract, ChildInterface, Parent
         return $this->getDocuments()->getDefaultKey();
     }
 
+    public function setConfigFilePath($configFilePath)
+    {
+        $this->configFilePath =$configFilePath;
+        return $this;
+    }
+
+    public function getConfigFilePath()
+    {
+        return $this->configFilePath;
+    }
+
+    public function getLastModified()
+    {
+        return $this->getFiles()->lastModified($this->configFilePath);
+    }
 }

@@ -36,7 +36,11 @@ return [
         'log'  => storage_path('logs/codex.log'),
     ],
 
-    'cache' => config('app.debug') === false,
+    'cache' => [
+        'enabled'  => env('CODEX_CACHE_ENABLED', config('app.debug') !== true),
+        'key'     => env('CODEX_CACHE_KEY', 'codex'),
+        'minutes' => (int)env('CODEX_CACHE_MINUTES', 60),
+    ],
 
     'http' => [
         // run codex under a specific uri. For example, setting this to 'foobar' will result in urls like
@@ -77,20 +81,7 @@ return [
         'description'  => null,
         'processors'   => [ 'enabled' => [], 'disabled' => [], ],
 
-        'view'  => 'codex::partials.document',
-        'cache' => [
-            // true     = enabled
-            // false    = disabled
-            // null     = disabled when app.debug is true
-            'mode'    => null, // \Codex\Types\CacheMode::AUTO(), //\Codex\Entities\Document::CACHE_AUTO,
-
-            // Whenever a document's last modified time changes, the document's cache is refreshed.
-            // It is possible to set this to null making it refresh by checking last modified.
-            // Alternatively, you can also set a max duration in minutes.
-            // Recommended is to put it on null
-            'minutes' => 7,
-        ],
-
+        'view'                          => 'codex::partials.document',
         'default_revision'              => 'master',
         'allow_revision_php_config'     => false,
         'allowed_revision_config_files' => [ 'revision.yml', 'revision.yaml', 'config.yml', 'config.yaml' ],

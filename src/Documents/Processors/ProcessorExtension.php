@@ -25,17 +25,26 @@ abstract class ProcessorExtension extends Extension
 
     abstract public function defineConfigAttributes(AttributeDefinition $definition);
 
-    public function onRegistered(Repository $config, AttributeDefinitionRegistry $registry)
+    protected function registerDefaultConfig(Repository $config, AttributeDefinitionRegistry $registry)
     {
         $defaultConfig = $this->defaultConfig;
         if (is_string($defaultConfig)) {
             $defaultConfig = $config->get($defaultConfig, []);
         }
         $config->set('codex.processors.' . $this->getName(), $defaultConfig);
+    }
 
+    protected function registerConfigAttributes(Repository $config, AttributeDefinitionRegistry $registry)
+    {
         $processors = $registry->getGroup('codex')->getChild('processors');
         $processor  = $processors->add($this->getName(), 'dictionary', 'Assoc');
         $this->defineConfigAttributes($processor);
+    }
+
+    public function onRegistered(Repository $config, AttributeDefinitionRegistry $registry)
+    {
+        $this->registerDefaultConfig($config, $registry);
+        $this->registerConfigAttributes($config, $registry);
     }
 
     public function isEnabledForDocument(Document $document)
@@ -48,11 +57,16 @@ abstract class ProcessorExtension extends Extension
         if ($document === null) {
             $document = $this->document;
         }
-        $config = $document->getAttribute("processors.{$this->getName()}");
+        $config = $document->attr($this->getConfigKey(), []);
         if ($key === null) {
             return $config;
         }
         return data_get($config, $key, $default);
+    }
+
+    protected function getConfigKey()
+    {
+        return "processors.{$this->getName()}";
     }
 
     public function getProvides()
@@ -69,7 +83,6 @@ abstract class ProcessorExtension extends Extension
     {
         return $this->before;
     }
-
 
 
     /**

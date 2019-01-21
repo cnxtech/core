@@ -158,6 +158,11 @@ class CodexServiceProvider extends ServiceProvider
         $codex    = $registry->codex;
         $codex->add('changes', 'dictionary', 'Assoc');
 
+        $cache = $codex->add('cache', 'dictionary')->setApiType('CacheConfig', [ 'new' ]);
+        $cache->add('enabled', 'boolean');
+        $cache->add('key', 'string');
+        $cache->add('minutes', 'integer');
+
         $codex->add('display_name', 'string')->setDefault('Codex');
         $codex->add('description', 'string')->setDefault('');
         $codex->add('default_project', 'string', 'ID')->setDefault(null);
@@ -249,8 +254,9 @@ class CodexServiceProvider extends ServiceProvider
 
 
         $projects = $registry->projects;
+        $projects->addMergeKeys([]);
+        $projects->addInheritKeys([ 'processors', 'layout', 'cache' ]);
         $projects->add('inherits', 'array.scalarPrototype', '[String]');
-        $projects->addInheritKeys([ 'processors', 'layout' ]);
         $projects->add('changes', 'dictionary', 'Assoc');
         $projects->add('key', 'string', 'ID!');
         $projects->add('path', 'string')->noApi();
@@ -259,18 +265,10 @@ class CodexServiceProvider extends ServiceProvider
         $projects->add('disk', 'string')->setDefault(null);
         $projects->add('view', 'string')->setDefault('codex::document');
 
-        $cache = $projects->add('cache', 'dictionary')->setApiType('Cache', [ 'new' ]);
-        $cache->add('mode', 'string')->setDefault(null);
-        $cache->add('minutes', 'integer')->setDefault(7);
-
         $meta = $projects->add('meta', 'dictionary')->setApiType('Meta', [ 'new' ]);
         $meta->add('icon', 'string')->setDefault('fa-book');
         $meta->add('color', 'string')->setDefault('deep-orange');
         $meta->add('license', 'string')->setDefault('MIT');
-//        $meta->add('stylesheets', 'array.scalarPrototype');
-//        $meta->add('javascripts', 'array.scalarPrototype');
-//        $meta->add('styles', 'array.scalarPrototype');
-//        $meta->add('scripts', 'array.scalarPrototype');
 
         $meta->add('defaultTitle', 'string');
         $meta->add('title', 'string');
@@ -283,13 +281,10 @@ class CodexServiceProvider extends ServiceProvider
         $metaScript = $meta->add('script', 'array.scalarPrototype', '[String]', []);
         $metaStyle  = $meta->add('style', 'array.scalarPrototype', '[String]', []);
 
-
-//        $revision = $projects->add('revision', 'dictionary')->setApiType('RevisionConfig', [ 'new' ]);
         $projects->add('default_revision', 'string')->setDefault('master');
         $projects->add('allow_revision_php_config', 'string')->setDefault(false);
         $projects->add('allowed_revision_config_files', 'array.scalarPrototype');
 
-//        $document = $projects->add('document', 'dictionary')->setApiType('DocumentConfig', [ 'new' ]);
         $projects->add('default_document', 'string')->setDefault('index');
         $projects->add('document_extensions', 'array.scalarPrototype');
 

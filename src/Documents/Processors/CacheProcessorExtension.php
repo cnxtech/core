@@ -3,22 +3,21 @@
 namespace Codex\Documents\Processors;
 
 use Codex\Attributes\AttributeDefinition;
+use Codex\Attributes\AttributeDefinitionRegistry;
 use Codex\Contracts\Documents\Document;
-use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Contracts\Config\Repository as Config;
 
 class CacheProcessorExtension extends ProcessorExtension implements PreProcessorInterface, PostProcessorInterface
 {
-    protected $defaultConfig = [
-        'mode'    => null,
-        'minutes' => null,
-    ];
+    protected $defaultConfig = 'codex.cache';
 
     /** @var \Illuminate\Contracts\Cache\Repository */
     protected $cache;
 
     protected $after = [ 'attributes' ];
 
-    public function __construct(Repository $cache)
+    public function __construct(Cache $cache)
     {
         $this->cache = $cache;
     }
@@ -26,12 +25,6 @@ class CacheProcessorExtension extends ProcessorExtension implements PreProcessor
     public function getName()
     {
         return 'cache';
-    }
-
-    public function defineConfigAttributes(AttributeDefinition $definition)
-    {
-        $definition->add('mode', 'string')->setDefault(null);
-        $definition->add('minutes', 'mixed', 'Int')->setDefault(null);
     }
 
     public function preProcess(Document $document)
@@ -114,11 +107,7 @@ class CacheProcessorExtension extends ProcessorExtension implements PreProcessor
      */
     protected function shouldCache()
     {
-        $mode = $this->config('mode');
-        if ($mode === true || ($mode === null && config('app.debug', false) !== true)) {
-            return true;
-        }
-        return false;
+        return $this->config('enabled', false) === true;
     }
 
     /**
@@ -130,6 +119,22 @@ class CacheProcessorExtension extends ProcessorExtension implements PreProcessor
      */
     protected function getCacheKey($suffix = '')
     {
-        return 'codex.document.' . $this->getDocument()->getProject()->getKey() . '.' . str_slug($this->getDocument()->getPath()) . $suffix;
+        return $this->config('key') . '.document.' . $this->getDocument()->getProject()->getKey() . '.' . str_slug($this->getDocument()->getPath()) . $suffix;
+    }
+
+    protected function getConfigKey()
+    {
+        return 'cache';
+    }
+
+    public function onRegistered(Config $config, AttributeDefinitionRegistry $registry)
+    {
+//        $this->registerDefaultConfig($config, $registry);
+//        $this->registerConfigAttributes($config, $registry);
+    }
+
+    public function defineConfigAttributes(AttributeDefinition $definition)
+    {
+
     }
 }

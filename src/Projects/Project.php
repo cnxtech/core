@@ -11,6 +11,7 @@ use Codex\Mergable\Concerns\HasParent;
 use Codex\Mergable\Model;
 use Codex\Revisions\RevisionCollection;
 use Illuminate\Contracts\Filesystem\Factory;
+use Illuminate\Filesystem\Filesystem;
 
 /**
  * This is the class Project.
@@ -43,6 +44,12 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
      */
     protected $fsm;
 
+    /** @var string */
+    protected $configFilePath;
+
+    /** @var \Illuminate\Filesystem\Filesystem */
+    protected $fs;
+
 
     /**
      * Project constructor.
@@ -51,9 +58,11 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
      * @param \Codex\Revisions\RevisionCollection      $revisions
      * @param \Illuminate\Contracts\Filesystem\Factory $fsm
      */
-    public function __construct(array $attributes, RevisionCollection $revisions, Factory $fsm)
+    public function __construct(array $attributes, RevisionCollection $revisions, Factory $fsm, Filesystem $fs)
     {
         $this->fsm = $fsm;
+        $this->fs = $fs;
+
         $this->setParent($this->getCodex());
         $this->setChildren($revisions->setParent($this));
         $registry = $this->getCodex()->getRegistry()->resolveGroup('projects');
@@ -65,13 +74,6 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
     public function url($revisionKey = null, $documentKey = null)
     {
         return $this->getCodex()->url($this->getKey(), $revisionKey, $documentKey);
-    }
-
-    public function setMergedAttributes(array $attributes)
-    {
-        parent::setMergedAttributes($attributes);
-        $this->updateDisk();
-        return $this;
     }
 
     /** @return \Codex\Contracts\Revisions\Revision[]|\Codex\Mergable\EloquentCollection */
@@ -113,6 +115,22 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
     public function getDefaultRevisionKey()
     {
         return $this->getRevisions()->getDefaultKey();
+    }
+
+    public function setConfigFilePath($configFilePath)
+    {
+        $this->configFilePath =$configFilePath;
+        return $this;
+    }
+
+    public function getConfigFilePath()
+    {
+        return $this->configFilePath;
+    }
+
+    public function getLastModified()
+    {
+        return $this->fs->lastModified($this->configFilePath);
     }
 
     //region: FS Disk
