@@ -37,6 +37,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         __callStatic as __callStaticMacro;
     }
 
+    protected $storage;
+
     protected $primaryKey = 'key';
 
     protected $keyType = 'string';
@@ -133,6 +135,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if ($attributeDefinitions !== null) {
             $this->attributeDefinitions = $attributeDefinitions;
         }
+
+        $this->storage = collect();
 
         $this->bootIfNotBooted();
 
@@ -241,7 +245,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
     public function getChanges()
     {
-        if($this instanceof ChildInterface) {
+        if ($this instanceof ChildInterface) {
             return $this->dispatch(new GetChangedAttributes($this, true, [ 'changes' ]));
         }
         return [];
@@ -680,6 +684,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             }
         }
         return new Collection($models);
+    }
+
+    /**
+     * @return Collection
+     */
+    public function getStorage()
+    {
+        return $this->storage;
     }
 
     //endregion
