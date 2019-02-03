@@ -5,8 +5,6 @@
     <title>{{ $codex['display_name'] }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.2.0/custom-elements-es5-adapter.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/1.2.0/webcomponents-loader.js"></script>
 
     <style>
         html,
@@ -24,27 +22,48 @@
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.2.1/custom-elements-es5-adapter.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.2.1/webcomponents-loader.js"></script>
-    <script src="/backend_data.js"></script>
-    <script>
-        if ( window.localStorage.getItem('test-polys') ) {
-            delete window.fetch;
-            delete Object.assign;
-            delete String.prototype.startsWith;
-        }
-    </script>
+    <script src="{{ asset('backend_data.js') }}"></script>
 
-    <link href="{{ asset('vendor/codex_core/css/vendor~core.chunk.css?71e2db1ca80b87318ba1') }}" rel="stylesheet">
-    <link href="{{ asset('vendor/codex_core/css/core.css?35f1169523e0046d9ad3" rel="stylesheet') }} ">
-    <script type="text/javascript" src="{{ asset('vendor/codex_site/js/chunk.vendor~core~phpdoc.page~polyfill.resize.js') }} "></script>
-    <script type="text/javascript" src="{{ asset('vendor/codex_phpdoc/js/chunk.vendor~core~phpdoc.page.js') }} "></script>
-    <script type="text/javascript" src="{{ asset('vendor/codex_phpdoc/js/chunk.vendor~core~phpdoc.js') }} "></script>
-    <script type="text/javascript" src="{{ asset('vendor/codex_site/js/chunk.vendor~core~polyfill.resize.js') }} "></script>
-    <script type="text/javascript" src="{{ asset('vendor/codex_core/js/chunk.vendor~core.js') }} "></script>
-    <script type="text/javascript" src="{{ asset('vendor/codex_phpdoc/js/chunk.core~phpdoc.page.js') }} "></script>
-    <script type="text/javascript" src="{{ asset('vendor/codex_core/js/core.js') }} "></script>
-    <script type="text/javascript" src="{{ asset('vendor/codex_phpdoc/js/phpdoc.js') }} "></script>
-    <script type="text/javascript" src="{{ asset('vendor/codex_site/js/chunk.vendor~site.js') }} "></script>
-    <script type="text/javascript" src="{{ asset('vendor/codex_site/js/site.js') }} "></script>
+    <link rel="shortcut icon" href="{{ asset('vendor/codex_core/img/favicon.ico') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('vendor/codex_core/img/favicon-16x16.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('vendor/codex_core/img/favicon-32x32.png') }}">
+    <link rel="manifest" href="{{ asset('vendor/codex_core/img/manifest.json') }}">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#fff">
+    <meta name="application-name" content="@codex/app">
+    <link rel="apple-touch-icon" sizes="57x57" href="{{ asset('vendor/codex_core/img/apple-touch-icon-57x57.png') }}">
+    <link rel="apple-touch-icon" sizes="60x60" href="{{ asset('vendor/codex_core/img/apple-touch-icon-60x60.png') }}">
+    <link rel="apple-touch-icon" sizes="72x72" href="{{ asset('vendor/codex_core/img/apple-touch-icon-72x72.png') }}">
+    <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('vendor/codex_core/img/apple-touch-icon-76x76.png') }}">
+    <link rel="apple-touch-icon" sizes="114x114" href="{{ asset('vendor/codex_core/img/apple-touch-icon-114x114.png') }}">
+    <link rel="apple-touch-icon" sizes="120x120" href="{{ asset('vendor/codex_core/img/apple-touch-icon-120x120.png') }}">
+    <link rel="apple-touch-icon" sizes="144x144" href="{{ asset('vendor/codex_core/img/apple-touch-icon-144x144.png') }}">
+    <link rel="apple-touch-icon" sizes="152x152" href="{{ asset('vendor/codex_core/img/apple-touch-icon-152x152.png') }}">
+    <link rel="apple-touch-icon" sizes="167x167" href="{{ asset('vendor/codex_core/img/apple-touch-icon-167x167.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('vendor/codex_core/img/apple-touch-icon-180x180.png') }}">
+    <link rel="apple-touch-icon" sizes="1024x1024" href="{{ asset('vendor/codex_core/img/apple-touch-icon-1024x1024.png') }}">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="@codex/app">
+    <link rel="apple-touch-startup-image" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 1)" href="{{ asset('vendor/codex_core/img/apple-touch-startup-image-320x460.png') }}">
+    <link rel="apple-touch-startup-image" media="(device-width: 320px) and (device-height: 480px) and (-webkit-device-pixel-ratio: 2)" href="{{ asset('vendor/codex_core/img/apple-touch-startup-image-640x920.png') }}">
+    <link rel="apple-touch-startup-image" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" href="{{ asset('vendor/codex_core/img/apple-touch-startup-image-640x1096.png') }}">
+    <link rel="apple-touch-startup-image" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" href="{{ asset('vendor/codex_core/img/apple-touch-startup-image-750x1294.png') }}">
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 736px) and (orientation: landscape) and (-webkit-device-pixel-ratio: 3)" href="{{ asset('vendor/codex_core/img/apple-touch-startup-image-1182x2208.png') }}">
+    <link rel="apple-touch-startup-image" media="(device-width: 414px) and (device-height: 736px) and (orientation: portrait) and (-webkit-device-pixel-ratio: 3)" href="{{ asset('vendor/codex_core/img/apple-touch-startup-image-1242x2148.png') }}">
+    <link rel="apple-touch-startup-image" media="(device-width: 768px) and (device-height: 1024px) and (orientation: landscape) and (-webkit-device-pixel-ratio: 1)" href="{{ asset('vendor/codex_core/img/apple-touch-startup-image-748x1024.png') }}">
+    <link rel="apple-touch-startup-image" media="(device-width: 768px) and (device-height: 1024px) and (orientation: portrait) and (-webkit-device-pixel-ratio: 1)" href="{{ asset('vendor/codex_core/img/apple-touch-startup-image-768x1004.png') }}">
+    <link rel="apple-touch-startup-image" media="(device-width: 768px) and (device-height: 1024px) and (orientation: landscape) and (-webkit-device-pixel-ratio: 2)" href="{{ asset('vendor/codex_core/img/apple-touch-startup-image-1496x2048.png') }}">
+    <link rel="apple-touch-startup-image" media="(device-width: 768px) and (device-height: 1024px) and (orientation: portrait) and (-webkit-device-pixel-ratio: 2)" href="{{ asset('vendor/codex_core/img/apple-touch-startup-image-1536x2008.png') }}">
+    <link rel="icon" type="image/png" sizes="228x228" href="{{ asset('vendor/codex_core/img/coast-228x228.png') }}">
+    <meta name="msapplication-TileColor" content="#fff">
+    <meta name="msapplication-TileImage" content="{{ asset('vendor/codex_core/img/mstile-144x144.png') }}">
+    <meta name="msapplication-config" content="{{ asset('vendor/codex_core/img/browserconfig.xml') }}">
+    <link rel="yandex-tableau-widget" href="{{ asset('vendor/codex_core/img/yandex-browser-manifest.json') }}">
+    <link href="{{ asset('vendor/codex_core/css/core.css?1c426d162ccb6428c69a') }}" rel="stylesheet">
+    <link href="{{ asset('vendor/codex_documents/css/documents.css?1c426d162ccb6428c69a') }}" rel="stylesheet">
+    <script type="text/javascript" src="{{ asset('vendor/codex_core/js/core.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('vendor/codex_documents/js/documents.js') }}"></script>
 </head>
 <body>
 
@@ -52,22 +71,22 @@
 <script>
     (function () {
         var codex = window['codex'];
-        codex.site.loadPolyfills()
-            .then(function () {
-                return codex.site.loadApp();
-            })
-            .then(function (site) {
-                // codex.phpdoc.install(site.app);
-
-                site.app.register({
-                    debug : true,
-                    rootID: 'root',
-                    api   : {
-                        url: '/api' // http://codex.local
-                    }
-                });
-                site.app.boot(site.App);
+        codex.core.loadPolyfills().then(function () {
+            var app = codex.core.app;
+            app.plugin(new codex.documents.default());
+            return app.register({
+                debug : app.store.config.debug,
+                cache : app.store.codex.cache.enabled,
+                rootID: 'root',
+                api   : {
+                    url: app.url.api()
+                }
             });
+        }).then(function (app) {
+            return app.boot();
+        }).then(function (app) {
+            console.log('booted');
+        });
     }).call();
 </script>
 
