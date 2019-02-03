@@ -26,6 +26,8 @@ use Codex\Documents\Processors\Macros\Macro;
  */
 class MacrosProcessorExtension extends ProcessorExtension implements ProcessorInterface
 {
+    const REGEXP = '/\*codex:(.*?)\*/';
+
     protected $defaultConfig = 'codex.processor-defaults.macros';
 
     protected $after = [];
@@ -51,22 +53,138 @@ class MacrosProcessorExtension extends ProcessorExtension implements ProcessorIn
 
     public function process(Document $document)
     {
-        // @formatter:off
-        preg_match_all('/<!--\*codex:(.*?)\*-->/', $content = $document->getContent(), $matches);
-        $definitions = $this->getAllMacroDefinitions();
 
-        // foreach found macro
-        foreach ($matches[0] as $i => $raw) {
-            $definition = Macro::extractDefinition($matches[1][$i]);
-            if (false === array_key_exists($definition, $definitions)) {
-                continue;
+        $definitions = $this->getAllMacroDefinitions();
+        $dom         = $document->getDOM();
+        $comments    = $dom->xpath('.//comment()');
+        /** @var Macro[] $macros */
+        $macros = [];
+        for ($commentIndex = 0; $commentIndex < $comments->length; $commentIndex++) {
+            $comment = $comments->item($commentIndex);
+            preg_match_all(MacrosProcessorExtension::REGEXP, $comment->nodeValue, $matches);
+
+            foreach ($matches[ 0 ] as $i => $raw) {
+                $definition = Macro::extractDefinition($matches[ 1 ][ $i ]);
+                if (false === array_key_exists($definition, $definitions)) {
+                    continue;
+                }
+                $macros[] = $macro = $this->createMacro($raw, $matches[ 1 ][ $i ]);
+                $macro->setHandler($definitions[ $macro->definition ]);
+
+                $parent = $comment->parentNode;
+//                $parent->removeChild($comment);
+                while ($parent) {
+
+
+                    if (isset($parent->tagName) && $parent->tagName === 'p') {
+                        $this->changeName($parent, 'span');
+                    }
+                    $parent = $parent->parentNode;
+                }
             }
-            $macro = $this->createMacro($raw, $matches[1][$i]);
-//            static::$macros[] = $macro;
-            $macro->setHandler($definitions[$macro->definition]);
-            $macro->run();
         }
-        // @formatter:on
+        $dom->saveToDocument();
+
+        foreach ($macros as $macro) {
+            $content = $document->getContent();
+            $result  = $macro->run();
+            $pattern = '/\<\!\-\-' . preg_quote($macro->raw, '/') . '\-\-\>/';
+            $content = preg_replace($pattern, $result, $content, 1);
+            $document->setContent($content);
+        }
+    }
+
+    public function process2(Document $document)
+    {
+        $definitions          = $this->getAllMacroDefinitions();
+        $dom                  = $document->getDOM();
+        $comments             = $dom->xpath('.//comment()');
+        $previousComment      = null;
+        $previousCommentMacro = null;
+
+        for ($commentIndex = 0; $commentIndex < $comments->length; $commentIndex++) {
+            $comment          = $comments->item($commentIndex);
+            $nextComment      = null;
+            $nextCommentMacro = null;
+            $nextCommentIndex = $commentIndex;
+            while ($comments->length + 1 >= $nextCommentIndex) { // if ($comments->length + 1 > $commentIndex) {
+                $nextCommentIndex++;
+                $nextComment           = $comments->item($nextCommentIndex);
+                $hasNextCommentMatches = preg_match_all(MacrosProcessorExtension::REGEXP, $nextComment, $nextCommentMatches) > 0;
+                if ($hasNextCommentMatches) {
+                    $nextCommentRaw = $nextCommentMatches[ 0 ][ 0 ];
+                    $definition     = Macro::extractDefinition($nextCommentMatches[ 1 ][ 0 ]);
+                    if (false === array_key_exists($definition, $definitions)) {
+                        continue;
+                    }
+                    $nextCommentMacro = $this->createMacro($nextCommentRaw, $nextCommentMatches[ 1 ][ 0 ]);
+                    $nextCommentMacro->setHandler($definitions[ $nextCommentMacro->definition ]);
+                    break;
+                }
+            }
+
+            preg_match_all(MacrosProcessorExtension::REGEXP, $comment->nodeValue, $matches);
+
+            foreach ($matches[ 0 ] as $i => $raw) {
+                $definition = Macro::extractDefinition($matches[ 1 ][ $i ]);
+                if (false === array_key_exists($definition, $definitions)) {
+                    continue;
+                }
+                $macro = $this->createMacro($raw, $matches[ 1 ][ $i ]);
+                $macro->setHandler($definitions[ $macro->definition ]);
+
+                if ($macro->isClosing()) {
+                    continue; // todo
+                }
+                if ($nextCommentMacro && $nextCommentMacro->definition === $macro->definition && $nextCommentMacro->isClosing()) {
+
+                    continue; // todo
+
+                    $contentNodes = [];
+                    $nextSibling  = $comment->nextSibling;
+                    while ($nextSibling) {
+                        $contentNodes[] = $nextSibling;
+                        $nextSibling    = $nextSibling->nextSibling;
+                    }
+                }
+                $result = $macro->run();
+                $el     = \FluentDOM::Query($result, 'html-fragment')->get(0);
+                $el2    = $comment->ownerDocument->createElement($el->nodeName, $el->nodeValue);
+
+
+                $new = \FluentDOM::Query($result, 'text/html');
+                $comment->before($new->xpath('//body/*')[ 0 ]);
+                $comment->insertBefore($el2, $comment);
+
+
+                $parent = $comment->parentNode;
+                $parent->removeChild($comment);
+                while ($parent) {
+
+
+                    if (isset($parent->tagName) && $parent->tagName === 'p') {
+                        $this->changeName($parent, 'span');
+                    }
+                    $parent = $parent->parentNode;
+                }
+            }
+            $previousComment = $comment;
+        }
+        $dom->saveToDocument();
+    }
+
+    protected function changeName(\FluentDOM\DOM\Element $node, $name)
+    {
+        $newnode = $node->ownerDocument->createElement($name);
+        foreach ($node->childNodes as $child) {
+            $child = $node->ownerDocument->importNode($child, true);
+            $newnode->appendChild($child);
+        }
+        foreach ($node->attributes as $attrName => $attrNode) {
+            $newnode->setAttribute($attrName, $attrNode);
+        }
+        $node->parentNode->replaceChild($newnode, $node);
+        return $newnode;
     }
 
     protected function createMacro($raw, $cleaned)

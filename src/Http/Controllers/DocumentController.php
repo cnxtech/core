@@ -2,10 +2,25 @@
 
 namespace Codex\Http\Controllers;
 
+use Codex\Commands\GetBackendData;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller;
 
 class DocumentController extends Controller
 {
+    use DispatchesJobs;
+
+    public function getBackendData()
+    {
+        $data = $this->dispatch(new GetBackendData());
+        $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+        return response(<<<EOT
+window['BACKEND_DATA'] = {$json};
+EOT
+            , 200, [
+                'Content-Type' => 'application/javascript; charset=UTF-8',
+            ]);
+    }
 
     public function getDocument($projectKey = null, $revisionKey = null, $documentKey = null)
     {

@@ -183,12 +183,13 @@ class Macro
     public function run()
     {
         if ($this->canRun()) {
-            $content = $this->document->getContent();
+//            $content = $this->document->getContent();
             $this->parseArguments();
             $arguments = array_merge([$this->isClosing()], $this->arguments);
             $result = \call_user_func_array($this->getCallable(), $arguments);
-            $content = preg_replace('/'.preg_quote($this->raw, '/').'/', $result, $content, 1);
-            $this->document->setContent($content);
+            return $result;
+//            $content = preg_replace('/'.preg_quote($this->raw, '/').'/', $result, $content, 1);
+//            $this->document->setContent($content);
         } else {
             throw Exception::make("Macro [{$this->cleaned}] cannot call because some properties havent been set. Prevent the Macro from running by using the canRun() method.");
         }

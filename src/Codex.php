@@ -85,11 +85,9 @@ class Codex extends Model implements ParentInterface
 
     public function getUrls()
     {
-        return [
-            'root'          => url()->route('codex', [], false),
-            'api'           => url()->route('codex.api', [], false),
-            'documentation' => url()->route('codex.documentation', [], false),
-        ];
+        return collect($this->attr('routeMap', []))->map(function ($routeName) {
+            return url()->route($routeName, [], false);
+        })->toArray();
     }
 
     public function url($projectKey = null, $revisionKey = null, $documentKey = null)

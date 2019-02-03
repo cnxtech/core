@@ -52,6 +52,13 @@ return [
         'documentation_prefix' => 'documentation',
 //        'documentation_view'   => 'codex::index',
         'documentation_view'   => 'codex::react.index',
+        'backend_data_url' => 'backend_data.js'
+    ],
+
+    'routeMap' => [
+        'root' => 'codex',
+        'api' => 'codex.api',
+        'documentation' => 'codex.documentation',
     ],
 
     'processors' => [

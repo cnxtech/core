@@ -87,8 +87,13 @@ class AddonProvider
     protected function mapConfig(AddonServiceProvider $provider)
     {
         foreach ($provider->mapConfig as $from => $to) {
-            foreach ($this->application[ 'config' ]->get($from, []) as $key => $value) {
-                $this->application[ 'config' ]->set($to . '.' . $key, $value);
+            $fromValue = $this->application[ 'config' ]->get($from, []);
+            if (is_array($fromValue)) {
+                foreach ($fromValue as $key => $value) {
+                    $this->application[ 'config' ]->set($to . '.' . $key, $value);
+                }
+            } else {
+                $this->application[ 'config' ]->set($to, $fromValue);
             }
         }
     }

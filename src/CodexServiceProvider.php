@@ -31,6 +31,11 @@ class CodexServiceProvider extends ServiceProvider
 
     protected $viewDirs = [ 'views' => 'codex' ];
 
+    protected $assetDirs = [
+        'assets/core' => 'codex_core',
+        'assets/documents' => 'codex_documents'
+    ];
+
     protected $commands = [
         Addons\Console\AddonCommand::class,
     ];
@@ -166,6 +171,8 @@ class CodexServiceProvider extends ServiceProvider
         $codex->add('description', 'string')->setDefault('');
         $codex->add('default_project', 'string', 'ID')->setDefault(null);
 
+        $routeMap = $codex->add('routeMap', 'array.scalarPrototype')->noApi();
+
         $urls = $codex->add('urls', 'dictionary')->setApiType('CodexUrls', [ 'new' ]);
         $urls->add('api', 'string');
         $urls->add('root', 'string');
@@ -183,6 +190,7 @@ class CodexServiceProvider extends ServiceProvider
         $http->add('api_prefix', 'string');
         $http->add('documentation_prefix', 'string');
         $http->add('documentation_view', 'string');
+        $http->add('backend_data_url', 'string');
 
         $menu = AttributeDefinitionFactory::attribute('menu', 'array.recursive')->setApiType('MenuItem', [ 'array', 'new' ]);
         $menu->add('id', 'string', 'ID', function () {
