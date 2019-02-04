@@ -88,7 +88,10 @@ class MacrosProcessorExtension extends ProcessorExtension implements ProcessorIn
         foreach ($macros as $macro) {
             $content = $document->getContent();
             $result  = $macro->run();
-            $pattern = '/\<\!\-\-' . preg_quote($macro->raw, '/') . '\-\-\>/';
+            // @todo improve
+            // negative lookbehind (?<!\") is a quick fix to counter replacing the macro for:
+            // <c-code-highlight code="<!--*codex:phpdoc:method('Codex\Codex::get()', true, true, 'namespace,tags')*-->"></c-code-highlight>
+            $pattern = '/(?<!\")\<\!\-\-' . preg_quote($macro->raw, '/') . '\-\-\>/';
             $content = preg_replace($pattern, $result, $content, 1);
             $document->setContent($content);
         }
