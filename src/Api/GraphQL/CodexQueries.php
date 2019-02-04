@@ -1,10 +1,11 @@
-<?php
+<?php /** @noinspection ALL */
 
 namespace Codex\Api\GraphQL;
 
 use Codex\Api\GraphQL\Directives\QueryConstraints;
 use Codex\Codex;
 use Codex\Exceptions\NotFoundException;
+use Codex\Hooks;
 use Codex\Mergable\Commands\GetChangedAttributes;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -18,6 +19,7 @@ class CodexQueries
         $codex = codex();
         $show  = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
         $codex->show($show);
+        Hooks::run('CodexQueries::resolve', [ $codex, $show ]);
         return $codex;
     }
 
@@ -30,116 +32,103 @@ class CodexQueries
 
         $show = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
         $projects->show($show);
-        return $projects;
+        return Hooks::waterfall('CodexQueries::projects', $projects, [ $rootValue, $args, $context, $resolveInfo ]);
+    }
+
+    /** @return \Codex\Contracts\Projects\Project */
+    protected function getProject($key = null)
+    {
+        if ($key === null) {
+            $key = codex()->getProjects()->getDefaultKey();
+        }
+        if ( ! codex()->hasProject($key)) {
+            throw NotFoundException::project($key)->toApiError();
+        }
+        $project = codex()->getProject($key);
+        return Hooks::waterfall('CodexQueries::getProject', $project, [ $key ]);
+    }
+
+    /** @return \Codex\Contracts\Revisions\Revision */
+    protected function getRevision($projectKey = null, $revisionKey = null)
+    {
+        $project = $this->getProject($projectKey);
+        if ( ! $project->hasRevision($revisionKey)) {
+            throw NotFoundException::revision($revisionKey)->toApiError();
+        }
+        if ($revisionKey === null) {
+            $revisionKey = $project->getRevisions()->getDefaultKey();
+        }
+        $revision = $project->getRevision($revisionKey);
+        return Hooks::waterfall('CodexQueries::getRevision', $revision, [ $projectKey, $revisionKey ]);
+    }
+
+    /** @return \Codex\Contracts\Revisions\Revision */
+    protected function getDocument($projectKey = null, $revisionKey = null, $documentKey = null)
+    {
+        $revision = $this->getRevision($projectKey, $revisionKey);
+        if ( ! $revision->hasDocument($documentKey)) {
+            throw NotFoundException::document($documentKey)->toApiError();
+        }
+        if ($documentKey === null) {
+            $documentKey = $revision->getDocuments()->getDefaultKey();
+        }
+        $document = $revision->getDocument($documentKey);
+        return Hooks::waterfall('CodexQueries::getDocument', $document, [ $projectKey, $revisionKey, $documentKey ]);
     }
 
     public function project($rootValue, array $args, $context, ResolveInfo $resolveInfo)
     {
-        $codex      = $rootValue instanceof Codex ? $rootValue : codex();
-        $defaultKey = $codex->getProjects()->getDefaultKey();
-        $key        = data_get($args, 'key', $defaultKey);
-        if ( ! $codex->hasProject($key)) {
-            throw NotFoundException::project($key)->toApiError();
-        }
-        $project = $codex->getProject($key);
+        $key     = data_get($args, 'key');
+        $project = $this->getProject($key);
         $show    = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
         $project->show($show);
-        return $project;
+        return Hooks::waterfall('CodexQueries::project', $project, [ $rootValue, $args, $context, $resolveInfo ]);
     }
 
     public function revisions(QueryConstraints $constraints, $rootValue, array $args, $context, ResolveInfo $resolveInfo)
     {
-        if ($rootValue instanceof \Codex\Contracts\Projects\Project) {
-            $project = $rootValue;
-        } else {
-            $codex      = codex();
-            $projectKey = data_get($args, 'projectKey', $codex->getProjects()->getDefault());
-            $project    = $codex->getProject($projectKey);
-            if ( ! $codex->hasProject($projectKey)) {
-                throw NotFoundException::project($projectKey)->toApiError();
-            }
-        }
-
-        $revisions = $project->getRevisions()->makeAll();
-        $revisions = $constraints->applyConstraints($revisions);
-        $show      = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
+        $projectKey = data_get($args, 'projectKey');
+        $project    = $this->getProject($projectKey);
+        $revisions  = $project->getRevisions()->makeAll();
+        $revisions  = $constraints->applyConstraints($revisions);
+        $show       = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
         $revisions->show($show);
-        return $revisions;
+        return Hooks::waterfall('CodexQueries::revisions', $revisions, [ $rootValue, $args, $context, $resolveInfo ]);
     }
 
     public function revision($rootValue, array $args, $context, ResolveInfo $resolveInfo)
     {
-        if ($rootValue instanceof \Codex\Contracts\Projects\Project) {
-            $project = $rootValue;
-        } else {
-            $codex      = codex();
-            $projectKey = data_get($args, 'projectKey', $codex->getProjects()->getDefault());
-            if ( ! $codex->hasProject($projectKey)) {
-                throw NotFoundException::project($projectKey)->toApiError();
-            }
-            $project = $codex->getProject($projectKey);
-        }
-        $revisionKey = data_get($args, 'revisionKey', $project->getRevisions()->getDefaultKey());
-        if ( ! $project->hasRevision($revisionKey)) {
-            throw NotFoundException::revision($revisionKey)->toApiError();
-        }
-        $revision = $project->getRevision($revisionKey);
-        $show     = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
+        $projectKey  = data_get($args, 'projectKey');
+        $revisionKey = data_get($args, 'revisionKey');
+        $revision    = $this->getRevision($projectKey, $revisionKey);
+        $show        = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
         $revision->show($show);
-        return $revision;
+        return Hooks::waterfall('CodexQueries::revision', $revision, [ $rootValue, $args, $context, $resolveInfo ]);
     }
 
 
     public function documents(QueryConstraints $constraints, $rootValue, array $args, $context, ResolveInfo $resolveInfo)
     {
-        if ($rootValue instanceof \Codex\Contracts\Revisions\Revision) {
-            $revision = $rootValue;
-        } else {
-            $codex      = codex();
-            $projectKey = data_get($args, 'projectKey', $codex->getProjects()->getDefault());
-            if ( ! $codex->hasProject($projectKey)) {
-                throw NotFoundException::project($projectKey)->toApiError();
-            }
-            $project     = $codex->getProject($projectKey);
-            $revisionKey = data_get($args, 'revisionKey', $project->getRevisions()->getDefaultKey());
-            if ( ! $project->hasRevision($revisionKey)) {
-                throw NotFoundException::revision($revisionKey)->toApiError();
-            }
-            $revision = $project->getRevision($revisionKey);
-        }
-        $documents = $revision->getDocuments()->makeAll(); // makeAll() ?
-        $documents = $constraints->applyConstraints($documents);
-        $show      = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
+        $projectKey  = data_get($args, 'projectKey');
+        $revisionKey = data_get($args, 'revisionKey');
+        $revision    = $this->getRevision($projectKey, $revisionKey);
+        $documents   = $revision->getDocuments()->makeAll(); // makeAll() ?
+        $documents   = $constraints->applyConstraints($documents);
+        $show        = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
         $documents->show($show);
-        return $documents;
+        return Hooks::waterfall('CodexQueries::documents', $documents, [ $rootValue, $args, $context, $resolveInfo ]);
     }
 
 
     public function document($rootValue, array $args, $context, ResolveInfo $resolveInfo)
     {
-        if ($rootValue instanceof \Codex\Contracts\Revisions\Revision) {
-            $revision = $rootValue;
-        } else {
-            $codex      = codex();
-            $projectKey = data_get($args, 'projectKey', $codex->getProjects()->getDefault());
-            if ( ! $codex->hasProject($projectKey)) {
-                throw NotFoundException::project($projectKey)->toApiError();
-            }
-            $project     = $codex->getProject($projectKey);
-            $revisionKey = data_get($args, 'revisionKey', $project->getRevisions()->getDefaultKey());
-            if ( ! $project->hasRevision($revisionKey)) {
-                throw NotFoundException::revision($revisionKey)->toApiError();
-            }
-            $revision = $project->getRevision($revisionKey);
-        }
-        $documentKey = data_get($args, 'documentKey', $revision->getDocuments()->getDefaultKey());
-        if ( ! $revision->hasDocument($documentKey)) {
-            throw NotFoundException::document($documentKey)->toApiError();
-        }
-        $document = $revision->getDocument($documentKey);
-        $show     = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
+        $projectKey  = data_get($args, 'projectKey');
+        $revisionKey = data_get($args, 'revisionKey');
+        $documentKey = data_get($args, 'documentKey');
+        $document    = $this->getDocument($projectKey, $revisionKey, $documentKey);
+        $show        = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
         $document->show($show);
-        return $document;
+        return Hooks::waterfall('CodexQueries::document', $document, [ $rootValue, $args, $context, $resolveInfo ]);
     }
 
     public function diff($rootValue, array $args, $context, ResolveInfo $resolveInfo)

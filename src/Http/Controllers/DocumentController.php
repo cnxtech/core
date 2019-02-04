@@ -3,6 +3,7 @@
 namespace Codex\Http\Controllers;
 
 use Codex\Commands\GetBackendData;
+use Codex\Hooks;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Routing\Controller;
 
@@ -47,6 +48,9 @@ EOT
 
         $document = $revision->getDocument($documentKey);
         $content  = $document->getContent();
+
+
+        Hooks::run('DocumentController:getDocument', [ $project, $revision, $document ]);
 
         view()->share(compact('codex', 'project', 'revision', 'document', 'content'));
 

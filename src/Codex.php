@@ -86,7 +86,16 @@ class Codex extends Model implements ParentInterface
     public function getUrls()
     {
         return collect($this->attr('routeMap', []))->map(function ($routeName) {
-            return url()->route($routeName, [], false);
+            try {
+                return url()->route($routeName, [], false);
+            } catch (\Exception $e) {
+                $route      = app()->make('router')->getRoutes()->getByName($routeName);
+                $parameters = [];
+                foreach ($route->parameterNames() as $name) {
+                    $parameters[ $name ] = '__' . $name . '__';
+                }
+                return url()->route($routeName, $parameters, false);
+            }
         })->toArray();
     }
 

@@ -7,6 +7,8 @@ use Codex\Attributes\AttributeDefinitionGroup;
 use Codex\Concerns\HasCallbacks;
 use Codex\Concerns\HasContainer;
 use Codex\Concerns\HasEvents;
+use Codex\Concerns\Hookable;
+use Codex\Concerns\Macroable;
 use Codex\Contracts\Mergable\ChildInterface;
 use Codex\Contracts\Mergable\Mergable;
 use Codex\Contracts\Mergable\ParentInterface;
@@ -20,7 +22,6 @@ use Illuminate\Database\Eloquent\Concerns\HidesAttributes;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, Mergable
@@ -32,6 +33,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     use HasEvents;
     use HasCallbacks;
     use HasMergableAttributes;
+    use Hookable;
     use Macroable {
         __call as __callMacro;
         __callStatic as __callStaticMacro;
@@ -866,7 +868,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 return $this->getAttribute($key);
             }
         }
-        return $this->__callMacro($name, $arguments);
+        if(static::hasMacro($name)) {
+            return $this->__callMacro($name, $arguments);
+        }
+        if($this->hasHook($name)){
+            return $this->call($name, $arguments);
+        }
     }
 
     //endregion

@@ -5,6 +5,7 @@ namespace Codex\Mergable\Commands;
 use Codex\Attributes\AttributeConfigBuilderGenerator;
 use Codex\Attributes\AttributeDefinitionGroup;
 use Codex\Contracts\Mergable\Mergable;
+use Codex\Hooks;
 use Symfony\Component\Config\Definition\Processor;
 
 class ProcessAttributes
@@ -33,6 +34,7 @@ class ProcessAttributes
         $processor = new Processor();
         $final     = $processor->process($builder->buildTree(), [ $this->attributes ]);
 
+        $final = Hooks::waterfall('ProcessAttributes', $final, [ $target ]);
         return $final;
     }
 }

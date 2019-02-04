@@ -3,6 +3,7 @@
 namespace Codex\Commands;
 
 use Codex\Codex;
+use Codex\Hooks;
 
 class GetBackendData
 {
@@ -20,13 +21,15 @@ query {
         display_name
         description
         default_project
+        
         urls @assoc
+        layout @assoc
+        
         http {
             api_prefix
             documentation_prefix
             prefix
         }
-        layout @assoc
         projects {
             key
             display_name
@@ -50,6 +53,8 @@ query {
 EOT
         );
 
-        return $r->data;
+
+        $data = Hooks::waterfall('GetBackendData', $r->data);
+        return $data;
     }
 }

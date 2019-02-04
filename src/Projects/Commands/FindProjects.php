@@ -2,6 +2,7 @@
 
 namespace Codex\Projects\Commands;
 
+use Codex\Hooks;
 use Symfony\Component\Finder\Finder;
 
 /**
@@ -46,6 +47,8 @@ class FindProjects
             $key           = basename(\dirname($file->getRealPath()));
             $paths[ $key ] = $file->getRealPath();
         }
+
+        $paths = Hooks::waterfall('projects:found', $paths, [$this]);
 
         return $paths;
     }
