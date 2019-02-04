@@ -7,9 +7,12 @@ use Codex\Hooks;
 
 class GetBackendData
 {
+    protected $requests = [];
+
     public function handle(Codex $codex)
     {
-        $r = $codex->getApi()->executeQuery(<<<'EOT'
+        $requests = [
+            <<<'EOT'
 query {
     codex {
         cache {
@@ -51,10 +54,26 @@ query {
     }
 }
 EOT
-        );
+            ,
+        ];
+        // put the requests array trough the hook to allow additional requests by others
+        // a request can either be the query string or a assoc array with the query and variables
+        $requests = Hooks::waterfall('GetBackendData::request', $requests);
+        // transform all requests that only have query string to assoc array
+        $requests = array_map(function ($request) {
+            return is_string($request) ? [ 'query' => $request, 'variables' => [] ] : $request;
+        }, $requests);
 
+        $response = $codex->getApi()->executeBatchedQueries($requests);
+        // transform all responses to the data arrays
+        $data = array_map(function ($response) {
+            return $response->data;
+        }, $response);
+        $data = array_replace_recursive(...$data);
 
-        $data = Hooks::waterfall('GetBackendData', $r->data);
+        // put the data trough the hook to allow external modification
+        $data = Hooks::waterfall('GetBackendData::response', $data);
+
         return $data;
     }
 }
