@@ -108,6 +108,7 @@ class Document extends Model implements DocumentContract, ChildInterface
         if ($this->content === null) {
             $resolver      = $this->contentResolver;
             $this->content = $resolver($this);
+
         }
         // @todo: find a better way to fix this, This way the  FluentDOM::Query('', 'text/html') does not generate a exception
         if ('' === $this->content) {

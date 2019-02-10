@@ -198,6 +198,7 @@ class CodexServiceProvider extends ServiceProvider
             return md5(str_random());
         });
         $menu->add('type', 'string');
+        $menu->add('class', 'string');
         $menu->add('side', 'string');
         $menu->add('target', 'string')->setDefault('self');
         $menu->add('href', 'string');

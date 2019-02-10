@@ -3,9 +3,11 @@
 namespace Codex\Documents\Processors\Parser;
 
 use cebe\markdown\GithubMarkdown;
+use Codex\Concerns\Macroable;
 
 class MarkdownParser extends GithubMarkdown implements ParserInterface
 {
+    use Macroable;
     protected $options = [];
 
     public function setOptions(array $options)
