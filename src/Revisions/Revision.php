@@ -7,6 +7,7 @@ use Codex\Contracts\Mergable\ChildInterface;
 use Codex\Contracts\Mergable\ParentInterface;
 use Codex\Contracts\Revisions\Revision as RevisionContract;
 use Codex\Documents\DocumentCollection;
+use Codex\Hooks;
 use Codex\Mergable\Concerns\HasChildren;
 use Codex\Mergable\Concerns\HasParent;
 use Codex\Mergable\Model;
@@ -49,9 +50,11 @@ class Revision extends Model implements RevisionContract, ChildInterface, Parent
     {
         $this->setChildren($documents->setParent($this));
         $registry = $this->getCodex()->getRegistry()->resolveGroup('revisions');
-        $this->init($attributes, $registry);
+        $attributes = Hooks::waterfall('revision.initialize', $attributes, [ $registry, $this ]);
+        $this->initialize($attributes, $registry);
         $this->addGetMutator('inherits', 'getInheritKeys', true, true);
         $this->addGetMutator('changes', 'getChanges', true, true);
+        Hooks::run('revision.initialized', [ $this ]);
     }
 
     public function url($documentKey = null)

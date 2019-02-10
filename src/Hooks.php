@@ -30,19 +30,23 @@ class Hooks
         }
         return static::$handlers[ $id ];
     }
+
     public static function run($id, array $args = [], $abortable = false)
     {
+        if ($id !== 'hooks.run') {
+            static::run('hooks.run', [ $id, $args, $abortable ]);
+        }
         foreach (static::getHandlers($id) as $handler) {
             $retval = app()->call($handler, $args);
             if ($abortable === false && $retval !== null && $retval !== true) {
-                throw new Exceptions\Exception("Invalid return from hook [{$id}] handler");
+                throw Exceptions\Exception::make("Invalid return from hook [{$id}] handler");
             }
             if ($retval === null) {
                 continue;
             }
             if (is_string($retval)) {
                 // String returned means error.
-                throw new Exceptions\Exception($retval);
+                throw Exceptions\Exception::make($retval);
             }
             if ($retval === false) {
                 // False was returned. Stop processing, but no error.
@@ -54,6 +58,9 @@ class Hooks
 
     public static function waterfall($id, $value, array $args = [])
     {
+        if ($id !== 'hooks.waterfall') {
+            static::run('hooks.waterfall', [ $id, $value,$args ]);
+        }
         $pipes = collect(static::getHandlers($id))
             ->map(function ($hook) use ($args) {
                 return function ($value, $next) use ($hook, $args) {

@@ -13,6 +13,7 @@ use Symfony\Component\Finder\Finder;
  */
 class FindProjects
 {
+
     /**
      * @var null|string
      */
@@ -48,8 +49,7 @@ class FindProjects
             $paths[ $key ] = $file->getRealPath();
         }
 
-        $paths = Hooks::waterfall('projects:found', $paths, [$this]);
-
+        $paths = Hooks::waterfall('projects.found', $paths, [ $this ]);
         return $paths;
     }
 

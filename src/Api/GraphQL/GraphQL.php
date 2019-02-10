@@ -3,6 +3,7 @@
 namespace Codex\Api\GraphQL;
 
 use Codex\Api\GraphQL\QueryDirectives\QueryFieldManipulator;
+use Codex\Hooks;
 use GraphQL\Error\Error;
 use GraphQL\Executor\ExecutionResult;
 use GraphQL\Language\AST\FieldDefinitionNode;
@@ -37,6 +38,7 @@ class GraphQL extends \Nuwave\Lighthouse\GraphQL
 
     public function executeQuery(string $query, $context = null, $variables = [], $rootValue = null): ExecutionResult
     {
+        Hooks::run('api.execute', [ $query ]);
         $result = \GraphQL\GraphQL::executeQuery(
             $this->prepSchemaWithQuery($query),
             $query,
@@ -76,7 +78,7 @@ class GraphQL extends \Nuwave\Lighthouse\GraphQL
                 );
             }
         );
-
+        Hooks::run('api.result', [ $query ]);
         return $result;
     }
 
@@ -108,8 +110,8 @@ class GraphQL extends \Nuwave\Lighthouse\GraphQL
                             if ( ! $parentFields->has($ancestorFieldNode->name->value)) {
                                 break;
                             }
-                            $field           = $parentFields->get($ancestorFieldNode->name->value);
-                            $fieldType       = ASTHelper::getUnderlyingNamedTypeNode($field);
+                            $field      = $parentFields->get($ancestorFieldNode->name->value);
+                            $fieldType  = ASTHelper::getUnderlyingNamedTypeNode($field);
                             $parentType = $document->objectTypeDefinition($fieldType->name->value);
                         }
 
@@ -164,6 +166,7 @@ class GraphQL extends \Nuwave\Lighthouse\GraphQL
                     },
                 ],
             ]);
+            Hooks::run('api.schema', [ $parsed, $document, $query ]);
             $this->executableSchema = $this->schemaBuilder->build(
                 $document
             );

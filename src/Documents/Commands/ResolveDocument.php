@@ -6,10 +6,11 @@ use Codex\Contracts\Documents\Document as DocumentContract;
 use Codex\Contracts\Revisions\Revision;
 use Codex\Documents\Document;
 use Codex\Documents\Events\ResolvedDocument;
+use Codex\Hooks;
 use Codex\Mergable\Commands\MergeAttributes;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
-class MakeDocument
+class ResolveDocument
 {
     use DispatchesJobs;
 
@@ -44,6 +45,8 @@ class MakeDocument
         $attributes = compact('key', 'path');
         $document   = app(DocumentContract::class, compact('attributes', 'revision'));
         $this->dispatch(new MergeAttributes($document));
+
+        Hooks::run('document.resolved', [ $this ]);
         $document->fireEvent('resolved');
         ResolvedDocument::dispatch($document);
         $document->preprocess();

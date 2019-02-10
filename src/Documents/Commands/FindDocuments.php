@@ -4,6 +4,7 @@ namespace Codex\Documents\Commands;
 
 use Codex\Contracts\Revisions\Revision;
 use Codex\Documents\Document;
+use Codex\Hooks;
 
 /**
  * This is the class FindDocumentFiles.
@@ -51,10 +52,21 @@ class FindDocuments
             ->keyBy('key')
             ->transform(function ($pathInfo) {
                 return $pathInfo[ 'path' ];
-            });
+            })->toArray();
 
 
-        return $paths->toArray();
+        $paths = Hooks::waterfall('documents.found', $paths, [ $this ]);
+
+        return $paths;
     }
+
+    /**
+     * @return \Codex\Contracts\Revisions\Revision
+     */
+    public function getRevision()
+    {
+        return $this->revision;
+    }
+
 
 }

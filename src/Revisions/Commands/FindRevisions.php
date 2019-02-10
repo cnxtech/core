@@ -3,6 +3,7 @@
 namespace Codex\Revisions\Commands;
 
 use Codex\Contracts\Projects\Project;
+use Codex\Hooks;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
 /**
@@ -37,13 +38,15 @@ class FindRevisions
      */
     public function handle()
     {
-        $configFilePaths = [];
+        $paths = [];
         foreach ($this->getFS()->directories() as $directory) {
             if ($configFilePath = $this->getConfigFileFrom($directory)) {
-                $configFilePaths[ $directory ] = $configFilePath;
+                $paths[ $directory ] = $configFilePath;
             }
         }
-        return $configFilePaths;
+
+        $paths = Hooks::waterfall('revisions.found', $paths, [$this]);
+        return $paths;
     }
 
     /**
@@ -88,5 +91,15 @@ class FindRevisions
             return true;
         });
     }
+
+    /**
+     * @return \Codex\Contracts\Projects\Project
+     */
+    public function getProject(): \Codex\Contracts\Projects\Project
+    {
+        return $this->project;
+    }
+
+
 
 }

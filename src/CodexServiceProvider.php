@@ -14,7 +14,6 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Laradic\ServiceProvider\ServiceProvider;
-use Laradic\ServiceProvider\Plugins;
 use League\Flysystem\Filesystem as Flysystem;
 use Radic\BladeExtensions\BladeExtensionsServiceProvider;
 
@@ -33,8 +32,8 @@ class CodexServiceProvider extends ServiceProvider
     protected $viewDirs = [ 'views' => 'codex' ];
 
     protected $assetDirs = [
-        'assets/core' => 'codex_core',
-        'assets/documents' => 'codex_documents'
+        'assets/core'      => 'codex_core',
+        'assets/documents' => 'codex_documents',
     ];
 
     protected $commands = [

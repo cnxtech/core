@@ -34,7 +34,7 @@ class ProcessAttributes
         $processor = new Processor();
         $final     = $processor->process($builder->buildTree(), [ $this->attributes ]);
 
-        $final = Hooks::waterfall('ProcessAttributes', $final, [ $target ]);
+        $final = Hooks::waterfall('command.process_attributes', $final, [ $target ]);
         return $final;
     }
 }

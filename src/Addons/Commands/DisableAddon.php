@@ -7,6 +7,7 @@ use Codex\Addons\AddonManager;
 use Codex\Addons\AddonRegistry;
 use Codex\Addons\Events\AddonWasDisabled;
 use Codex\Exceptions\Exception;
+use Codex\Hooks;
 use Illuminate\Contracts\Events\Dispatcher;
 
 class DisableAddon
@@ -33,15 +34,18 @@ class DisableAddon
         if (false === $this->addon->isEnabled()) {
             throw Exception::make("Could not disable addon [{$this->addon->getName()}] because its not enabled");
         }
-        $this->addon->fire('disable');
 
-        $registry->setDisabled($this->addon->getName());
+        if (Hooks::run('addon.disable', [ $this->addon ], true)) {
+            $this->addon->fire('disable');
 
-        $this->addon->setEnabled(false);
+            $registry->setDisabled($this->addon->getName());
 
-        $this->addon->fire('disabled');
+            $this->addon->setEnabled(false);
 
-        $dispatcher->dispatch(new AddonWasDisabled($this->addon));
+            $this->addon->fire('disabled');
+
+            $dispatcher->dispatch(new AddonWasDisabled($this->addon));
+        }
     }
 
 }

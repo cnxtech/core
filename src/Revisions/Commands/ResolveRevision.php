@@ -3,6 +3,7 @@
 namespace Codex\Revisions\Commands;
 
 use Codex\Contracts\Projects\Project;
+use Codex\Hooks;
 use Codex\Mergable\Commands\MergeAttributes;
 use Codex\Revisions\Events\ResolvedRevision;
 use Codex\Revisions\Revision;
@@ -11,7 +12,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Symfony\Component\Yaml\Yaml;
 
-class MakeRevision
+class ResolveRevision
 {
     use DispatchesJobs;
 
@@ -72,6 +73,7 @@ class MakeRevision
             $this->dispatch(new MergeAttributes($revision));
         }
 
+        Hooks::run('revisions.resolved', [$this]);
         $revision->fireEvent('resolved', $revision);
         ResolvedRevision::dispatch($revision);
         return $revision;

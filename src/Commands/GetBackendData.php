@@ -58,7 +58,7 @@ EOT
         ];
         // put the requests array trough the hook to allow additional requests by others
         // a request can either be the query string or a assoc array with the query and variables
-        $requests = Hooks::waterfall('GetBackendData::request', $requests);
+        $requests = Hooks::waterfall('commands.get_backend_data.request', $requests);
         // transform all requests that only have query string to assoc array
         $requests = array_map(function ($request) {
             return is_string($request) ? [ 'query' => $request, 'variables' => [] ] : $request;
@@ -72,7 +72,7 @@ EOT
         $data = array_replace_recursive(...$data);
 
         // put the data trough the hook to allow external modification
-        $data = Hooks::waterfall('GetBackendData::response', $data);
+        $data = Hooks::waterfall('commands.get_backend_data.response', $data);
 
         return $data;
     }

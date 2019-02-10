@@ -6,6 +6,7 @@ use Codex\Concerns;
 use Codex\Contracts\Mergable\ChildInterface;
 use Codex\Contracts\Mergable\ParentInterface;
 use Codex\Contracts\Projects\Project as ProjectContract;
+use Codex\Hooks;
 use Codex\Mergable\Concerns\HasChildren;
 use Codex\Mergable\Concerns\HasParent;
 use Codex\Mergable\Model;
@@ -61,14 +62,16 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
     public function __construct(array $attributes, RevisionCollection $revisions, Factory $fsm, Filesystem $fs)
     {
         $this->fsm = $fsm;
-        $this->fs = $fs;
+        $this->fs  = $fs;
 
         $this->setParent($this->getCodex());
         $this->setChildren($revisions->setParent($this));
-        $registry = $this->getCodex()->getRegistry()->resolveGroup('projects');
-        $this->init($attributes, $registry);
+        $registry   = $this->getCodex()->getRegistry()->resolveGroup('projects');
+        $attributes = Hooks::waterfall('project.initialize', $attributes, [ $registry, $this ]);
+        $this->initialize($attributes, $registry);
         $this->addGetMutator('inherits', 'getInheritKeys', true, true);
         $this->addGetMutator('changes', 'getChanges', true, true);
+        Hooks::run('project.initialized', [ $this ]);
     }
 
     public function url($revisionKey = null, $documentKey = null)
@@ -119,7 +122,7 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
 
     public function setConfigFilePath($configFilePath)
     {
-        $this->configFilePath =$configFilePath;
+        $this->configFilePath = $configFilePath;
         return $this;
     }
 

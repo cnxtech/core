@@ -6,6 +6,7 @@ use Codex\Addons\Addon;
 use Codex\Addons\AddonManager;
 use Codex\Addons\AddonRegistry;
 use Codex\Addons\Events\AddonWasUninstalled;
+use Codex\Hooks;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
@@ -35,15 +36,18 @@ class UninstallAddon
         if ($this->addon->isEnabled()) {
             $this->dispatch(new DisableAddon($this->addon));
         }
-        $this->addon->fire('uninstall');
 
-        $registry->setUninstalled($this->addon->getName());
+        if (Hooks::run('addon.uninstall', [ $this->addon ], true)) {
+            $this->addon->fire('uninstall');
 
-        $this->addon->setInstalled(false);
+            $registry->setUninstalled($this->addon->getName());
 
-        $this->addon->fire('uninstalled');
+            $this->addon->setInstalled(false);
 
-        $dispatcher->dispatch(new AddonWasUninstalled($this->addon));
+            $this->addon->fire('uninstalled');
+
+            $dispatcher->dispatch(new AddonWasUninstalled($this->addon));
+        }
     }
 
 }

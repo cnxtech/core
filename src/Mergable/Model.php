@@ -7,11 +7,11 @@ use Codex\Attributes\AttributeDefinitionGroup;
 use Codex\Concerns\HasCallbacks;
 use Codex\Concerns\HasContainer;
 use Codex\Concerns\HasEvents;
-use Codex\Concerns\Hookable;
 use Codex\Concerns\Macroable;
 use Codex\Contracts\Mergable\ChildInterface;
 use Codex\Contracts\Mergable\Mergable;
 use Codex\Contracts\Mergable\ParentInterface;
+use Codex\Hooks;
 use Codex\Mergable\Commands\GetChangedAttributes;
 use Codex\Mergable\Concerns\HasMergableAttributes;
 use Codex\Mergable\Concerns\HasRelations;
@@ -30,10 +30,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     use HasContainer;
     use HasRelations;
     use HidesAttributes;
+    use HasMergableAttributes;
+
+
     use HasEvents;
     use HasCallbacks;
-    use HasMergableAttributes;
-    use Hookable;
     use Macroable {
         __call as __callMacro;
         __callStatic as __callStaticMacro;
@@ -117,6 +118,40 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
 
+    protected $enabled = true;
+
+    public function isEnabled()
+    {
+        return $this->enabled;
+    }
+
+    public function isDisabled()
+    {
+        return ! $this->enabled;
+    }
+
+    public function setEnabled(bool $enabled)
+    {
+        $this->enabled = $enabled;
+        return $this;
+    }
+
+    public function getEnabled()
+    {
+        return $this->enabled;
+    }
+
+    public function disable()
+    {
+        return $this->setEnabled(false);
+    }
+
+    public function enable()
+    {
+        return $this->setEnabled(true);
+    }
+
+
     //region: Init
 
     public static $snakeAttributes = true;
@@ -128,7 +163,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $initialized = false;
 
 
-    public function init(array $attributes = [], AttributeDefinitionGroup $attributeDefinitions = null)
+    public function initialize(array $attributes = [], AttributeDefinitionGroup $attributeDefinitions = null)
     {
         if ($this->initialized) {
             return $this;
@@ -144,9 +179,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $this->initializeTraits();
 
+        $attributes = Hooks::waterfall('model.initialize', $attributes, [ $this ]);
+
         $this->setRawAttributes($attributes);
 
         $this->initialized = true;
+
+        Hooks::run('model.initialized', [ $this ]);
 
         $this->fireEvent('initialized', $this);
 
@@ -868,12 +907,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 return $this->getAttribute($key);
             }
         }
-        if(static::hasMacro($name)) {
+        if (static::hasMacro($name)) {
             return $this->__callMacro($name, $arguments);
         }
-        if($this->hasHook($name)){
-            return $this->call($name, $arguments);
-        }
+        throw new \BadMethodCallException("Could not find method [{$name}]");
     }
 
     //endregion

@@ -74,11 +74,12 @@ class Codex extends Model implements ParentInterface
         $this->extensions = $extensions;
         $this->api        = $api;
 
+
         $this->setChildren($projects->setParent($this));
         $attributes = array_except($config->get('codex', []), [ 'projects', 'revisions', 'documents' ]);
         $group      = $registry->resolveGroup('codex');
         $attributes = $this->dispatch(new ProcessAttributes($group, $attributes));
-        $this->init($attributes, $group)->rehide();
+        $this->initialize($attributes, $group)->rehide();
         $this->addGetMutator('urls', 'getUrls', true, true);
         $this->addGetMutator('changes', 'getChanges', true, true);
     }
@@ -88,7 +89,8 @@ class Codex extends Model implements ParentInterface
         return collect($this->attr('routeMap', []))->map(function ($routeName) {
             try {
                 return url()->route($routeName, [], false);
-            } catch (\Exception $e) {
+            }
+            catch (\Exception $e) {
                 $route      = app()->make('router')->getRoutes()->getByName($routeName);
                 $parameters = [];
                 foreach ($route->parameterNames() as $name) {
@@ -284,4 +286,11 @@ class Codex extends Model implements ParentInterface
         $this->getLog()->log($string, $message, $context);
         return $this;
     }
+
+    public function setEnabled(bool $enabled)
+    {
+        $this->enabled = true;
+        return $this;
+    }
+
 }

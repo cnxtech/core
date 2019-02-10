@@ -4,7 +4,7 @@ namespace Codex\Projects;
 
 use Codex\Mergable\ModelCollection;
 use Codex\Projects\Commands\FindProjects;
-use Codex\Projects\Commands\MakeProject;
+use Codex\Projects\Commands\ResolveProject;
 use Codex\Projects\Events\ResolvedProject;
 
 /**
@@ -43,7 +43,7 @@ class ProjectCollection extends ModelCollection
      */
     protected function makeModel($key)
     {
-        return $this->dispatch(new MakeProject($this->getLoadable($key)));
+        return $this->dispatch(new ResolveProject($this->getLoadable($key)));
     }
 
     /**

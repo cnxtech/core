@@ -6,6 +6,7 @@ use Codex\Addons\Addon;
 use Codex\Addons\AddonManager;
 use Codex\Addons\AddonRegistry;
 use Codex\Addons\Events\AddonWasEnabled;
+use Codex\Hooks;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
@@ -32,18 +33,21 @@ class EnableAddon
         Dispatcher $dispatcher
     )
     {
-        if(!$this->addon->isInstalled()){
+        if ( ! $this->addon->isInstalled()) {
             $this->dispatch(new InstallAddon($this->addon));
         }
-        $this->addon->fire('enable');
 
-        $registry->setEnabled($this->addon->getName());
+        if (Hooks::run('addon.enable', [ $this->addon ], true)) {
+            $this->addon->fire('enable');
 
-        $this->addon->setEnabled(true);
+            $registry->setEnabled($this->addon->getName());
 
-        $this->addon->fire('enabled');
+            $this->addon->setEnabled(true);
 
-        $dispatcher->dispatch(new AddonWasEnabled($this->addon));
+            $this->addon->fire('enabled');
+
+            $dispatcher->dispatch(new AddonWasEnabled($this->addon));
+        }
     }
 
 }

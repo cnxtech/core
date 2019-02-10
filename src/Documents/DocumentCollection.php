@@ -3,7 +3,7 @@
 namespace Codex\Documents;
 
 use Codex\Documents\Commands\FindDocuments;
-use Codex\Documents\Commands\MakeDocument;
+use Codex\Documents\Commands\ResolveDocument;
 use Codex\Mergable\ModelCollection;
 
 /**
@@ -42,7 +42,7 @@ class DocumentCollection extends ModelCollection
      */
     protected function makeModel($key)
     {
-        $model = $this->dispatch(new MakeDocument($this->getRevision(), $this->getLoadable($key)));
+        $model = $this->dispatch(new ResolveDocument($this->getRevision(), $this->getLoadable($key)));
 
         return $model;
     }

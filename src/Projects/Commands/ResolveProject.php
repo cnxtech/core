@@ -3,12 +3,13 @@
 namespace Codex\Projects\Commands;
 
 use Codex\Contracts\Projects\Project;
+use Codex\Hooks;
 use Codex\Mergable\Commands\MergeAttributes;
 use Codex\Projects\Events\ResolvedProject;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
-class MakeProject
+class ResolveProject
 {
     use DispatchesJobs;
 
@@ -61,6 +62,7 @@ class MakeProject
         $project->updateDisk();
 
 
+        Hooks::run('project.resolved', [ $this ]);
         $project->fireEvent('resolved', $project);
         ResolvedProject::dispatch($project);
         return $project;

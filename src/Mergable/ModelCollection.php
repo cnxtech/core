@@ -129,9 +129,13 @@ abstract class ModelCollection extends EloquentCollection
 
     public function all()
     {
-        return array_map(function ($key) {
-            return $this->get($key);
-        }, $this->resolve()->keys());
+        return array_filter(
+            array_map(function ($key) {
+                return $this->get($key);
+            }, $this->resolve()->keys()),
+            function ($model) {
+                return $model->isEnabled();
+            });
     }
 
     protected function hasModel($key)
@@ -163,7 +167,6 @@ abstract class ModelCollection extends EloquentCollection
 
     public function getGraphSelection(array $attributes)
     {
-//        $all  = $this->all();
         $data = array_map(function (Model $model) use ($attributes) {
             return $model->getGraphSelection($attributes);
         }, $this->items);
@@ -210,5 +213,18 @@ abstract class ModelCollection extends EloquentCollection
         return $this;
     }
 
+    public function enabled()
+    {
+        return $this->filter(function (Model $model) {
+            return $model->isEnabled();
+        });
+    }
+
+    public function disabled()
+    {
+        return $this->filter(function (Model $model) {
+            return ! $model->isEnabled();
+        });
+    }
 
 }

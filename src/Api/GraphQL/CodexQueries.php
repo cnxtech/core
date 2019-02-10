@@ -19,20 +19,8 @@ class CodexQueries
         $codex = codex();
         $show  = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
         $codex->show($show);
-        Hooks::run('CodexQueries::resolve', [ $codex, $show ]);
+        Hooks::run('api.query.resolve', [ $codex, $show ]);
         return $codex;
-    }
-
-    public function projects(QueryConstraints $constraints, $rootValue, array $args, $context, ResolveInfo $resolveInfo)
-    {
-        $codex = $rootValue instanceof Codex ? $rootValue : codex();
-        /** @var \Codex\Projects\ProjectCollection $projects */
-        $projects = $codex->getProjects()->makeAll();
-        $projects = $constraints->applyConstraints($projects);
-
-        $show = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
-        $projects->show($show);
-        return Hooks::waterfall('CodexQueries::projects', $projects, [ $rootValue, $args, $context, $resolveInfo ]);
     }
 
     /** @return \Codex\Contracts\Projects\Project */
@@ -45,7 +33,7 @@ class CodexQueries
             throw NotFoundException::project($key)->toApiError();
         }
         $project = codex()->getProject($key);
-        return Hooks::waterfall('CodexQueries::getProject', $project, [ $key ]);
+        return Hooks::waterfall('api.queries.get.project', $project, [ $key ]);
     }
 
     /** @return \Codex\Contracts\Revisions\Revision */
@@ -59,7 +47,7 @@ class CodexQueries
             $revisionKey = $project->getRevisions()->getDefaultKey();
         }
         $revision = $project->getRevision($revisionKey);
-        return Hooks::waterfall('CodexQueries::getRevision', $revision, [ $projectKey, $revisionKey ]);
+        return Hooks::waterfall('api.queries.get.revision', $revision, [ $projectKey, $revisionKey ]);
     }
 
     /** @return \Codex\Contracts\Revisions\Revision */
@@ -73,7 +61,19 @@ class CodexQueries
             $documentKey = $revision->getDocuments()->getDefaultKey();
         }
         $document = $revision->getDocument($documentKey);
-        return Hooks::waterfall('CodexQueries::getDocument', $document, [ $projectKey, $revisionKey, $documentKey ]);
+        return Hooks::waterfall('api.queries.get.document', $document, [ $projectKey, $revisionKey, $documentKey ]);
+    }
+
+    public function projects(QueryConstraints $constraints, $rootValue, array $args, $context, ResolveInfo $resolveInfo)
+    {
+        $codex = $rootValue instanceof Codex ? $rootValue : codex();
+        /** @var \Codex\Projects\ProjectCollection $projects */
+        $projects = $codex->getProjects()->makeAll();
+        $projects = $constraints->applyConstraints($projects);
+
+        $show = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
+        $projects->show($show);
+        return Hooks::waterfall('api.query.projects', $projects, [ $rootValue, $args, $context, $resolveInfo ]);
     }
 
     public function project($rootValue, array $args, $context, ResolveInfo $resolveInfo)
@@ -82,7 +82,7 @@ class CodexQueries
         $project = $this->getProject($key);
         $show    = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
         $project->show($show);
-        return Hooks::waterfall('CodexQueries::project', $project, [ $rootValue, $args, $context, $resolveInfo ]);
+        return Hooks::waterfall('api.queries.project', $project, [ $rootValue, $args, $context, $resolveInfo ]);
     }
 
     public function revisions(QueryConstraints $constraints, $rootValue, array $args, $context, ResolveInfo $resolveInfo)
@@ -93,7 +93,7 @@ class CodexQueries
         $revisions  = $constraints->applyConstraints($revisions);
         $show       = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
         $revisions->show($show);
-        return Hooks::waterfall('CodexQueries::revisions', $revisions, [ $rootValue, $args, $context, $resolveInfo ]);
+        return Hooks::waterfall('api.queries.revisions', $revisions, [ $rootValue, $args, $context, $resolveInfo ]);
     }
 
     public function revision($rootValue, array $args, $context, ResolveInfo $resolveInfo)
@@ -103,7 +103,7 @@ class CodexQueries
         $revision    = $this->getRevision($projectKey, $revisionKey);
         $show        = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
         $revision->show($show);
-        return Hooks::waterfall('CodexQueries::revision', $revision, [ $rootValue, $args, $context, $resolveInfo ]);
+        return Hooks::waterfall('api.queries.revision', $revision, [ $rootValue, $args, $context, $resolveInfo ]);
     }
 
 
@@ -116,7 +116,7 @@ class CodexQueries
         $documents   = $constraints->applyConstraints($documents);
         $show        = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
         $documents->show($show);
-        return Hooks::waterfall('CodexQueries::documents', $documents, [ $rootValue, $args, $context, $resolveInfo ]);
+        return Hooks::waterfall('api.queries.documents', $documents, [ $rootValue, $args, $context, $resolveInfo ]);
     }
 
 
@@ -128,7 +128,7 @@ class CodexQueries
         $document    = $this->getDocument($projectKey, $revisionKey, $documentKey);
         $show        = Utils::transformSelectionToShow($resolveInfo->getFieldSelection(0));
         $document->show($show);
-        return Hooks::waterfall('CodexQueries::document', $document, [ $rootValue, $args, $context, $resolveInfo ]);
+        return Hooks::waterfall('api.queries.document', $document, [ $rootValue, $args, $context, $resolveInfo ]);
     }
 
     public function diff($rootValue, array $args, $context, ResolveInfo $resolveInfo)

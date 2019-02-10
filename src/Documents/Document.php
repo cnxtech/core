@@ -6,6 +6,8 @@ use Codex\Concerns;
 use Codex\Contracts\Documents\Document as DocumentContract;
 use Codex\Contracts\Mergable\ChildInterface;
 use Codex\Contracts\Revisions\Revision;
+use Codex\Exceptions\Exception;
+use Codex\Hooks;
 use Codex\Mergable\Concerns\HasParent;
 use Codex\Mergable\Model;
 
@@ -64,11 +66,13 @@ class Document extends Model implements DocumentContract, ChildInterface
         };
         $registry                  = $this->getCodex()->getRegistry()->resolveGroup('documents');
         $attributes[ 'extension' ] = path_get_extension($attributes[ 'path' ]);
-        $this->init($attributes, $registry);
+        $attributes                = Hooks::waterfall('document.initialize', $attributes, [ $registry, $this ]);
+        $this->initialize($attributes, $registry);
         $this->addGetMutator('inherits', 'getInheritKeys', true, true);
         $this->addGetMutator('changes', 'getChanges', true, true);
         $this->addGetMutator('content', 'getContent', true, true);
         $this->addGetMutator('last_modified', 'getLastModified', true, true);
+        Hooks::run('document.initialized', [ $this ]);
     }
 
     public function url()
@@ -108,7 +112,6 @@ class Document extends Model implements DocumentContract, ChildInterface
         if ($this->content === null) {
             $resolver      = $this->contentResolver;
             $this->content = $resolver($this);
-
         }
         // @todo: find a better way to fix this, This way the  FluentDOM::Query('', 'text/html') does not generate a exception
         if ('' === $this->content) {
@@ -138,30 +141,25 @@ class Document extends Model implements DocumentContract, ChildInterface
     /** @return DOMQueryDecorator */
     public function getDOM()
     {
-        // uses https://github.com/ThomasWeinert/PhpCss for css queries
         $content                              = $this->getContent();
         $query                                = \FluentDOM::QueryCss($content, 'html', [
             \FluentDOM\Loader\Options::ENCODING       => 'UTF-8',
             \FluentDOM\Loader\Options::FORCE_ENCODING => false,
-//            \FluentDOM\Loader\Xml::LIBXML_OPTIONS => LIBXML_ERR_NONE | LIBXML_NOERROR | LIBXML_HTML_NODEFDTD
         ]);
         $query->document->strictErrorChecking = false;
         return new DOMQueryDecorator($query, $this);
-        // https://stackoverflow.com/questions/23426745/case-sensitivity-with-getelementbytagname-and-getattribute-php
-//        return FluentDOM::Query(, 'text/html'); //, [FluentDOM\Loader\Xml::LIBXML_OPTIONS => LIBXML_ERR_NONE | LIBXML_NOERROR]);
     }
 
     /** @param \FluentDOM\Query $dom */
     public function saveDOM($dom)
     {
-        $this->content = urldecode($dom->find('body')->html());
-//        $this->content = $dom->find('//body')->first()->html();
+        $this->content = urldecode($dom->find('body')->html()); //        $this->content = $dom->find('//body')->first()->html();
     }
 
     public function setProcessed(bool $value, string $type = null)
     {
         if ($type !== null && ! in_array($type, [ 'pre', 'post' ], true)) {
-            throw new \Exception("Invalid process type [{$type}]. Should be either 'pre' or 'post'");
+            throw Exception::make("Invalid process type [{$type}]. Should be either 'pre' or 'post'");
         }
         $propertyName        = camel_case(($type === null ? '' : $type) . '_Processed');
         $this->$propertyName = $value;
@@ -171,7 +169,7 @@ class Document extends Model implements DocumentContract, ChildInterface
     protected function triggerProcess(string $type = null)
     {
         if ($type !== null && ! in_array($type, [ 'pre', 'post' ], true)) {
-            throw new \Exception("Invalid process type [{$type}]. Should be either 'pre' or 'post'");
+            throw Exception::make("Invalid process type [{$type}]. Should be either 'pre' or 'post'");
         }
         $propertyName = camel_case(($type === null ? '' : $type) . '_Processed');
         if ($this->$propertyName) {

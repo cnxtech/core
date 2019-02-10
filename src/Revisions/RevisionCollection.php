@@ -4,7 +4,7 @@ namespace Codex\Revisions;
 
 use Codex\Mergable\ModelCollection;
 use Codex\Revisions\Commands\FindRevisions;
-use Codex\Revisions\Commands\MakeRevision;
+use Codex\Revisions\Commands\ResolveRevision;
 
 /**
  * This is the class RevisionCollection.
@@ -43,7 +43,7 @@ class RevisionCollection extends ModelCollection
      */
     protected function makeModel($key)
     {
-        return $this->dispatch(new MakeRevision($this->getProject(), $this->getLoadable($key)));
+        return $this->dispatch(new ResolveRevision($this->getProject(), $this->getLoadable($key)));
     }
 
     /**
