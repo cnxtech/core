@@ -243,11 +243,11 @@ class Link
 
     public function replaceElementHtml($html)
     {
-        $new = FluentDOM::Query($html, 'text/html');
-        $this->element->before($new->xpath('//body/*')[ 0 ]);
+        $fd = FluentDOM($html, 'text/html-fragment');
+        $this->element->before($fd->get());
+        $new = $this->element->previousSibling;
         $this->element->remove();
-        $this->element = $new;
-
+        $this->element=$new;
         return $this->element;
     }
 
