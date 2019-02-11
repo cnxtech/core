@@ -60,20 +60,26 @@
     <meta name="msapplication-TileImage" content="{{ asset('vendor/codex_core/img/mstile-144x144.png') }}">
     <meta name="msapplication-config" content="{{ asset('vendor/codex_core/img/browserconfig.xml') }}">
     <link rel="yandex-tableau-widget" href="{{ asset('vendor/codex_core/img/yandex-browser-manifest.json') }}">
-    <link href="{{ asset('vendor/codex_core/css/core.css?1c426d162ccb6428c69a') }}" rel="stylesheet">
-    <link href="{{ asset('vendor/codex_documents/css/documents.css?1c426d162ccb6428c69a') }}" rel="stylesheet">
+    <link href="{{ asset('vendor/codex_core/css/core.css?571103a3e8466ae941a7') }}" rel="stylesheet">
     <script type="text/javascript" src="{{ asset('vendor/codex_core/js/core.js') }}"></script>
-    <script type="text/javascript" src="{{ asset('vendor/codex_documents/js/documents.js') }}"></script>
+
+    {{--<link href="{{ asset('vendor/codex_phpdoc/css/phpdoc.css?571103a3e8466ae941a7') }}" rel="stylesheet">--}}
+    <script type="text/javascript" src="{{ asset('vendor/codex_phpdoc/js/phpdoc.js') }}"></script>
+
+
+    {{--<script type="text/javascript" src="{{ asset('vendor/codex_auth/js/auth.js') }}"></script>--}}
 </head>
 <body>
 
 <div id="root"></div>
+
+
 <script>
     (function () {
         var codex = window['codex'];
         codex.core.loadPolyfills().then(function () {
             var app = codex.core.app;
-            app.plugin(new codex.documents.default());
+            app.plugin(new codex.phpdoc.default());
             return app.register({
                 debug : app.store.config.debug,
                 cache : app.store.codex.cache.enabled,
