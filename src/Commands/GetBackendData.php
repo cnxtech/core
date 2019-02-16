@@ -64,16 +64,27 @@ EOT
             return is_string($request) ? [ 'query' => $request, 'variables' => [] ] : $request;
         }, $requests);
 
-        $response = $codex->getApi()->executeBatchedQueries($requests);
-        // transform all responses to the data arrays
-        $data = array_map(function ($response) {
-            return $response->data;
-        }, $response);
-        $data = array_replace_recursive(...$data);
+        $cacheKey = md5(json_encode($requests));
+        $data = cache()->rememberForever($cacheKey, function () use ($codex, $requests) {
+            $response = $codex->getApi()->executeBatchedQueries($requests);
+            // transform all responses to the data arrays
+            $data = array_map(function ($response) {
+                return $response->data;
+            }, $response);
+            $data = array_replace_recursive(...$data);
+            return $data;
+        });
+
 
         // put the data trough the hook to allow external modification
         $data = Hooks::waterfall('commands.get_backend_data.response', $data);
 
-        return $data;
+        $options = config('app.debug') ? JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES : JSON_UNESCAPED_SLASHES;
+        $json    = json_encode($data, $options);
+        $content = <<<EOT
+window['BACKEND_DATA'] = {$json};
+EOT;
+
+        return $content;
     }
 }

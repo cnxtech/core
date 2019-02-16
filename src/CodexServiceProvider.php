@@ -31,10 +31,7 @@ class CodexServiceProvider extends ServiceProvider
 
     protected $viewDirs = [ 'views' => 'codex' ];
 
-    protected $assetDirs = [
-        'assets/core'      => 'codex_core',
-        'assets/documents' => 'codex_documents',
-    ];
+    protected $assetDirs = [ 'assets' => 'codex_core' ];
 
     protected $commands = [
         Addons\Console\AddonCommand::class,
@@ -131,6 +128,7 @@ class CodexServiceProvider extends ServiceProvider
         $app = parent::register();
         $this->registerLogger();
         $this->registerDefaultFilesystem();
+
         return $app;
     }
 

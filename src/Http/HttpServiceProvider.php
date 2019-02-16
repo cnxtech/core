@@ -23,5 +23,17 @@ class HttpServiceProvider extends RouteServiceProvider
             ->namespace($this->namespace)
             ->prefix($codex[ 'http.prefix' ])
             ->group(__DIR__ . '/../../routes/api.php');
+        
+        if ($router->getRoutes()->getByName('codex.documentation') === null) {
+            $router->getRoutes()->refreshNameLookups();
+        }
+        $documentationRoute = $router->getRoutes()->getByName('codex.documentation');
+        $router
+            ->redirect('/', $documentationRoute->uri())
+            ->middleware('web')
+            ->prefix($codex[ 'http.prefix' ])
+            ->name('codex');
     }
+
+
 }

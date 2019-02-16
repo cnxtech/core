@@ -13,11 +13,7 @@ class DocumentController extends Controller
 
     public function getBackendData()
     {
-        $data     = $this->dispatch(new GetBackendData());
-        $json     = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-        $content  = <<<EOT
-window['BACKEND_DATA'] = {$json};
-EOT;
+        $content = $this->dispatch(new GetBackendData());
         $response = response($content, 200, [
             'Content-Type' => 'application/javascript; charset=UTF-8',
         ]);
@@ -54,8 +50,9 @@ EOT;
 
         if (Hooks::run('controller.web.document', [ $project, $revision, $document ], true)) {
             view()->share(compact('codex', 'project', 'revision', 'document', 'content'));
-
-            return view($codex[ 'http.documentation_view' ], compact('content'));
+            $view = view($codex[ 'http.documentation_view' ], compact('content'));
+            Hooks::run('controller.web.view', [ $view ]);
+            return $view;
         }
     }
 }

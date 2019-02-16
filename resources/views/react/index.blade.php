@@ -22,7 +22,12 @@
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.2.1/custom-elements-es5-adapter.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/webcomponentsjs/2.2.1/webcomponents-loader.js"></script>
-    <script src="{{ asset('backend_data.js') }}"></script>
+{{--    @if(config('app.debug'))
+        <script src="{{ asset('backend_data.js') }}"></script>
+    @else
+        <script>{!! with(new \Codex\Commands\GetBackendData())->handle($codex)  !!}</script>
+    @endif--}}
+    <script>{!! with(new \Codex\Commands\GetBackendData())->handle($codex)  !!}</script>
 
     <link rel="shortcut icon" href="{{ asset('vendor/codex_core/img/favicon.ico') }}">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('vendor/codex_core/img/favicon-16x16.png') }}">
@@ -63,8 +68,9 @@
     <link href="{{ asset('vendor/codex_core/css/core.css?571103a3e8466ae941a7') }}" rel="stylesheet">
     <script type="text/javascript" src="{{ asset('vendor/codex_core/js/core.js') }}"></script>
 
+    @stack('head')
     {{--<link href="{{ asset('vendor/codex_phpdoc/css/phpdoc.css?571103a3e8466ae941a7') }}" rel="stylesheet">--}}
-    <script type="text/javascript" src="{{ asset('vendor/codex_phpdoc/js/phpdoc.js') }}"></script>
+
 
 
     {{--<script type="text/javascript" src="{{ asset('vendor/codex_auth/js/auth.js') }}"></script>--}}
@@ -79,8 +85,9 @@
         var codex = window['codex'];
         codex.core.loadPolyfills().then(function () {
             var app = codex.core.app;
-            app.plugin(new codex.phpdoc.default());
-            return app.register({
+            @stack('init')
+
+                return app.register({
                 debug : app.store.config.debug,
                 cache : app.store.codex.cache.enabled,
                 rootID: 'root',
