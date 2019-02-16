@@ -31,29 +31,32 @@ return [
         'layout:column'    => 'Codex\Documents\Processors\Macros\Layout@column',
         'general:hide'     => 'Codex\Documents\Processors\Macros\General@hide',
         'attribute:print'  => 'Codex\Documents\Processors\Macros\Attribute@printValue',
-//        'phpdoc:method:signature' => 'Codex\Addon\Phpdoc\PhpdocMacros@methodSignature',
-//        'phpdoc:method'           => 'Codex\Addon\Phpdoc\PhpdocMacros@method',
-//        'phpdoc:entity'           => 'Codex\Addon\Phpdoc\PhpdocMacros@entity',
-//        'phpdoc:list:method'      => 'Codex\Addon\Phpdoc\PhpdocMacros@listMethod',
-//        'phpdoc:list:property'    => 'Codex\Addon\Phpdoc\PhpdocMacros@listProperty',
     ],
     'parser'     => [
-        'markdown' => [ // refers to parser name
+        'markdown2'   => [ // refers to parser name
             'parser'     => 'Codex\Documents\Processors\Parser\MarkdownParser',
             'file_types' => [ 'md', 'markdown' ],
             'options'    => [
-                'html5' => true,
-                'table' => [
+                'html5'                => true,
+                'inline_html_elements' => [ 'c-c' ],
+                'table'                => [
                     'class' => 'table hover',
                 ],
-                'code'  => [
+                'code'                 => [
                     'line_numbers' => true,
                     'command_line' => true,
                     'loader'       => false,
                 ],
             ],
         ],
-        'rst'      => [], // refers to parser name
+        'markdown' => [
+            'parser'     => 'Codex\Documents\Processors\Parser\CommonMarkParser',
+            'file_types' => [ 'md', 'markdown' ],
+            'options'    => [
+
+            ],
+        ],
+        'rst'        => [], // refers to parser name
 
     ],
     'toc'        => [

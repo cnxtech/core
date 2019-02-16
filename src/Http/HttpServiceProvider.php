@@ -27,9 +27,9 @@ class HttpServiceProvider extends RouteServiceProvider
         if ($router->getRoutes()->getByName('codex.documentation') === null) {
             $router->getRoutes()->refreshNameLookups();
         }
-        $documentationRoute = $router->getRoutes()->getByName('codex.documentation');
+//        $documentationRoute = $router->getRoutes()->getByName('codex.documentation');
         $router
-            ->redirect('/', $documentationRoute->uri())
+            ->redirect('/', route('codex.documentation'))
             ->middleware('web')
             ->prefix($codex[ 'http.prefix' ])
             ->name('codex');

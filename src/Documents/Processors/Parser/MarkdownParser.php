@@ -8,12 +8,14 @@ use Codex\Concerns\Macroable;
 class MarkdownParser extends GithubMarkdown implements ParserInterface
 {
     use Macroable;
+
     protected $options = [];
 
     public function setOptions(array $options)
     {
-        $this->options = $options;
-        $this->html5   = data_get($options, 'html5', false);
+        $this->options            = $options;
+//        $this->inlineHtmlElements = array_merge($this->inlineHtmlElements, data_get($options, 'inline_html_elements', []));
+        $this->html5              = data_get($options, 'html5', false);
     }
 
     /**
@@ -21,8 +23,8 @@ class MarkdownParser extends GithubMarkdown implements ParserInterface
      */
     protected function renderCode($block)
     {
-        $language = $block['language'] ?? 'php';
-        $attr = ["language=\"{$language}\""];
+        $language = $block[ 'language' ] ?? 'php';
+        $attr     = [ "language=\"{$language}\"" ];
         if (true === data_get($this->options, 'code.line_numbers', false)) {
             $attr[] = 'with-line-numbers';
         }
@@ -34,7 +36,7 @@ class MarkdownParser extends GithubMarkdown implements ParserInterface
         }
 
         /** @noinspection NonSecureHtmlspecialcharsUsageInspection */
-        $code   = htmlspecialchars($block['content']."\n", ENT_NOQUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $code   = htmlspecialchars($block[ 'content' ] . "\n", ENT_NOQUOTES | ENT_SUBSTITUTE, 'UTF-8');
         $attr[] = "code=\"{$code}\"";
         $attr   = implode(' ', $attr);
 
@@ -46,6 +48,6 @@ class MarkdownParser extends GithubMarkdown implements ParserInterface
         $table = parent::renderTable($block);
         $class = data_get($this->options, 'table.class', 'table');
 
-        return str_replace('<table>', '<table class="'.$class.'">', $table);
+        return str_replace('<table>', '<table class="' . $class . '">', $table);
     }
 }

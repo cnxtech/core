@@ -17,7 +17,7 @@ class DocumentController extends Controller
         $response = response($content, 200, [
             'Content-Type' => 'application/javascript; charset=UTF-8',
         ]);
-        $response = Hooks::waterfall('controller.web.backend_data', $response, [ $data ]);
+        $response = Hooks::waterfall('controller.web.backend_data', $response);
         return $response;
     }
 
