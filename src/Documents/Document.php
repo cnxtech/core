@@ -75,9 +75,9 @@ class Document extends Model implements DocumentContract, ChildInterface
         Hooks::run('document.initialized', [ $this ]);
     }
 
-    public function url()
+    public function url($absolute = true)
     {
-        return $this->getRevision()->url($this->getKey());
+        return $this->getRevision()->url($this->getKey(), $absolute);
     }
 
     /**

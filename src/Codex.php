@@ -101,7 +101,7 @@ class Codex extends Model implements ParentInterface
         })->toArray();
     }
 
-    public function url($projectKey = null, $revisionKey = null, $documentKey = null)
+    public function url($projectKey = null, $revisionKey = null, $documentKey = null, $absolute=true)
     {
         if ($projectKey instanceof Project) {
             $projectKey = $projectKey->getKey();
@@ -112,7 +112,7 @@ class Codex extends Model implements ParentInterface
         if ($documentKey instanceof Document) {
             $documentKey = $documentKey->getKey();
         }
-        return route('codex.documentation', compact('projectKey', 'revisionKey', 'documentKey'));
+        return route('codex.documentation', compact('projectKey', 'revisionKey', 'documentKey'),$absolute);
     }
 
     /**

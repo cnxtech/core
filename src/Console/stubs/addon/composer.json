@@ -1,0 +1,24 @@
+{
+    "name": ":package:",
+    "license": "MIT",
+    "type": "codex-addon",
+    "description": "A Codex Addon",
+    "require": {
+        "codex/core": "~2.1"
+    },
+    "autoload": {
+        "psr-4": {
+            ":psr4:": "src/"
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        },
+        "laravel": {
+            "dont-discover": [
+                ":package:"
+            ]
+        }
+    }
+}

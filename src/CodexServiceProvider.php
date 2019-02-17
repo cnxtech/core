@@ -4,6 +4,7 @@ namespace Codex;
 
 use Codex\Addons\Extensions\RegisterExtension;
 use Codex\Attributes\AttributeDefinitionFactory;
+use Codex\Concerns\ProvidesResources;
 use Codex\Contracts\Documents\Document;
 use Codex\Documents\Events\ResolvedDocument;
 use Codex\Documents\Listeners\ProcessDocument;
@@ -19,6 +20,7 @@ use Radic\BladeExtensions\BladeExtensionsServiceProvider;
 
 class CodexServiceProvider extends ServiceProvider
 {
+    use ProvidesResources;
     use DispatchesJobs;
 
     protected $strict = false;
@@ -34,7 +36,13 @@ class CodexServiceProvider extends ServiceProvider
     protected $assetDirs = [ 'assets' => 'codex_core' ];
 
     protected $commands = [
-        Addons\Console\AddonCommand::class,
+        Console\AddonsListCommand::class,
+        Console\AddonsDisableCommand::class,
+        Console\AddonsEnableCommand::class,
+        Console\AddonsUninstallCommand::class,
+        Console\AddonsInstallCommand::class,
+        Console\ProjectsMakeCommand::class,
+        Console\ConfigCommand::class,
     ];
 
     public $singletons = [
@@ -169,7 +177,7 @@ class CodexServiceProvider extends ServiceProvider
         $codex->add('description', 'string')->setDefault('');
         $codex->add('default_project', 'string', 'ID')->setDefault(null);
 
-        $routeMap = $codex->add('routeMap', 'array.scalarPrototype')->noApi();
+//        $routeMap = $codex->add('routeMap', 'array.scalarPrototype')->noApi();
 
         $urls = $codex->add('urls', 'dictionary')->setApiType('CodexUrls', [ 'new' ]);
         $urls->add('api', 'string');

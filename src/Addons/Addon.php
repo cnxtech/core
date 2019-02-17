@@ -156,7 +156,7 @@ class Addon
     /**
      * newServiceProvider method
      *
-     * @return \Illuminate\Support\ServiceProvider
+     * @return \Codex\Addons\AddonServiceProvider
      */
     public function newServiceProvider()
     {

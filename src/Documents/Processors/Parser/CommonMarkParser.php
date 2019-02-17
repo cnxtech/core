@@ -29,13 +29,13 @@ class CommonMarkParser implements ParserInterface
 //                    'inner_separator' => "\n",
 //                    'soft_break'      => "\n",
 //                ],
-//                'enable_em' => true,
-//                'enable_strong' => true,
+                'enable_em' => true,
+                'enable_strong' => true,
 //                'use_asterisk' => true,
 //                'use_underscore' => true,
-                'html_input' => 'escape',
-//                'allow_unsafe_links' => false,
-//                'max_nesting_level' => INF
+                'html_input' => Environment::HTML_INPUT_ALLOW,
+                'allow_unsafe_links' => true,
+                'max_nesting_level' => INF
             ];
             $this->converter = new CommonMarkConverter($config, $environment);
         }

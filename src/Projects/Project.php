@@ -74,9 +74,9 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
         Hooks::run('project.initialized', [ $this ]);
     }
 
-    public function url($revisionKey = null, $documentKey = null)
+    public function url($revisionKey = null, $documentKey = null, $absolute = true)
     {
-        return $this->getCodex()->url($this->getKey(), $revisionKey, $documentKey);
+        return $this->getCodex()->url($this->getKey(), $revisionKey, $documentKey, $absolute);
     }
 
     /** @return \Codex\Contracts\Revisions\Revision[]|\Codex\Mergable\EloquentCollection */

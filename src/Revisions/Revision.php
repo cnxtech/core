@@ -49,7 +49,7 @@ class Revision extends Model implements RevisionContract, ChildInterface, Parent
     public function __construct(array $attributes, DocumentCollection $documents)
     {
         $this->setChildren($documents->setParent($this));
-        $registry = $this->getCodex()->getRegistry()->resolveGroup('revisions');
+        $registry   = $this->getCodex()->getRegistry()->resolveGroup('revisions');
         $attributes = Hooks::waterfall('revision.initialize', $attributes, [ $registry, $this ]);
         $this->initialize($attributes, $registry);
         $this->addGetMutator('inherits', 'getInheritKeys', true, true);
@@ -57,9 +57,9 @@ class Revision extends Model implements RevisionContract, ChildInterface, Parent
         Hooks::run('revision.initialized', [ $this ]);
     }
 
-    public function url($documentKey = null)
+    public function url($documentKey = null, $absolute = true)
     {
-        return $this->getCodex()->url($this->getProject()->getKey(), $this->getKey(), $documentKey);
+        return $this->getCodex()->url($this->getProject()->getKey(), $this->getKey(), $documentKey, $absolute);
     }
 
     public function path(...$parts)
@@ -121,7 +121,7 @@ class Revision extends Model implements RevisionContract, ChildInterface, Parent
 
     public function setConfigFilePath($configFilePath)
     {
-        $this->configFilePath =$configFilePath;
+        $this->configFilePath = $configFilePath;
         return $this;
     }
 

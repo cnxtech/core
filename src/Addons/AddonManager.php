@@ -89,4 +89,26 @@ class AddonManager
     {
         $this->dispatch(new DisableAddon($addon));
     }
+
+    public function getFinder(): \Codex\Addons\AddonFinder
+    {
+        return $this->finder;
+    }
+
+    public function getIntegrator(): \Codex\Addons\AddonIntegrator
+    {
+        return $this->integrator;
+    }
+
+    public function getRegistry(): \Codex\Addons\AddonRegistry
+    {
+        return $this->registry;
+    }
+
+    public function getAddons(): \Codex\Addons\AddonCollection
+    {
+        return $this->addons;
+    }
+
+
 }

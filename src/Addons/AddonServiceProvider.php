@@ -2,16 +2,15 @@
 
 namespace Codex\Addons;
 
+use Codex\Concerns\ProvidesResources;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\ServiceProvider;
 use ReflectionClass;
 
-//use Laradic\ServiceProvider\BaseServiceProvider;
-//use Laradic\ServiceProvider\Plugins;
-
 class AddonServiceProvider extends ServiceProvider
 {
     use DispatchesJobs;
+    use ProvidesResources;
 
     /**
      * The provider class names.
@@ -199,17 +198,17 @@ class AddonServiceProvider extends ServiceProvider
      *
      * @var array
      */
-    protected $configFiles = [];
+//    protected $configFiles = [];
 
     /** @var string */
-    protected $configDestinationPath = '{path.config}';
+//    protected $configDestinationPath = '{path.config}';
 
     /**
      * Path to the config directory.
      *
      * @var string
      */
-    protected $configPath = '{packagePath}/config';
+//    protected $configPath = '{packagePath}/config';
 
     /*
      |---------------------------------------------------------------------
@@ -285,6 +284,7 @@ class AddonServiceProvider extends ServiceProvider
      */
     protected $seedDirs = [/* 'dirName', */ ];
 
+
     /**
      * startPathsPlugin method.
      *
@@ -293,34 +293,24 @@ class AddonServiceProvider extends ServiceProvider
     protected function addResourcesHandler()
     {
         $this->app->booted(function () {
-            foreach ($this->viewDirs as $dirName => $namespace) {
-                $viewPath = $this->resolvePath('viewsPath', compact('dirName'));
-                $this->loadViewsFrom($viewPath, $namespace);
-                $this->publishes([ $viewPath => $this->resolvePath('viewsDestinationPath', compact('namespace')) ], 'views');
+            $resources = $this->getResources();
+            foreach ($resources[ 'views' ] as $resource) {
+                $this->loadViewsFrom($resource[ 'path' ], $resource[ 'namespace' ]);
+                $this->publishes([ $resource[ 'path' ] => $resource[ 'publishPath' ] ], 'views');
             }
-
-            foreach ($this->translationDirs as $dirName => $namespace) {
-                $transPath = $this->resolvePath('translationPath', compact('dirName'));
-                $this->loadTranslationsFrom($transPath, $namespace);
-                $this->publishes([ $transPath => $this->resolvePath('translationDestinationPath', compact('namespace')) ], 'translations');
+            foreach ($resources[ 'translations' ] as $resource) {
+                $this->loadTranslationsFrom($resource[ 'path' ], $resource[ 'namespace' ]);
+                $this->publishes([ $resource[ 'path' ] => $resource[ 'publishPath' ] ], 'translations');
             }
-
-            foreach ($this->assetDirs as $dirName => $namespace) {
-                $this->publishes([
-                    $this->resolvePath('assetsPath', compact('dirName')) => $this->resolvePath('assetsDestinationPath', compact('namespace')),
-                ], 'public');
+            foreach ($resources[ 'assets' ] as $resource) {
+                $this->publishes([ $resource[ 'path' ] => $resource[ 'publishPath' ] ], 'public');
             }
-
-            foreach ($this->migrationDirs as $dirName) {
-                $migrationPaths = $this->resolvePath('migrationsPath', compact('dirName'));
-                $this->loadMigrationsFrom($migrationPaths);
-                if ($this->publishMigrations) {
-                    $this->publishes([ $migrationPaths => $this->resolvePath('migrationDestinationPath') ], 'database');
-                }
+            foreach ($resources[ 'migrations' ] as $resource) {
+                $this->loadMigrationsFrom($resource[ 'path' ]);
+                $this->publishes([ $resource[ 'path' ] => $resource[ 'publishPath' ] ], 'database');
             }
-
-            foreach ($this->seedDirs as $dirName) {
-                $this->publishes([ $this->resolvePath('seedsPath', compact('dirName')) => $this->resolvePath('seedsDestinationPath') ], 'database');
+            foreach ($resources[ 'seeds' ] as $resource) {
+                $this->publishes([ $resource[ 'path' ] => $resource[ 'publishPath' ] ], 'database');
             }
         });
     }
@@ -407,7 +397,7 @@ class AddonServiceProvider extends ServiceProvider
 
     private function getRootDir()
     {
-        if($this->rootDir === null) {
+        if ($this->rootDir === null) {
             $class     = new ReflectionClass(get_called_class());
             $filePath  = $class->getFileName();
             $this->dir = $rootDir = path_get_directory($filePath);
