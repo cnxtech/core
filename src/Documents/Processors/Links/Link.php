@@ -89,7 +89,8 @@ class Link
     protected function parse()
     {
 //        $result = preg_match('/codex:(.*?)(?:\[(.*?)\]|$|)(?:(:.*)|$)/', urldecode($this->url->toString()), $matches);
-        $result = preg_match('/codex:(.*?)(?:[\[(](.*?)[)\]]|$|)(?:(:.*)|$)/', urldecode($this->url->toString()), $matches);
+//        $result = preg_match('/codex:(.*?)(?:[\[(](.*?)[)\]]|$|)(?:(:.*)|$)/', urldecode($this->url->toString()), $matches);
+        $result = preg_match('/codex:(.*?)(?:\[(.*?)\]|$|)(?:(:.*)|$)/', urldecode($this->url->toString()), $matches);
         if (0 === $result) {
             return;
         }

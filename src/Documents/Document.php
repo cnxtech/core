@@ -153,6 +153,7 @@ class Document extends Model implements DocumentContract, ChildInterface
     /** @param \FluentDOM\Query $dom */
     public function saveDOM($dom)
     {
+//        $this->content = $dom->find('body')->html();
         $this->content = urldecode($dom->find('body')->html()); //        $this->content = $dom->find('//body')->first()->html();
     }
 
