@@ -17,6 +17,7 @@ use Codex\Documents\Processors\LinksProcessorExtension;
 use FluentDOM;
 use FluentDOM\DOM\Element;
 use Illuminate\Foundation\Bus\DispatchesJobs;
+use League\Uri\UriException;
 
 /**
  * This is the class Action.
@@ -49,6 +50,8 @@ class Link
     /** @var \Codex\Revisions\Revision */
     public $revision;
 
+    protected $valid = false;
+
     /**
      * @var string
      */
@@ -65,10 +68,15 @@ class Link
     {
         $this->dispatch(new AssignClassDocumentProperties($processor->getDocument(), $this));
         $this->processor = $processor;
-        $this->url       = Url::createFromString(urldecode($element->getAttribute('href')));
         $this->element   = $element;
 
-        $this->parse();
+        try {
+            $this->url = Url::createFromString(urldecode($element->getAttribute('href')));
+            $this->parse();
+            $this->valid = true;
+        } catch (UriException $exception){
+
+        }
     }
 
     /**
@@ -133,6 +141,11 @@ class Link
 
             return $param;
         }, $params);
+    }
+
+    public function isValid()
+    {
+        return $this->valid;
     }
 
     /**

@@ -16,6 +16,11 @@ use League\Uri\Http;
 
 class Url extends Http
 {
+    protected static $supported_schemes = [
+        'http' => 80,
+        'https' => 443
+    ];
+
     public function toString()
     {
         return $this->__toString();

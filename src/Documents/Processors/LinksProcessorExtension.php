@@ -15,7 +15,7 @@ class LinksProcessorExtension extends ProcessorExtension implements ProcessorInt
 
     protected $defaultConfig = 'codex.processor-defaults.links';
 
-    protected $before = [ 'macros'];
+    protected $before = [ 'macros' ];
 
     public function getName()
     {
@@ -39,7 +39,9 @@ class LinksProcessorExtension extends ProcessorExtension implements ProcessorInt
         $d->find('a')->each(function (Element $element) {
             /** @var Element $parent */
             $link = new Links\Link($this, $element);
-
+            if ( ! $link->isValid()) {
+                return;
+            }
             if ($link->isAction()) {
                 $actions = $this->config('actions', []);
 
@@ -56,11 +58,16 @@ class LinksProcessorExtension extends ProcessorExtension implements ProcessorInt
                 }
             } elseif ($link->isInternal()) {
                 $this->handleInternal($link);
+            } elseif ( ! $link->isInternal()) {
+                $this->handleExternal($link);
             }
         });
         $document->saveDOM($d);
     }
 
+    protected function handleExternal(Link $link){
+        $link->getElement()->setAttribute('target', '_blank');
+    }
     protected function handleInternal(Link $link)
     {
         $current     = Url::createFromString($this->document->url());
