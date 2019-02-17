@@ -36,6 +36,7 @@ class CodexServiceProvider extends ServiceProvider
     protected $assetDirs = [ 'assets' => 'codex_core' ];
 
     protected $commands = [
+        Console\AddonsMakeCommand::class,
         Console\AddonsListCommand::class,
         Console\AddonsDisableCommand::class,
         Console\AddonsEnableCommand::class,

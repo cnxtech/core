@@ -1,7 +1,4 @@
 <?php
-
-/** @noinspection RepetitiveMethodCallsInspection */
-
 namespace AddonNamespace;
 
 use Codex\Addons\AddonServiceProvider;
@@ -24,6 +21,7 @@ class DummyAddonServiceProvider extends AddonServiceProvider
     public function boot(AttributeDefinitionRegistry $registry)
     {
         $projects = $registry->projects;
-        $projects->add(':name:', 'dictionary')->setApiType(':Name:Config', [ 'new' ]);
+        $addon = $projects->add(':name:', 'dictionary')->setApiType(':Name:Config', [ 'new' ]);
+        $addon->add('enabled', 'boolean');
     }
 }

@@ -32,7 +32,8 @@ class AddonsMakeCommand extends Command
             ':Vendor:'       => ucfirst($vendor),
             ':name:'         => $name,
             ':Name:'         => ucfirst($name),
-            ':psr4:'         => studly_case($vendor) . '\\\\' . studly_case($name),
+            ':package:'      => $vendor . '/' . $name,
+            ':psr4:'         => studly_case($vendor) . '\\\\' . studly_case($name) . '\\\\',
             'Dummy'          => studly_case($name),
             'AddonNamespace' => studly_case($vendor) . '\\' . studly_case($name),
         ];
@@ -45,7 +46,7 @@ class AddonsMakeCommand extends Command
         StubGenerator::create(__DIR__ . '/stubs/addon/src/DummyAddonServiceProvider.php', $path . '/src/' . $replacements[ 'Dummy' ] . 'AddonServiceProvider.php', $replacements);
         StubGenerator::create(__DIR__ . '/stubs/addon/resources/assets/dummy.js', $path . '/resources/assets/index.js', $replacements);
         StubGenerator::create(__DIR__ . '/stubs/addon/resources/views/dummy.blade.php', $path . '/resources/views/index.blade.php', $replacements);
-        StubGenerator::create(__DIR__ . '/stubs/addon/config/dummy.php', $path . '/config/' . $replacements[ ':vendor:' ] . '-' . $replacements[ ':name:' ], $replacements);
+        StubGenerator::create(__DIR__ . '/stubs/addon/config/dummy.php', $path . '/config/' . $replacements[ ':vendor:' ] . '-' . $replacements[ ':name:' ] . '.php', $replacements);
 
         $this->line('Created addon files in ' . $path);
     }
