@@ -86,7 +86,13 @@ class Codex extends Model implements ParentInterface
 
     public function getUrls()
     {
-        return collect($this->attr('routeMap', []))->map(function ($routeName) {
+        $routeMap = [
+            'root'          => 'codex',
+            'api'           => 'codex.api',
+            'documentation' => 'codex.documentation',
+        ];
+        $routeMap = Hooks::waterfall('codex.urls.map', $routeMap, [ $this ]);
+        $urls = collect($routeMap)->map(function ($routeName) {
             try {
                 return url()->route($routeName, [], false);
             }
@@ -99,9 +105,11 @@ class Codex extends Model implements ParentInterface
                 return url()->route($routeName, $parameters, false);
             }
         })->toArray();
+        $urls = Hooks::waterfall('codex.urls.mapped', $urls, [ $this ]);
+        return $urls;
     }
 
-    public function url($projectKey = null, $revisionKey = null, $documentKey = null, $absolute=true)
+    public function url($projectKey = null, $revisionKey = null, $documentKey = null, $absolute = true)
     {
         if ($projectKey instanceof Project) {
             $projectKey = $projectKey->getKey();
@@ -112,7 +120,7 @@ class Codex extends Model implements ParentInterface
         if ($documentKey instanceof Document) {
             $documentKey = $documentKey->getKey();
         }
-        return route('codex.documentation', compact('projectKey', 'revisionKey', 'documentKey'),$absolute);
+        return route('codex.documentation', compact('projectKey', 'revisionKey', 'documentKey'), $absolute);
     }
 
     /**

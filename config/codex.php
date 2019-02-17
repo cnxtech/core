@@ -55,11 +55,11 @@ return [
         'backend_data_url' => 'backend_data.js'
     ],
 
-    'routeMap' => [
-        'root' => 'codex',
-        'api' => 'codex.api',
-        'documentation' => 'codex.documentation',
-    ],
+//    'routeMap' => [
+//        'root' => 'codex',
+//        'api' => 'codex.api',
+//        'documentation' => 'codex.documentation',
+//    ],
 
     'processors' => [
         'enabled'  => [],
