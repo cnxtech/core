@@ -34,6 +34,12 @@ class FencedCodeRenderer extends \League\CommonMark\Block\Renderer\FencedCodeRen
             $attrs[ 'language' ] = Xml::escape($infoWords[ 0 ], true);
         }
 
-        return new HtmlElement('c-code-highlight', $attrs, Xml::escape($block->getStringContent()));
+        $content  = Xml::escape($block->getStringContent()); //Asciimath
+        $language = strtolower($attrs[ 'language' ]);
+        if ($language === 'mermaid' || $language === 'chart' || $language === 'mathjax'|| $language === 'katex' || $language === 'asciimath' || $language === 'nomnoml') {
+            return new HtmlElement('c-code-renderer', $attrs, $content);
+        }
+
+        return new HtmlElement('c-code-highlight', $attrs, $content);
     }
 }

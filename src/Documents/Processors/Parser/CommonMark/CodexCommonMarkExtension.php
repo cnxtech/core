@@ -25,6 +25,7 @@ class CodexCommonMarkExtension extends Extension
             new BlockParser\HtmlBlockParser(),
             new BlockParser\SetExtHeadingParser(),
             new BlockParser\ThematicBreakParser(),
+            new TaskListParser(),
             new BlockParser\ListParser(),
             new BlockParser\IndentedCodeParser(),
             new BlockParser\LazyParagraphParser(),
@@ -44,6 +45,7 @@ class CodexCommonMarkExtension extends Extension
             new InlineParser\EmphasisParser(),
 //            new InlineParser\AutolinkParser(),
             new AutolinkParser(),
+            new IconParser(),
             new InlineParser\HtmlInlineParser(),
             new InlineParser\CloseBracketParser(),
             new InlineParser\OpenBracketParser(),
@@ -74,8 +76,13 @@ class CodexCommonMarkExtension extends Extension
             'League\CommonMark\Block\Element\Heading'       => new BlockRenderer\HeadingRenderer(),
             'League\CommonMark\Block\Element\HtmlBlock'     => new BlockRenderer\HtmlBlockRenderer(),
             'League\CommonMark\Block\Element\IndentedCode'  => new BlockRenderer\IndentedCodeRenderer(),
+
+            TaskListBlock::class                            => new TaskListBlockRenderer(),
+            TaskListItem::class                             => new TaskListItemRenderer(),
+
             'League\CommonMark\Block\Element\ListBlock'     => new BlockRenderer\ListBlockRenderer(),
             'League\CommonMark\Block\Element\ListItem'      => new BlockRenderer\ListItemRenderer(),
+
             'League\CommonMark\Block\Element\Paragraph'     => new BlockRenderer\ParagraphRenderer(),
             'League\CommonMark\Block\Element\ThematicBreak' => new BlockRenderer\ThematicBreakRenderer(),
         ];
@@ -91,6 +98,10 @@ class CodexCommonMarkExtension extends Extension
             'League\CommonMark\Inline\Element\Emphasis'   => new InlineRenderer\EmphasisRenderer(),
             'League\CommonMark\Inline\Element\HtmlInline' => new InlineRenderer\HtmlInlineRenderer(),
             'League\CommonMark\Inline\Element\Image'      => new InlineRenderer\ImageRenderer(),
+
+            Icon::class                                   => new IconRenderer(),
+            Emoji::class                                  => new IconRenderer(),
+
 //            'League\CommonMark\Inline\Element\Link'       => new InlineRenderer\LinkRenderer(),
             'League\CommonMark\Inline\Element\Link'       => new LinkRenderer(),
             'League\CommonMark\Inline\Element\Newline'    => new InlineRenderer\NewlineRenderer(),
