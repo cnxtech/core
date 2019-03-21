@@ -59,17 +59,19 @@ class Hooks
     public static function waterfall($id, $value, array $args = [])
     {
         if ($id !== 'hooks.waterfall') {
-            static::run('hooks.waterfall', [ $id, $value,$args ]);
+            static::run('hooks.waterfall', [ $id, $value, $args ]);
         }
-        $pipes = collect(static::getHandlers($id))
-            ->map(function ($hook) use ($args) {
-                return function ($value, $next) use ($hook, $args) {
-                    if (is_callable($hook)) {
-                        return $hook($value, ...$args);
-                    }
-                    return $value;
-                };
-            })
+        $pipes = collect(static::getHandlers($id));
+
+        $pipes = $pipes->map(function ($hook) use ($args) {
+
+            return function ($value, $next) use ($hook, $args) {
+                if (is_callable($hook)) {
+                    return $next($hook($value, ...$args));
+                }
+                return $next($value);
+            };
+        })
             ->all();
 
         return with(new Pipeline())

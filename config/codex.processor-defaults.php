@@ -77,7 +77,7 @@ return [
 //                'target' => '_blank',
 //            ],
         ],
-        'default_button_attributes' => [
+        'button_defaults' => [
             'color'  => 'secondary',
             'href'   => 'javascript:;',
             'class'  => [],

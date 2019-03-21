@@ -49,7 +49,8 @@ abstract class ProcessorExtension extends Extension
 
     public function isEnabledForDocument(Document $document)
     {
-        return in_array($this->getName(), $document[ 'processors.enabled' ], true);
+//        return in_array($this->getName(), $document[ 'processors.enabled' ], true);
+        return $document->attr('processors.enabled.' . $this->getName(), false) === true;
     }
 
     public function config($key = null, $default = null, Document $document = null)

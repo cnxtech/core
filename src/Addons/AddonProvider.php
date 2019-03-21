@@ -66,10 +66,10 @@ class AddonProvider
 
         /** @var \Codex\Addons\AddonServiceProvider $provider */
         $this->providers[] = $provider = $addon->newServiceProvider();
-        $this->application->register($provider);
-        $this->bindAliases($provider);
         $this->registerConfig($provider);
+        $this->application->register($provider);
         $this->mapConfig($provider);
+        $this->bindAliases($provider);
         $this->registerEvents($provider);
         $this->registerCommands($provider);
         $this->dispatch(new RegisterExtension($provider->extensions, $addon));

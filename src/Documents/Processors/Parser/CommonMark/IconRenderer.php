@@ -3,7 +3,6 @@
 namespace Codex\Documents\Processors\Parser\CommonMark;
 
 use League\CommonMark\ElementRendererInterface;
-use League\CommonMark\HtmlElement;
 use League\CommonMark\Inline\Element\AbstractInline;
 use League\CommonMark\Inline\Renderer\InlineRendererInterface;
 use League\CommonMark\Util\Configuration;
@@ -26,10 +25,6 @@ class IconRenderer implements InlineRendererInterface, ConfigurationAwareInterfa
         foreach ($inline->getData('attributes', []) as $key => $value) {
             $attrs[$key] = Xml::escape($value, true);
         }
-
-//        $alt = $htmlRenderer->renderInlines($inline->children());
-//        $alt = preg_replace('/\<[^>]*alt="([^"]*)"[^>]*\>/', '$1', $alt);
-//        $attrs['alt'] = preg_replace('/\<[^>]*\>/', '', $alt);
 
         if (isset($inline->data['name'])) {
             $attrs['name'] = Xml::escape($inline->data['name'], true);

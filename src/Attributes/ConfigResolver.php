@@ -126,6 +126,7 @@ class ConfigResolver
         $node->validate()->always(function ($value) {
             return $value;
         });
+        $node->ignoreExtraKeys(true);
         $node = $node->scalarPrototype();
 
         return $node;

@@ -55,12 +55,6 @@ return [
         'backend_data_url' => 'backend_data.js'
     ],
 
-//    'routeMap' => [
-//        'root' => 'codex',
-//        'api' => 'codex.api',
-//        'documentation' => 'codex.documentation',
-//    ],
-
     'processors' => [
         'enabled'  => [],
         'disabled' => [],
@@ -86,7 +80,7 @@ return [
         'disk'         => null,
         'display_name' => null,
         'description'  => null,
-        'processors'   => [ 'enabled' => [], 'disabled' => [], ],
+//        'processors'   => [ 'enabled' => [], 'disabled' => [], ],
 
         'view'                          => 'codex::partials.document',
         'default_revision'              => 'master',

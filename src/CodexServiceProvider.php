@@ -87,8 +87,11 @@ class CodexServiceProvider extends ServiceProvider
         Documents\Processors\MacrosProcessorExtension::class,
         Documents\Processors\TocProcessorExtension::class,
         Documents\Processors\HeaderProcessorExtension::class,
+        Documents\Processors\ButtonsProcessorExtension::class,
         Attributes\AttributeSchemaExtension::class,
     ];
+
+    protected $middleware = [ Http\DebugbarCollectionLoggerMiddleware::class ];
 
     /**
      * boot method
@@ -190,7 +193,8 @@ class CodexServiceProvider extends ServiceProvider
         $paths->add('log', 'string');
 
         $processors = $codex->add('processors', 'dictionary')->noApi(); //->setApiType('Processors', [ 'new' ]);
-        $processors->add('enabled', 'array.scalarPrototype');
+//        $processors->add('enabled', 'array.scalarPrototype');
+        $processors->add('enabled', 'array.scalarPrototype', 'Assoc');
 
         $http = $codex->add('http', 'dictionary')->setApiType('HttpConfig', [ 'new' ]);
         $http->add('prefix', 'string');

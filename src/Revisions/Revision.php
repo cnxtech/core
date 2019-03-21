@@ -5,12 +5,14 @@ namespace Codex\Revisions;
 use Codex\Concerns;
 use Codex\Contracts\Mergable\ChildInterface;
 use Codex\Contracts\Mergable\ParentInterface;
+use Codex\Contracts\Projects\Project;
 use Codex\Contracts\Revisions\Revision as RevisionContract;
 use Codex\Documents\DocumentCollection;
 use Codex\Hooks;
 use Codex\Mergable\Concerns\HasChildren;
 use Codex\Mergable\Concerns\HasParent;
 use Codex\Mergable\Model;
+use Codex\Support\DB;
 
 /**
  * This is the class Revision.
@@ -46,8 +48,9 @@ class Revision extends Model implements RevisionContract, ChildInterface, Parent
      * @param array                               $attributes
      * @param \Codex\Documents\DocumentCollection $documents
      */
-    public function __construct(array $attributes, DocumentCollection $documents)
+    public function __construct(array $attributes, Project $project, DocumentCollection $documents)
     {
+        DB::startMeasure($project . ':revision:' . $attributes[ 'key' ]);
         $this->setChildren($documents->setParent($this));
         $registry   = $this->getCodex()->getRegistry()->resolveGroup('revisions');
         $attributes = Hooks::waterfall('revision.initialize', $attributes, [ $registry, $this ]);

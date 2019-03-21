@@ -10,12 +10,15 @@ use Codex\Documents\Processors\ProcessorExtension;
 use Codex\Documents\Processors\ProcessorInterface;
 use Codex\Documents\Processors\ProcessorSorter;
 use Codex\Exceptions\Exception;
-use Laradic\DependencySorter\Sorter;
+use Codex\Hooks;
 
 class ProcessDocument
 {
     /** @var \Codex\Addons\Extensions\ExtensionCollection */
     protected $extensions;
+
+    /** @var \Codex\Documents\Processors\ProcessorSorter */
+    protected $sorter;
 
     /**
      * ProcessDocument constructor.
@@ -25,37 +28,38 @@ class ProcessDocument
     public function __construct(ExtensionCollection $extensions)
     {
         $this->extensions = $extensions;
+        $this->sorter     = resolve(ProcessorSorter::class);
     }
 
     protected function getTriggerFor(string $interface)
     {
         if ($interface === PreProcessorInterface::class) {
-            return 'pre_process';
+            return 'preProcess';
         }
         if ($interface === ProcessorInterface::class) {
             return 'process';
         }
         if ($interface === PostProcessorInterface::class) {
-            return 'post_process';
+            return 'postProcess';
         }
         throw Exception::make("Could not get trigger for interface [{$interface}]");
     }
 
     public function handle(ResolvedDocument $event)
     {
-        $sorter = resolve(ProcessorSorter::class);
         $document   = $event->getDocument();
         $interfaces = [
             PreProcessorInterface::class,
             ProcessorInterface::class,
             PostProcessorInterface::class,
         ];
+
         foreach ($interfaces as $interface) {
             /** @var ProcessorExtension[] $sorted */
-            $sorted  = $sorter->getSortedExtensionsFor($interface)->toArray();
             $trigger = $this->getTriggerFor($interface);
-            foreach ($sorted as $extension) {
-                $document->on($trigger, function () use ($extension, $document, $trigger) {
+            $sorted  = $this->sorter->getSortedExtensionsFor($interface)->toArray();
+            Hooks::register($document->getProcessHookPrefix() . $trigger, function ($document) use ($sorted, $trigger) {
+                foreach ($sorted as $extension) {
                     if ( ! $extension->isEnabledForDocument($document)) {
                         return;
                     }
@@ -63,8 +67,17 @@ class ProcessDocument
                     $methodName = camel_case($trigger);
                     $extension->$methodName($document);
                     $extension->setDocument(null);
-                });
-            }
+//                $document->on($trigger, function () use ($extension, $document, $trigger) {
+//                    if ( ! $extension->isEnabledForDocument($document)) {
+//                        return;
+//                    }
+//                    $extension->setDocument($document);
+//                    $methodName = camel_case($trigger);
+//                    $extension->$methodName($document);
+//                    $extension->setDocument(null);
+//                });
+                }
+            });
         }
     }
 

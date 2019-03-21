@@ -86,7 +86,7 @@ class ResolveRevision
         $attributes[ 'key' ] = basename(dirname($path));
         $project             = $this->project;
         $this->revision      = app()
-            ->make(Revision::class, compact('attributes'))
+            ->make(Revision::class, compact('attributes','project'))
             ->setParent($project)
             ->setFiles($project->getFiles())
             ->setConfigFilePath($path);

@@ -3,6 +3,7 @@
 namespace Codex\Http\Controllers;
 
 use Codex\Hooks;
+use Codex\Support\DB;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Nuwave\Lighthouse\Schema\Extensions\ExtensionRequest;
@@ -11,6 +12,7 @@ class ApiController extends \Nuwave\Lighthouse\Support\Http\Controllers\GraphQLC
 {
     public function query(Request $request)
     {
+        DB::startMeasure('ApiController@query');
         $request = Hooks::waterfall('controller.api.query.request', $request);
 
         // If the request is a 0-indexed array, we know we are dealing with a batched query
@@ -28,6 +30,7 @@ class ApiController extends \Nuwave\Lighthouse\Support\Http\Controllers\GraphQLC
         $response = $response instanceof Response ? $response : response($response);
 
         $response = Hooks::waterfall('controller.api.query.response', $response, [ $request ]);
+        DB::stopMeasure('ApiController@query');
         return $response;
     }
 }

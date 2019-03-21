@@ -11,6 +11,7 @@ use Codex\Mergable\Concerns\HasChildren;
 use Codex\Mergable\Concerns\HasParent;
 use Codex\Mergable\Model;
 use Codex\Revisions\RevisionCollection;
+use Codex\Support\DB;
 use Illuminate\Contracts\Filesystem\Factory;
 use Illuminate\Filesystem\Filesystem;
 
@@ -61,6 +62,7 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
      */
     public function __construct(array $attributes, RevisionCollection $revisions, Factory $fsm, Filesystem $fs)
     {
+        DB::startMeasure('project:'. $attributes['key']);
         $this->fsm = $fsm;
         $this->fs  = $fs;
 
@@ -72,6 +74,7 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
         $this->addGetMutator('inherits', 'getInheritKeys', true, true);
         $this->addGetMutator('changes', 'getChanges', true, true);
         Hooks::run('project.initialized', [ $this ]);
+
     }
 
     public function url($revisionKey = null, $documentKey = null, $absolute = true)

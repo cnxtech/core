@@ -64,8 +64,7 @@ EOT
             return is_string($request) ? [ 'query' => $request, 'variables' => [] ] : $request;
         }, $requests);
 
-        $cacheKey = md5(json_encode($requests));
-        $data = cache()->rememberForever($cacheKey, function () use ($codex, $requests) {
+        $fn = function () use ($codex, $requests) {
             $response = $codex->getApi()->executeBatchedQueries($requests);
             // transform all responses to the data arrays
             $data = array_map(function ($response) {
@@ -73,7 +72,15 @@ EOT
             }, $response);
             $data = array_replace_recursive(...$data);
             return $data;
-        });
+        };
+
+        // @todo: improve
+        if (config('codex.cache.enabled', false) === true) {
+            $cacheKey = md5(json_encode($requests));
+            $data     = cache()->rememberForever($cacheKey, $fn);
+        } else {
+            $data = $fn();
+        }
 
 
         // put the data trough the hook to allow external modification
