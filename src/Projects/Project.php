@@ -41,9 +41,7 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
     /** @var \Codex\Revisions\RevisionCollection */
     protected $children;
 
-    /**
-     * @var \Illuminate\Contracts\Filesystem\Factory
-     */
+    /** @var \Illuminate\Contracts\Filesystem\Factory */
     protected $fsm;
 
     /** @var string */

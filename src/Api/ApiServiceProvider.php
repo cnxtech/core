@@ -11,6 +11,7 @@ use Nuwave\Lighthouse\Schema\DirectiveRegistry;
 
 class ApiServiceProvider extends EventServiceProvider
 {
+
     public $listen = [
         BuildingAST::class => [
             AttachSchemaExtensions::class,

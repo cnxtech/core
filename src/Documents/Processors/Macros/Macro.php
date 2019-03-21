@@ -5,8 +5,8 @@
  * The license can be found in the package and online at https://codex-project.mit-license.org.
  *
  * @copyright 2018 Codex Project
- * @author Robin Radic
- * @license https://codex-project.mit-license.org MIT License
+ * @author    Robin Radic
+ * @license   https://codex-project.mit-license.org MIT License
  */
 
 namespace Codex\Documents\Processors\Macros;
@@ -70,8 +70,8 @@ class Macro
      */
     public function __construct($raw, $cleaned)
     {
-        $this->raw = $raw;
-        $this->cleaned = $cleaned;
+        $this->raw        = $raw;
+        $this->cleaned    = $cleaned;
         $this->definition = static::extractDefinition($cleaned);
     }
 
@@ -89,7 +89,7 @@ class Macro
             throw Exception::make('Macro definition could not be extracted');
         }
 
-        return $definition[1][0];
+        return $definition[ 1 ][ 0 ];
     }
 
     public function isClosing()
@@ -99,7 +99,7 @@ class Macro
 
     public function hasArguments()
     {
-        return str_contains($this->cleaned, ['(', ')']);
+        return str_contains($this->cleaned, [ '(', ')' ]);
     }
 
     public function setHandler($handler)
@@ -107,54 +107,16 @@ class Macro
         $this->handler = $handler;
     }
 
-    protected function addArgument($arg)
-    {
-        $this->arguments[] = $this->transformArg($arg);
-    }
-
-    protected function transformArg($arg)
-    {
-        $arg = trim($arg);
-        //https://regex101.com/r/gB9bP9/1
-
-        if (preg_match_all('/^(\')(.*?)(\')$/', $arg, $matches) > 0) {
-            return str_replace('COMMA', ',', $matches[2][0]);
-        } elseif ('true' === $arg || 'false' === $arg) {
-            return 'true' === $arg;
-        } elseif (is_numeric($arg)) {
-            return (int) $arg;
-        } elseif (class_exists((string) $arg)) {
-            return app((string) $arg);
-        } else {
-            return $arg;
-        }
-    }
-
     protected function parseArguments()
     {
-        // parsing argument houtje touwtje style
-        // we explode the arguments string with , ex: "234, true, false, 'mydaady is gone'" = array("234", "true", "false", "'mydaady is gone'")
-        // problem is when doing so with ex: "234, true, false, 'mydaady, is gone'" = array("234", "true", "false", "'mydaady", "is gone'")
-        // which is unwanted, the explode does not work
-        // ninja solution: replace , in strings with CCOMMAA, then revert back after
-
         $this->arguments = [];
-
         //https://regex101.com/r/gB9bP9/2
         if (preg_match('/\((.*?)\)(?!.*\))/', $this->cleaned, $argumentString) < 1) {
             return;
         }
-        $argumentString = last($argumentString);
-
-        preg_match_all('/\'(.*?)\'/', $argumentString, $stringArguments);
-        foreach ($stringArguments[0] as $sai => $stringArgument) {
-            $new = str_replace(',', 'COMMA', $stringArgument);
-            $argumentString = str_replace($stringArgument, $new, $argumentString);
-        }
-
-        foreach (explode(',', $argumentString) as $arg) {
-            $this->arguments[] = $this->transformArg($arg);
-        }
+        $argumentString  = last($argumentString);
+        $argumentString  = preg_replace('/(?<!\\\)\\\(?!\\\)|(?<!\\\)\\\\\\\(?!\\\)/', '\\\\\\', $argumentString);
+        $this->arguments = json5_decode('[' . $argumentString . ']', true, 512);
     }
 
     protected function getCallable()
@@ -163,15 +125,15 @@ class Macro
             return $this->handler;
         } else {
             // assuming its a @ string
-            list($class, $method) = explode('@', (string) $this->handler);
+            list($class, $method) = explode('@', (string)$this->handler);
             $instance = app()->make($class);
-            foreach (['codex', 'document', 'project', 'definition'] as $property) {
+            foreach ([ 'codex', 'document', 'project', 'definition' ] as $property) {
                 if (property_exists($instance, $property)) {
                     $instance->{$property} = $this->{$property};
                 }
             }
 
-            return [$instance, $method];
+            return [ $instance, $method ];
         }
     }
 
@@ -185,8 +147,8 @@ class Macro
         if ($this->canRun()) {
 //            $content = $this->document->getContent();
             $this->parseArguments();
-            $arguments = array_merge([$this->isClosing()], $this->arguments);
-            $result = \call_user_func_array($this->getCallable(), $arguments);
+            $arguments = array_merge([ $this->isClosing() ], $this->arguments);
+            $result    = \call_user_func_array($this->getCallable(), $arguments);
             return $result;
 //            $content = preg_replace('/'.preg_quote($this->raw, '/').'/', $result, $content, 1);
 //            $this->document->setContent($content);

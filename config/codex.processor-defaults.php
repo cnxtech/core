@@ -31,9 +31,11 @@ return [
         'layout:column'    => 'Codex\Documents\Processors\Macros\Layout@column',
         'general:hide'     => 'Codex\Documents\Processors\Macros\General@hide',
         'attribute:print'  => 'Codex\Documents\Processors\Macros\Attribute@printValue',
+        'gist'             => 'Codex\Documents\Processors\Macros\Components@gist',
+        'scrollbar'        => 'Codex\Documents\Processors\Macros\Components@scrollbar',
     ],
     'parser'     => [
-        'markdown2'   => [ // refers to parser name
+        'markdown2' => [ // refers to parser name
             'parser'     => 'Codex\Documents\Processors\Parser\MarkdownParser',
             'file_types' => [ 'md', 'markdown' ],
             'options'    => [
@@ -49,14 +51,14 @@ return [
                 ],
             ],
         ],
-        'markdown' => [
+        'markdown'  => [
             'parser'     => 'Codex\Documents\Processors\Parser\CommonMarkParser',
             'file_types' => [ 'md', 'markdown' ],
             'options'    => [
 
             ],
         ],
-        'rst'        => [], // refers to parser name
+        'rst'       => [], // refers to parser name
 
     ],
     'toc'        => [
@@ -69,7 +71,7 @@ return [
         'header_view'      => 'codex::react.processors.toc-header',//'codex::processors.toc-header',
     ],
     'buttons'    => [
-        'buttons'                   => [
+        'buttons'         => [
 //            'button-id' => [
 //                'text'   => 'Haai',
 //                'icon'   => 'fa fa-github',
@@ -83,7 +85,7 @@ return [
             'class'  => [],
             'target' => '_blank',
         ],
-        'view'                      => 'codex::processors.buttons',
+        'view'            => 'codex::processors.buttons',
 
     ],
     'header'     => [

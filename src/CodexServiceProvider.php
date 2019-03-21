@@ -193,6 +193,7 @@ class CodexServiceProvider extends ServiceProvider
         $paths->add('log', 'string');
 
         $processors = $codex->add('processors', 'dictionary')->noApi(); //->setApiType('Processors', [ 'new' ]);
+//        $processors = $codex->add('processors', 'dictionary')->setApiType('Processors', [ 'new' ]);
 //        $processors->add('enabled', 'array.scalarPrototype');
         $processors->add('enabled', 'array.scalarPrototype', 'Assoc');
 
@@ -328,5 +329,9 @@ class CodexServiceProvider extends ServiceProvider
         $documents->add('title', 'string')->setDefault('');
         $documents->add('subtitle', 'string')->setDefault('');
         $documents->add('description', 'string')->setDefault('');
+        $documents->add('scripts', 'array.scalarPrototype', '[String]', []);
+        $documents->add('styles', 'array.scalarPrototype', '[String]', []);
+        $documents->add('html', 'array.scalarPrototype', '[String]', []);
+
     }
 }

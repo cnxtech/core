@@ -14,7 +14,7 @@ namespace Codex\Documents\Processors\Links;
 //use Codex\Concerns\HasConfig;
 use Codex\Documents\Commands\AssignClassDocumentProperties;
 use Codex\Documents\Processors\LinksProcessorExtension;
-use FluentDOM;
+use ColinODell\Json5\SyntaxError;
 use FluentDOM\DOM\Element;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use League\Uri\UriException;
@@ -74,7 +74,8 @@ class Link
             $this->url = Url::createFromString(urldecode($element->getAttribute('href')));
             $this->parse();
             $this->valid = true;
-        } catch (UriException $exception){
+        }
+        catch (UriException $exception) {
 
         }
     }
@@ -96,7 +97,7 @@ class Link
         }
         @list($_, $id, $params, $modifiers) = $matches;
         $hasParams        = \strlen($params) > 0;
-        $this->parameters = $this->parseParams($hasParams ? explode(',', $params) : []);
+        $this->parameters = $hasParams ? $this->parseParameterString($params) : [];
 
         $hasModifiers = \strlen($modifiers) > 0;
         $modifiers    = $hasModifiers ? explode(':', str_remove_left($modifiers, ':')) : [];
@@ -107,7 +108,7 @@ class Link
                 preg_match('/(.*?)\[(.*?)\]/', $modifier, $mparams);
                 $name   = $mparams[ 1 ];
                 $params = explode(',', $mparams[ 2 ]);
-                $this->parseParams($params);
+                $params = $this->parseParameterString($params);
             }
 
             return compact('name', 'params');
@@ -119,29 +120,18 @@ class Link
         $this->id = $id;
     }
 
-    /**
-     * parseParams method.
-     *
-     * @param array $params
-     *
-     * @return array
-     */
-    protected function parseParams(array $params)
-    {
-        return array_map(function ($param) {
-            $param = trim($param);
-            if (starts_with($param, '"')) {
-                $param = str_remove_left(str_remove_right($param, '"'), '"');
-            } elseif (starts_with($param, '\'')) {
-                $param = str_remove_left(str_remove_right($param, '\''), '\'');
-            } elseif (is_numeric($param)) {
-                $param = (int)$param;
-            } elseif ('true' === $param || 'false' === $param) {
-                $param = 'true' === $param;
-            }
 
-            return $param;
-        }, $params);
+    protected function parseParameterString($params)
+    {
+        try {
+            $params = preg_replace('/(?<!\\\)\\\(?!\\\)|(?<!\\\)\\\\\\\(?!\\\)/', '\\\\\\', $params);
+            $params = json5_decode('[' . $params . ']', true, 512);
+            return $params;
+        }
+        catch (SyntaxError $e) {
+            $this->valid = false;
+            return [];
+        }
     }
 
     public function isValid()
@@ -261,7 +251,7 @@ class Link
         $this->element->before($fd->get());
         $new = $this->element->previousSibling;
         $this->element->remove();
-        $this->element=$new;
+        $this->element = $new;
         return $this->element;
     }
 

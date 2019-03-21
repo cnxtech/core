@@ -18,12 +18,12 @@
         "league/commonmark-extras":"~0.1",
         "webuni/commonmark-table-extension": "~0.9",
         "webuni/commonmark-attributes-extension": "~0.6",
-        "cebe/markdown": "~1.1",
         "barryvdh/laravel-cors": "~0.9",
         "graham-campbell/flysystem": "~5.0",
         "symfony/config": "~4.0",
         "nuwave/lighthouse": "~2.6",
-        "deinternetjongens/lighthouse-utils": "~0.2"
+        "deinternetjongens/lighthouse-utils": "~0.2",
+        "colinodell/json5": "^2.0"
     },
     "autoload": {
         "files": [
