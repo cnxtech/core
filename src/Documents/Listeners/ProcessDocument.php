@@ -61,7 +61,7 @@ class ProcessDocument
             Hooks::register($document->getProcessHookPrefix() . $trigger, function ($document) use ($sorted, $trigger) {
                 foreach ($sorted as $extension) {
                     if ( ! $extension->isEnabledForDocument($document)) {
-                        return;
+                        continue;
                     }
                     $extension->setDocument($document);
                     $methodName = camel_case($trigger);

@@ -29,6 +29,8 @@ class CodexCommonMarkExtension extends Extension
             new BlockParser\ListParser(),
             new BlockParser\IndentedCodeParser(),
             new BlockParser\LazyParagraphParser(),
+
+            new \Webuni\CommonMark\TableExtension\TableParser(),
         ];
     }
 
@@ -69,22 +71,28 @@ class CodexCommonMarkExtension extends Extension
     public function getBlockRenderers()
     {
         return [
-            'League\CommonMark\Block\Element\BlockQuote'    => new BlockRenderer\BlockQuoteRenderer(),
-            'League\CommonMark\Block\Element\Document'      => new BlockRenderer\DocumentRenderer(),
+            'League\CommonMark\Block\Element\BlockQuote'   => new BlockRenderer\BlockQuoteRenderer(),
+            'League\CommonMark\Block\Element\Document'     => new BlockRenderer\DocumentRenderer(),
 //            'League\CommonMark\Block\Element\FencedCode'    => new BlockRenderer\FencedCodeRenderer(),
-            'League\CommonMark\Block\Element\FencedCode'    => new FencedCodeRenderer(),
-            'League\CommonMark\Block\Element\Heading'       => new BlockRenderer\HeadingRenderer(),
-            'League\CommonMark\Block\Element\HtmlBlock'     => new BlockRenderer\HtmlBlockRenderer(),
-            'League\CommonMark\Block\Element\IndentedCode'  => new BlockRenderer\IndentedCodeRenderer(),
+            'League\CommonMark\Block\Element\FencedCode'   => new FencedCodeRenderer(),
+            'League\CommonMark\Block\Element\Heading'      => new BlockRenderer\HeadingRenderer(),
+            'League\CommonMark\Block\Element\HtmlBlock'    => new BlockRenderer\HtmlBlockRenderer(),
+            'League\CommonMark\Block\Element\IndentedCode' => new BlockRenderer\IndentedCodeRenderer(),
 
-            TaskListBlock::class                            => new TaskListBlockRenderer(),
-            TaskListItem::class                             => new TaskListItemRenderer(),
+            TaskListBlock::class => new TaskListBlockRenderer(),
+            TaskListItem::class  => new TaskListItemRenderer(),
 
-            'League\CommonMark\Block\Element\ListBlock'     => new BlockRenderer\ListBlockRenderer(),
-            'League\CommonMark\Block\Element\ListItem'      => new BlockRenderer\ListItemRenderer(),
+            'League\CommonMark\Block\Element\ListBlock' => new BlockRenderer\ListBlockRenderer(),
+            'League\CommonMark\Block\Element\ListItem'  => new BlockRenderer\ListItemRenderer(),
 
             'League\CommonMark\Block\Element\Paragraph'     => new BlockRenderer\ParagraphRenderer(),
             'League\CommonMark\Block\Element\ThematicBreak' => new BlockRenderer\ThematicBreakRenderer(),
+
+            'Webuni\CommonMark\TableExtension\Table'        => new \Webuni\CommonMark\TableExtension\TableRenderer(),
+            'Webuni\CommonMark\TableExtension\TableCaption' => new \Webuni\CommonMark\TableExtension\TableCaptionRenderer(),
+            'Webuni\CommonMark\TableExtension\TableRows'    => new \Webuni\CommonMark\TableExtension\TableRowsRenderer(),
+            'Webuni\CommonMark\TableExtension\TableRow'     => new \Webuni\CommonMark\TableExtension\TableRowRenderer(),
+            'Webuni\CommonMark\TableExtension\TableCell'    => new \Webuni\CommonMark\TableExtension\TableCellRenderer(),
         ];
     }
 
@@ -99,14 +107,14 @@ class CodexCommonMarkExtension extends Extension
             'League\CommonMark\Inline\Element\HtmlInline' => new InlineRenderer\HtmlInlineRenderer(),
             'League\CommonMark\Inline\Element\Image'      => new InlineRenderer\ImageRenderer(),
 
-            Icon::class                                   => new IconRenderer(),
-            Emoji::class                                  => new IconRenderer(),
+            Icon::class                                => new IconRenderer(),
+            Emoji::class                               => new IconRenderer(),
 
 //            'League\CommonMark\Inline\Element\Link'       => new InlineRenderer\LinkRenderer(),
-            'League\CommonMark\Inline\Element\Link'       => new LinkRenderer(),
-            'League\CommonMark\Inline\Element\Newline'    => new InlineRenderer\NewlineRenderer(),
-            'League\CommonMark\Inline\Element\Strong'     => new InlineRenderer\StrongRenderer(),
-            'League\CommonMark\Inline\Element\Text'       => new InlineRenderer\TextRenderer(),
+            'League\CommonMark\Inline\Element\Link'    => new LinkRenderer(),
+            'League\CommonMark\Inline\Element\Newline' => new InlineRenderer\NewlineRenderer(),
+            'League\CommonMark\Inline\Element\Strong'  => new InlineRenderer\StrongRenderer(),
+            'League\CommonMark\Inline\Element\Text'    => new InlineRenderer\TextRenderer(),
         ];
     }
 

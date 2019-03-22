@@ -26,36 +26,31 @@ return [
         ],
     ],
     'macros'     => [
-        'table:responsive' => 'Codex\Documents\Processors\Macros\Table@responsive',
-        'layout:row'       => 'Codex\Documents\Processors\Macros\Layout@row',
-        'layout:column'    => 'Codex\Documents\Processors\Macros\Layout@column',
-        'general:hide'     => 'Codex\Documents\Processors\Macros\General@hide',
         'attribute:print'  => 'Codex\Documents\Processors\Macros\Attribute@printValue',
+        'hide'             => 'Codex\Documents\Processors\Macros\General@hide',
         'gist'             => 'Codex\Documents\Processors\Macros\Components@gist',
         'scrollbar'        => 'Codex\Documents\Processors\Macros\Components@scrollbar',
+        'tabs'             => 'Codex\Documents\Processors\Macros\Components@tabs',
+        'tab'              => 'Codex\Documents\Processors\Macros\Components@tab',
+        'row'              => 'Codex\Documents\Processors\Macros\Components@row',
+        'col'              => 'Codex\Documents\Processors\Macros\Components@col',
     ],
     'parser'     => [
-        'markdown2' => [ // refers to parser name
-            'parser'     => 'Codex\Documents\Processors\Parser\MarkdownParser',
-            'file_types' => [ 'md', 'markdown' ],
-            'options'    => [
-                'html5'                => true,
-                'inline_html_elements' => [ 'c-c' ],
-                'table'                => [
-                    'class' => 'table hover',
-                ],
-                'code'                 => [
-                    'line_numbers' => true,
-                    'command_line' => true,
-                    'loader'       => false,
-                ],
-            ],
-        ],
         'markdown'  => [
             'parser'     => 'Codex\Documents\Processors\Parser\CommonMarkParser',
             'file_types' => [ 'md', 'markdown' ],
             'options'    => [
 
+                'element_attributes'=>[
+                    'table'                => [
+                        'class' => 'table hover',
+                    ],
+                    'c-code-highlight'                 => [
+                        'line_numbers' => true,
+                        'command_line' => true,
+                        'loader'       => false,
+                    ],
+                ]
             ],
         ],
         'rst'       => [], // refers to parser name

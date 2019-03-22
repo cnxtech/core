@@ -158,6 +158,10 @@ class TocProcessorExtension extends ProcessorExtension implements ProcessorInter
                 $parentNode = $prevNode->getParent();
                 while (true) {
                     if ($size === $parentNode->getValue()->getSize()) {
+                        if(!$parentNode->getParent()){
+                            $rootNode->addChild($node);
+                            break;
+                        }
                         $parentNode->getParent()->addChild($node);
                         $node->setParent($parentNode->getParent());
                         break;

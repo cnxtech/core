@@ -33,7 +33,7 @@ class IconRenderer implements InlineRendererInterface, ConfigurationAwareInterfa
         if($inline instanceof Emoji) {
             return new HtmlElement('c-emoji', $attrs, '', true);
         }
-        return new HtmlElement('icon', $attrs, '', true);
+        return new HtmlElement('c-icon', $attrs, '', true);
     }
 
     /**

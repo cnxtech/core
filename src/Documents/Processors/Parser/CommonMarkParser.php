@@ -6,7 +6,6 @@ use Codex\Documents\Processors\Parser\CommonMark\CodexCommonMarkExtension;
 use League\CommonMark\CommonMarkConverter;
 use League\CommonMark\Environment;
 use Webuni\CommonMark\AttributesExtension\AttributesExtension;
-use Webuni\CommonMark\TableExtension\TableExtension;
 
 class CommonMarkParser implements ParserInterface
 {
@@ -19,31 +18,15 @@ class CommonMarkParser implements ParserInterface
     {
         if ($this->converter === null) {
             $environment = new Environment();
+            $environment->mergeConfig($this->options);
+
             $environment->addExtension(new CodexCommonMarkExtension());
-            $environment->mergeConfig([
-                'renderer'           => [
-                    'block_separator' => "\n",
-                    'inner_separator' => "\n",
-                    'soft_break'      => "\n",
-                ],
-                'safe'               => false, // deprecated option
-                'html_input'         => Environment::HTML_INPUT_ALLOW,
-                'allow_unsafe_links' => true,
-                'max_nesting_level'  => INF,
-            ]);
-            $environment->addExtension(new TableExtension());
+//            $environment->addExtension(new TableExtension());
             $environment->addExtension(new AttributesExtension());
 
             $config          = [
-//                'renderer' => [
-//                    'block_separator' => "\n",
-//                    'inner_separator' => "\n",
-//                    'soft_break'      => "\n",
-//                ],
                 'enable_em'     => true,
                 'enable_strong' => true,
-//                'use_asterisk' => true,
-//                'use_underscore' => true,
             ];
             $this->converter = new CommonMarkConverter($config, $environment);
         }
@@ -57,8 +40,18 @@ class CommonMarkParser implements ParserInterface
         return $result;
     }
 
-    public function setOptions(array $options)
+    public function setOptions(array $options = [])
     {
-        $this->options = $options;
+        $this->options = array_replace_recursive([
+            'renderer'           => [
+                'block_separator' => "\n",
+                'inner_separator' => "\n",
+                'soft_break'      => "\n",
+            ],
+            'safe'               => false, // deprecated option
+            'html_input'         => Environment::HTML_INPUT_ALLOW,
+            'allow_unsafe_links' => true,
+            'max_nesting_level'  => INF,
+        ], $options);
     }
 }

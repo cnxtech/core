@@ -95,7 +95,7 @@ class ConfigResolver
         $target->ignoreExtraKeys(true);
         $node = $target->children()->arrayNode($attribute->name);
         $arrayProto = $node->arrayPrototype();
-        $scalarProto = $arrayProto->scalarPrototype();
+        $scalarProto = $arrayProto->variablePrototype();
         $arrayProto->ignoreExtraKeys(true);
 
         return $scalarProto;

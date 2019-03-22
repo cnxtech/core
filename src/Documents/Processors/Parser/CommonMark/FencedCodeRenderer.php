@@ -6,10 +6,15 @@ use League\CommonMark\Block\Element\AbstractBlock;
 use League\CommonMark\Block\Element\FencedCode;
 use League\CommonMark\ElementRendererInterface;
 use League\CommonMark\HtmlElement;
+use League\CommonMark\Util\Configuration;
+use League\CommonMark\Util\ConfigurationAwareInterface;
 use League\CommonMark\Util\Xml;
 
-class FencedCodeRenderer extends \League\CommonMark\Block\Renderer\FencedCodeRenderer
+class FencedCodeRenderer extends \League\CommonMark\Block\Renderer\FencedCodeRenderer implements ConfigurationAwareInterface
 {
+    /** @var Configuration */
+    protected $config;
+
     /**
      * @param FencedCode               $block
      * @param ElementRendererInterface $htmlRenderer
@@ -39,14 +44,13 @@ class FencedCodeRenderer extends \League\CommonMark\Block\Renderer\FencedCodeRen
         if ($language === 'mermaid' || $language === 'chart' || $language === 'mathjax' || $language === 'katex' || $language === 'asciimath' || $language === 'nomnoml') {
             return new HtmlElement('c-code-renderer', $attrs, $content);
         }
-//        if (starts_with($language, 'gist')) {
-//            list($_language, $gist, $file) = explode(' ', $language);
-//            $attrs[ 'language' ] = 'gist';
-//            $attrs[ 'gist' ]     = $gist;
-//            $attrs[ 'file' ]     = $file;
-//            return new HtmlElement('c-code-renderer', $attrs, $content);
-//        }
 
+        $attrs = array_replace_recursive($attrs, $this->config->getConfig('element_attributes/c-code-highlight', []));
         return new HtmlElement('c-code-highlight', $attrs, $content);
+    }
+
+    public function setConfiguration(Configuration $configuration)
+    {
+        $this->config = $configuration;
     }
 }
