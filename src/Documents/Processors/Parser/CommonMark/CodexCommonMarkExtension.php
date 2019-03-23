@@ -88,7 +88,7 @@ class CodexCommonMarkExtension extends Extension
             'League\CommonMark\Block\Element\Paragraph'     => new BlockRenderer\ParagraphRenderer(),
             'League\CommonMark\Block\Element\ThematicBreak' => new BlockRenderer\ThematicBreakRenderer(),
 
-            'Webuni\CommonMark\TableExtension\Table'        => new \Webuni\CommonMark\TableExtension\TableRenderer(),
+            'Webuni\CommonMark\TableExtension\Table'        => new TableRenderer(), //\Webuni\CommonMark\TableExtension\TableRenderer(),
             'Webuni\CommonMark\TableExtension\TableCaption' => new \Webuni\CommonMark\TableExtension\TableCaptionRenderer(),
             'Webuni\CommonMark\TableExtension\TableRows'    => new \Webuni\CommonMark\TableExtension\TableRowsRenderer(),
             'Webuni\CommonMark\TableExtension\TableRow'     => new \Webuni\CommonMark\TableExtension\TableRowRenderer(),

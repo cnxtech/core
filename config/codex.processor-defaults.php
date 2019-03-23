@@ -26,34 +26,36 @@ return [
         ],
     ],
     'macros'     => [
-        'attribute:print'  => 'Codex\Documents\Processors\Macros\Attribute@printValue',
-        'hide'             => 'Codex\Documents\Processors\Macros\General@hide',
-        'gist'             => 'Codex\Documents\Processors\Macros\Components@gist',
-        'scrollbar'        => 'Codex\Documents\Processors\Macros\Components@scrollbar',
-        'tabs'             => 'Codex\Documents\Processors\Macros\Components@tabs',
-        'tab'              => 'Codex\Documents\Processors\Macros\Components@tab',
-        'row'              => 'Codex\Documents\Processors\Macros\Components@row',
-        'col'              => 'Codex\Documents\Processors\Macros\Components@col',
+        'attribute:print' => 'Codex\Documents\Processors\Macros\Attribute@printValue',
+        'hide'            => 'Codex\Documents\Processors\Macros\General@hide',
+        'gist'            => 'Codex\Documents\Processors\Macros\Components@gist',
+        'scrollbar'       => 'Codex\Documents\Processors\Macros\Components@scrollbar',
+        'tabs'            => 'Codex\Documents\Processors\Macros\Components@tabs',
+        'tab'             => 'Codex\Documents\Processors\Macros\Components@tab',
+        'row'             => 'Codex\Documents\Processors\Macros\Components@row',
+        'col'             => 'Codex\Documents\Processors\Macros\Components@col',
     ],
     'parser'     => [
-        'markdown'  => [
+        'markdown' => [
             'parser'     => 'Codex\Documents\Processors\Parser\CommonMarkParser',
             'file_types' => [ 'md', 'markdown' ],
             'options'    => [
 
-                'element_attributes'=>[
-                    'table'                => [
+                'element_attributes' => [
+                    'table'            => [
                         'class' => 'table hover',
                     ],
-                    'c-code-highlight'                 => [
-                        'line_numbers' => true,
-                        'command_line' => true,
-                        'loader'       => false,
+                    'c-code-highlight' => [
+                        'props' => [
+                            'withLineNumbers' => true,
+                            'withCommandLine' => true,
+                            'withLoader'      => false,
+                        ],
                     ],
-                ]
+                ],
             ],
         ],
-        'rst'       => [], // refers to parser name
+        'rst'      => [], // refers to parser name
 
     ],
     'toc'        => [

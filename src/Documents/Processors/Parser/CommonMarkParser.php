@@ -53,5 +53,11 @@ class CommonMarkParser implements ParserInterface
             'allow_unsafe_links' => true,
             'max_nesting_level'  => INF,
         ], $options);
+
+//        foreach ($this->options[ 'element_attributes' ] as $element => $attrs) {
+//            $this->options[ 'element_attributes' ][ $element ] = collect($attrs)->mapWithKeys(function ($value, $key) {
+//                return [ camel_case($key) => $value ];
+//            })->toArray();
+//        }
     }
 }
