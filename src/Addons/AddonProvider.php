@@ -2,6 +2,7 @@
 
 namespace Codex\Addons;
 
+use Closure;
 use Codex\Addons\Extensions\RegisterExtension;
 use Illuminate\Console\Events\ArtisanStarting;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -88,6 +89,9 @@ class AddonProvider
     {
         foreach ($provider->mapConfig as $from => $to) {
             $fromValue = $this->application[ 'config' ]->get($from, []);
+            if ($fromValue instanceof Closure) {
+                $fromValue = app()->call($to);
+            }
             if (is_array($fromValue)) {
                 foreach ($fromValue as $key => $value) {
                     $this->application[ 'config' ]->set($to . '.' . $key, $value);

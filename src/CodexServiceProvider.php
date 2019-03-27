@@ -234,6 +234,7 @@ class CodexServiceProvider extends ServiceProvider
             $part->add('class', 'array.scalarPrototype');
             $part->add('style', 'array.scalarPrototype')->setDefault([]);
             $part->add('color', 'string')->setDefault(null);
+            $part->add('children', 'dictionaryPrototype', '[Assoc]'); //->setApiType('LayoutToolbarItem', [ 'new'])->setDefault([]);
             return $part;
         };
         $addLayoutHorizontalSide = function (string $name, string $apiType) use ($addLayoutPart, $menu) {
@@ -263,6 +264,8 @@ class CodexServiceProvider extends ServiceProvider
         $layoutRight     = $addLayoutHorizontalSide('right', 'LayoutRight');
         $layoutMiddle    = $addLayoutPart('middle', 'LayoutMiddle');
         $layoutContent   = $addLayoutPart('content', 'LayoutContent');
+        $layoutToolbar   = $addLayoutPart('toolbar', 'LayoutToolbar');
+        $layoutToolbar->add('breadcrumbs', 'dictionaryPrototype', '[Assoc]');
 
         $layoutHeader->add('show_left_toggle', 'boolean')->setDefault(false);
         $layoutHeader->add('show_right_toggle', 'boolean')->setDefault(false);
@@ -271,7 +274,8 @@ class CodexServiceProvider extends ServiceProvider
         $layoutMiddle->add('margin', 'mixed', 'Mixed', 0);
         $layoutContent->add('padding', 'mixed', 'Mixed', 0);
         $layoutContent->add('margin', 'mixed', 'Mixed', 0);
-
+        $layoutToolbar->add('left', 'dictionaryPrototype', '[Assoc]'); //->setApiType('LayoutToolbarItem', [ 'new'])->setDefault([]);
+        $layoutToolbar->add('right', 'dictionaryPrototype', '[Assoc]'); //->setApiType('LayoutToolbarItem', [ 'new'])->setDefault([]);
 
         $projects = $registry->projects;
         $projects->addMergeKeys([]);
@@ -332,6 +336,5 @@ class CodexServiceProvider extends ServiceProvider
         $documents->add('scripts', 'array.scalarPrototype', '[String]', []);
         $documents->add('styles', 'array.scalarPrototype', '[String]', []);
         $documents->add('html', 'array.scalarPrototype', '[String]', []);
-
     }
 }

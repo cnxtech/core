@@ -4,6 +4,8 @@
 namespace Codex\Contracts\Projects;
 
 
+use Codex\Contracts\Mergable\Model;
+
 /**
  * Interface ProjectInterface
  *
@@ -11,7 +13,7 @@ namespace Codex\Contracts\Projects;
  * @author  Robin Radic
  * @mixin \Codex\Projects\Project
  */
-interface Project
+interface Project extends Model
 {
 
 }

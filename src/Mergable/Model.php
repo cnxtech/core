@@ -3,6 +3,7 @@
 namespace Codex\Mergable;
 
 use ArrayAccess;
+use Closure;
 use Codex\Attributes\AttributeDefinitionGroup;
 use Codex\Concerns\HasCallbacks;
 use Codex\Concerns\HasContainer;
@@ -10,6 +11,7 @@ use Codex\Concerns\HasEvents;
 use Codex\Concerns\Macroable;
 use Codex\Contracts\Mergable\ChildInterface;
 use Codex\Contracts\Mergable\Mergable;
+use Codex\Contracts\Mergable\Model as ModelContract;
 use Codex\Contracts\Mergable\ParentInterface;
 use Codex\Hooks;
 use Codex\Mergable\Commands\GetChangedAttributes;
@@ -24,7 +26,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\Arr;
 use JsonSerializable;
 
-abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, Mergable
+abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, Mergable, ModelContract
 {
     use DispatchesJobs;
     use HasContainer;
@@ -40,6 +42,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         __callStatic as __callStaticMacro;
     }
 
+    /** @var \Codex\Mergable\Storage */
     protected $storage;
 
     protected $primaryKey = 'key';
@@ -173,7 +176,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $this->attributeDefinitions = $attributeDefinitions;
         }
 
-        $this->storage = collect();
+        $this->storage = new Storage($this);
 
         $this->bootIfNotBooted();
 
@@ -284,6 +287,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
     protected $attributes = [];
 
+    protected $callAttributeClosures = false;
+
     public function getChanges()
     {
         if ($this instanceof ChildInterface) {
@@ -362,9 +367,38 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         return $value;
     }
 
+    public function callClosures(bool $value = true)
+    {
+        $this->callAttributeClosures = $value;
+        return $this;
+    }
+
     protected function getAttributeFromArray($key)
     {
-        return data_get($this->attributes, $key);
+        $data = data_get($this->attributes, $key);
+
+        if ($this->callAttributeClosures) {
+            if ($data instanceof Closure) {
+                $data = app()->call($data, [ $this, $this->getContainer() ]);
+            }
+            if (is_array($data)) {
+                return $this->callAttributeChildClosures($data);
+            }
+        }
+        return $data;
+    }
+
+    protected function callAttributeChildClosures($data)
+    {
+        foreach ($data as $key => $value) {
+            if (is_array($value)) {
+                $data[ $key ] = $this->callAttributeChildClosures($value);
+            }
+            if ($value instanceof Closure) {
+                $data[ $key ] = app()->call($value, [ $this, $this->getContainer() ]);
+            }
+        }
+        return $data;
     }
 
     public function setAttribute($key, $value)
@@ -728,11 +762,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * @return Collection
+     * @return Storage
      */
     public function getStorage()
     {
         return $this->storage;
+    }
+
+    public function storage($key, callable $value)
+    {
+        return $this->storage->getSet($key, $value);
     }
 
     //endregion

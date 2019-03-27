@@ -37,7 +37,7 @@ return [
     ],
 
     'cache' => [
-        'enabled'  => env('CODEX_CACHE_ENABLED', config('app.debug') !== true),
+        'enabled' => env('CODEX_CACHE_ENABLED', config('app.debug') !== true),
         'key'     => env('CODEX_CACHE_KEY', 'codex'),
         'minutes' => (int)env('CODEX_CACHE_MINUTES', 60),
     ],
@@ -52,8 +52,9 @@ return [
         'documentation_prefix' => 'documentation',
 //        'documentation_view'   => 'codex::index',
         'documentation_view'   => 'codex::react.index',
-        'backend_data_url' => 'backend_data.js'
+        'backend_data_url'     => 'backend_data.js',
     ],
+
 
     'processors' => [
         'enabled'  => [],

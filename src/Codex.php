@@ -15,7 +15,7 @@ use Codex\Mergable\Commands\ProcessAttributes;
 use Codex\Mergable\Concerns\HasChildren;
 use Codex\Mergable\Model;
 use Codex\Projects\ProjectCollection;
-use Illuminate\Contracts\Config\Repository as Config;
+use Codex\Contracts\Config\Repository as Config;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
 /**
@@ -73,7 +73,6 @@ class Codex extends Model implements ParentInterface
         $this->addons     = $addons;
         $this->extensions = $extensions;
         $this->api        = $api;
-
 
         $this->setChildren($projects->setParent($this));
         $attributes = array_except($config->get('codex', []), [ 'projects', 'revisions', 'documents' ]);

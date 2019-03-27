@@ -46,7 +46,7 @@ class ResolveDocument
         $document   = app(DocumentContract::class, compact('attributes', 'revision'));
         $this->dispatch(new MergeAttributes($document));
 
-        Hooks::run('document.resolved', [ $this ]);
+        Hooks::run('document.resolved', [ $document ]);
         $document->fireEvent('resolved');
         ResolvedDocument::dispatch($document);
         $document->preprocess();
