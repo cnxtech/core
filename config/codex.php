@@ -89,7 +89,7 @@ return [
         'allowed_revision_config_files' => [ 'revision.yml', 'revision.yaml', 'config.yml', 'config.yaml' ],
 
         'default_document'    => 'index',
-        'document_extensions' => [ 'md', 'markdown' ],
+        'document_extensions' => [ 'md', 'markdown', 'rst' ],
     ],
 
     'revisions' => [],

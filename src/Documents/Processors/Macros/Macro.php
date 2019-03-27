@@ -13,6 +13,8 @@ namespace Codex\Documents\Processors\Macros;
 
 use Closure;
 use Codex\Exceptions\Exception;
+use Codex\Exceptions\InvalidArgumentException;
+use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 /**
  * The Macro class represents.
@@ -146,10 +148,15 @@ class Macro
     {
         if ($this->canRun()) {
 //            $content = $this->document->getContent();
-            $this->parseArguments();
-            $arguments = array_merge([ $this->isClosing() ], $this->arguments);
-            $result    = \call_user_func_array($this->getCallable(), $arguments);
-            return $result;
+            try {
+                $this->parseArguments();
+                $arguments = array_merge([ $this->isClosing() ], $this->arguments);
+                $result    = \call_user_func_array($this->getCallable(), $arguments);
+                return $result;
+            }
+            catch (\TypeError $exception) {
+                throw InvalidArgumentException::from($exception);
+            }
 //            $content = preg_replace('/'.preg_quote($this->raw, '/').'/', $result, $content, 1);
 //            $this->document->setContent($content);
         } else {

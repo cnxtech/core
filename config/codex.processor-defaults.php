@@ -55,7 +55,11 @@ return [
                 ],
             ],
         ],
-        'rst'      => [], // refers to parser name
+        'rst'      => [
+
+            'parser'     => 'Codex\Documents\Processors\Parser\RstParser',
+            'file_types' => [ 'rst' ],
+        ], // refers to parser name
 
     ],
     'toc'        => [

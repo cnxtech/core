@@ -7,6 +7,7 @@ use MyCLabs\Enum\Enum;
 /**
  * @method static AttributeDefinitionType MIXED()
  * @method static AttributeDefinitionType DICTIONARY()
+ * @method static AttributeDefinitionType DICTIONARY_ARRAY()
  * @method static AttributeDefinitionType ARRAY_ARRAY()
  * @method static AttributeDefinitionType ARRAY_SCALAR()
  * @method static AttributeDefinitionType ARRAY_RECURSIVE()

@@ -23,7 +23,10 @@
         "symfony/config": "~4.0",
         "nuwave/lighthouse": "~2.6",
         "deinternetjongens/lighthouse-utils": "~0.2",
-        "colinodell/json5": "^2.0"
+        "colinodell/json5": "^2.0",
+        "gregwar/rst": "1.0.*",
+        "doctrine/rst-parser": "dev-master@dev",
+        "marc-mabe/php-enum": "3.1.*"
     },
     "autoload": {
         "files": [

@@ -3,6 +3,7 @@
 namespace Codex\Documents\Processors;
 
 use Codex\Attributes\AttributeDefinition;
+use Codex\Attributes\AttributeDefinitionType;
 use Codex\Contracts\Documents\Document;
 
 class ParserProcessorExtension extends ProcessorExtension implements ProcessorInterface
@@ -20,10 +21,15 @@ class ParserProcessorExtension extends ProcessorExtension implements ProcessorIn
 
     public function defineConfigAttributes(AttributeDefinition $definition)
     {
-        $parser = $definition->add('markdown', 'dictionary');
-        $parser->add('parser', 'string');
-        $parser->add('file_types', 'array.scalarPrototype');
-        $parser->add('options', 'dictionaryPrototype');
+        $definition->setType(AttributeDefinitionType::DICTIONARY_ARRAY());
+//        $parser = $definition->add('markdown', 'dictionaryPrototype');
+//        $parser->add('parser', 'string');
+//        $parser->add('file_types', 'array.scalarPrototype');
+//        $parser->add('options', 'dictionaryPrototype');
+
+        $definition->add('parser', 'string');
+        $definition->add('file_types', 'array.scalarPrototype');
+        $definition->add('options', 'dictionaryPrototype');
     }
 
     public function process(Document $document)

@@ -85,6 +85,7 @@
         var codex = window['codex'];
         codex.core.loadPolyfills().then(function () {
             var app = codex.core.app;
+
             @stack('init')
 
                 return app.register({
