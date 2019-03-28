@@ -1,6 +1,39 @@
 {
     "name": "codex/core",
+    "keywords": [
+        "laravel",
+        "documentation",
+        "markdown",
+        "codex"
+    ],
     "license": "MIT",
+    "homepage": "https://codex.radic.ninja",
+    "authors": [
+        {
+            "name": "Robin Radic",
+            "email": "rradic@hotmail.com",
+            "homepage": "https://radic.ninja",
+            "role": "developer"
+        }
+    ],
+    "support": {
+        "docs": "https://codex.radic.ninja",
+        "email": "rradic@hotmail.com",
+        "issues": "https://github.com/codex-project/codex/issues",
+        "source": "https://github.com/codex-project/codex/core",
+        "wiki": "https://codex.radic.ninja"
+    },
+    "suggest": {
+        "codex/auth": "Provides authentication using oauth providers (socialite) to restrict project access (~2.0)",
+        "codex/algolia-search": "Integrates algolia search into codex (~2.0)",
+        "codex/blog": "Provides blogging capability with categories containing posts (~2.0)",
+        "codex/comments": "Adds comments to your documents like Disqus or create your own adapter (~2.0)",
+        "codex/filesystems": "Adds a collection of common filesystem adapters. These can be used by your projects. (~2.0)",
+        "codex/git": "Enables Github/Bitbucket integration & synchronisation (auto-webhook or manual) based on tags/branches. (~2.0)",
+        "codex/packagist": "Integrates Packagist information links and macros in your projects (~2.0)",
+        "codex/phpdoc": "Integrates PHPDoc documentation, links and macros in your projects (~2.0)",
+        "codex/sitemap": "Generates a sitemap.xml (~2.0)"
+    },
     "require": {
         "php": ">=7.0.0",
         "codex/composer-plugin": "~1.0",
@@ -14,8 +47,8 @@
         "fluentdom/selectors-phpcss": "~1.2",
         "radic/blade-extensions": "~7.1",
         "myclabs/php-enum": "~1.5",
-        "league/commonmark":"^0.17",
-        "league/commonmark-extras":"~0.1",
+        "league/commonmark": "^0.17",
+        "league/commonmark-extras": "~0.1",
         "webuni/commonmark-table-extension": "~0.9",
         "webuni/commonmark-attributes-extension": "~0.6",
         "barryvdh/laravel-cors": "~0.9",
