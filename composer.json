@@ -1,5 +1,6 @@
 {
     "name": "codex/core",
+    "description": "The core package for Codex. This is the minimal requirement to get Codex up and running.",
     "keywords": [
         "laravel",
         "documentation",
@@ -57,8 +58,6 @@
         "nuwave/lighthouse": "~2.6",
         "deinternetjongens/lighthouse-utils": "~0.2",
         "colinodell/json5": "^2.0",
-        "gregwar/rst": "1.0.*",
-        "doctrine/rst-parser": "dev-master@dev",
         "marc-mabe/php-enum": "3.1.*"
     },
     "autoload": {
@@ -76,7 +75,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "2.1.x-dev"
+            "dev-develop": "2.0.x-dev"
         },
         "laravel": {
             "dont-discover": [
