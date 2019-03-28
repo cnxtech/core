@@ -1,0 +1,1 @@
+(window.webpackJsonp=window.webpackJsonp||[]).push([["polyfill.resize"],{"./build/resize-observable-polyfill.js":function(e,s,i){"use strict";i.r(s);var o=i("../node_modules/resize-observer-polyfill/dist/ResizeObserver.es.js");void 0===window.ResizeObserver&&(window.ResizeObserver=o.default)}}]);
