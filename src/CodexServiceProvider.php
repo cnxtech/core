@@ -68,9 +68,9 @@ class CodexServiceProvider extends ServiceProvider
         'codex.extensions'                  => Addons\Extensions\ExtensionCollection::class,
         'codex.attributes'                  => Attributes\AttributeDefinitionRegistry::class,
         'codex.attributes.config'           => Attributes\ConfigResolverRegistry::class,
-        Contracts\Projects\Project::class   => Projects\Project::class,
-        Contracts\Revisions\Revision::class => Revisions\Revision::class,
-        Contracts\Documents\Document::class => Documents\Document::class,
+        Contracts\Projects\Project::class   => Projects\Project::class, //Contracts\Projects\Project::class
+        Contracts\Revisions\Revision::class => Revisions\Revision::class, //Contracts\Revisions\Revision::class
+        Contracts\Documents\Document::class => Documents\Document::class, //Contracts\Documents\Document::class
     ];
 
     protected $listen = [

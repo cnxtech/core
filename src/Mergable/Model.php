@@ -105,7 +105,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function attr($key, $default = null)
     {
         $this->show($key);
-        $data = data_get($this, $key, $default);
+        if($this->hasAttribute($key)) {
+            $data = $this->getAttribute($key);
+        } else {
+            $data = data_get($this, $key, $default);
+        }
         $this->rehide(true);
         return $data;
     }
@@ -336,7 +340,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
     public function hasAttribute($key)
     {
-        return array_has($this->attributes, $key);
+        return array_has($this->attributes, $key) || $this->hasGetMutator($key);
+//        return array_has($this->attributes, $key);
     }
 
     public function getAttribute($key)

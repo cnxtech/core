@@ -37,7 +37,8 @@ class Hooks
             static::run('hooks.run', [ $id, $args, $abortable ]);
         }
         foreach (static::getHandlers($id) as $handler) {
-            $retval = app()->call($handler, $args);
+//            $retval = app()->call($handler, $args);
+            $retval = call_user_func_array($handler, $args);
             if ($abortable === false && $retval !== null && $retval !== true) {
                 throw Exceptions\Exception::make("Invalid return from hook [{$id}] handler");
             }
