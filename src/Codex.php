@@ -6,6 +6,7 @@ use Codex\Addons\AddonCollection;
 use Codex\Addons\Extensions\ExtensionCollection;
 use Codex\Api\GraphQL\GraphQL;
 use Codex\Attributes\AttributeDefinitionRegistry;
+use Codex\Contracts\Config\Repository as Config;
 use Codex\Contracts\Documents\Document;
 use Codex\Contracts\Mergable\ParentInterface;
 use Codex\Contracts\Projects\Project;
@@ -15,7 +16,6 @@ use Codex\Mergable\Commands\ProcessAttributes;
 use Codex\Mergable\Concerns\HasChildren;
 use Codex\Mergable\Model;
 use Codex\Projects\ProjectCollection;
-use Codex\Contracts\Config\Repository as Config;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
 /**
@@ -75,10 +75,10 @@ class Codex extends Model implements ParentInterface
         $this->api        = $api;
 
         $this->setChildren($projects->setParent($this));
-        $attributes = array_except($config->get('codex', []), [ 'projects', 'revisions', 'documents' ]);
-        $group      = $registry->resolveGroup('codex');
-        $attributes = $this->dispatch(new ProcessAttributes($group, $attributes));
-        $this->initialize($attributes, $group)->rehide();
+        $attributes                 = array_except($config->raw('codex', []), [ 'projects', 'revisions', 'documents' ]);
+        $this->attributeDefinitions = $registry->resolveGroup('codex');
+        $attributes                 = $this->dispatch(new ProcessAttributes($this, $attributes));
+        $this->initialize($attributes, $this->attributeDefinitions)->rehide();
         $this->addGetMutator('urls', 'getUrls', true, true);
         $this->addGetMutator('changes', 'getChanges', true, true);
     }
@@ -91,7 +91,7 @@ class Codex extends Model implements ParentInterface
             'documentation' => 'codex.documentation',
         ];
         $routeMap = Hooks::waterfall('codex.urls.map', $routeMap, [ $this ]);
-        $urls = collect($routeMap)->map(function ($routeName) {
+        $urls     = collect($routeMap)->map(function ($routeName) {
             try {
                 return url()->route($routeName, [], false);
             }
@@ -104,7 +104,7 @@ class Codex extends Model implements ParentInterface
                 return url()->route($routeName, $parameters, false);
             }
         })->toArray();
-        $urls = Hooks::waterfall('codex.urls.mapped', $urls, [ $this ]);
+        $urls     = Hooks::waterfall('codex.urls.mapped', $urls, [ $this ]);
         return $urls;
     }
 
@@ -210,6 +210,11 @@ class Codex extends Model implements ParentInterface
      * **Syntax examples:**
      * `codex/master::getting-started/installation`
      *
+     * @param string $query The query to run
+     *
+     * @return \Codex\Documents\Document|\Codex\Documents\DocumentCollection|\Codex\Projects\Project|\Codex\Projects\ProjectCollection|\Codex\Revisions\Revision|\Codex\Revisions\RevisionCollection
+     *
+     * @throws \Codex\Exceptions\NotFoundException
      * @example
      * $projects    = codex()->get('*'); # Codex\Entities\Projects
      * $project     = codex()->get('!'); # Codex\Entities\Project (default)
@@ -225,11 +230,6 @@ class Codex extends Model implements ParentInterface
      * $document    = codex()->get('!/!::!'); # Codex\Entities\Document
      * $document    = codex()->get('codex/master::develop/hooks'); # Codex\Entities\Document
      *
-     * @param string $query The query to run
-     *
-     * @return \Codex\Documents\Document|\Codex\Documents\DocumentCollection|\Codex\Projects\Project|\Codex\Projects\ProjectCollection|\Codex\Revisions\Revision|\Codex\Revisions\RevisionCollection
-     *
-     * @throws \Codex\Exceptions\NotFoundException
      */
     public function get($query)
     {

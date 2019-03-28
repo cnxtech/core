@@ -49,6 +49,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
     protected $keyType = 'string';
 
+    public function getClassSlug()
+    {
+        return str_slug(last(explode('\\', static::class)));
+    }
 
     public function show($attributes)
     {
@@ -792,7 +796,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Convert the model instance to JSON.
      *
-     * @param  int $options
+     * @param int $options
      *
      * @return string
      *
@@ -822,7 +826,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Dynamically retrieve attributes on the model.
      *
-     * @param  string $key
+     * @param string $key
      *
      * @return mixed
      */
@@ -834,8 +838,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Dynamically set attributes on the model.
      *
-     * @param  string $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
      *
      * @return void
      */
@@ -847,7 +851,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Determine if the given attribute exists.
      *
-     * @param  mixed $offset
+     * @param mixed $offset
      *
      * @return bool
      */
@@ -859,7 +863,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Get the value for a given offset.
      *
-     * @param  mixed $offset
+     * @param mixed $offset
      *
      * @return mixed
      */
@@ -871,8 +875,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Set the value for a given offset.
      *
-     * @param  mixed $offset
-     * @param  mixed $value
+     * @param mixed $offset
+     * @param mixed $value
      *
      * @return void
      */
@@ -884,7 +888,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Unset the value for a given offset.
      *
-     * @param  mixed $offset
+     * @param mixed $offset
      *
      * @return void
      */
@@ -896,7 +900,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Determine if an attribute or relation exists on the model.
      *
-     * @param  string $key
+     * @param string $key
      *
      * @return bool
      */
@@ -908,7 +912,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Unset an attribute on the model.
      *
-     * @param  string $key
+     * @param string $key
      *
      * @return void
      */

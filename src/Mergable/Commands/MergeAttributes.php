@@ -3,7 +3,8 @@
 namespace Codex\Mergable\Commands;
 
 use Codex\Attributes\AttributeConfigBuilderGenerator;
-use Codex\Contracts\Mergable\Mergable;
+use Codex\Contracts\Mergable\ChildInterface;
+use Codex\Contracts\Mergable\Model;
 use Illuminate\Contracts\Config\Repository;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\Arr;
@@ -18,7 +19,7 @@ class MergeAttributes
     /** @var array */
     protected $attributes;
 
-    public function __construct(Mergable $target, array $attributes = [])
+    public function __construct(Model $target, array $attributes = [])
     {
         $this->target     = $target;
         $this->attributes = $attributes;
@@ -50,7 +51,6 @@ class MergeAttributes
             $result = Arr::merge($result, data_get($parentAttributes, $mergeKey, []));
         }
         $result = Arr::merge($result, $this->attributes);
-
 
         // 3 : Generate and build the Config tree from attribute definitions
         // 4 : Filter the merged result to only include nodes defined/accepted with the target

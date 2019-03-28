@@ -27,8 +27,8 @@ class Repository extends BaseRepository implements RepositoryContract
     /**
      * Get the specified configuration value.
      *
-     * @param  array|string $key
-     * @param  mixed        $default
+     * @param array|string $key
+     * @param mixed        $default
      *
      * @return mixed
      */
@@ -42,10 +42,19 @@ class Repository extends BaseRepository implements RepositoryContract
         return $value;
     }
 
+    public function raw($key, $default = null)
+    {
+        return $this->config->get($key, $default);
+    }
+    public function rawMany($keys)
+    {
+        return $this->config->get($keys);
+    }
+
     /**
      * Get many configuration values.
      *
-     * @param  array $keys
+     * @param array $keys
      *
      * @return array
      */
@@ -80,9 +89,11 @@ class Repository extends BaseRepository implements RepositoryContract
         $aggregator = new ConfigAggregator(
             [ new ArrayProvider(compact('config')) ],
             null,
-            [ new ParameterPostProcessor(collect($this->config->all())->filter(function($item, $key){
-                return starts_with($key,'codex');
-            })->toArray()) ]
+            [
+                new ParameterPostProcessor(collect($this->config->all())->filter(function ($item, $key) {
+                    return starts_with($key, 'codex');
+                })->toArray()),
+            ]
         );
         return data_get($aggregator->getMergedConfig(), 'config', []);
     }

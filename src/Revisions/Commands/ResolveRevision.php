@@ -4,7 +4,9 @@ namespace Codex\Revisions\Commands;
 
 use Codex\Contracts\Projects\Project;
 use Codex\Hooks;
+use Codex\Mergable\Commands\AggregateAttributes;
 use Codex\Mergable\Commands\MergeAttributes;
+use Codex\Mergable\Concerns\BuildsParameterData;
 use Codex\Revisions\Events\ResolvedRevision;
 use Codex\Revisions\Revision;
 use Illuminate\Contracts\Cache\Repository;
@@ -15,6 +17,7 @@ use Symfony\Component\Yaml\Yaml;
 class ResolveRevision
 {
     use DispatchesJobs;
+    use BuildsParameterData;
 
     /**
      * @var string
@@ -45,8 +48,8 @@ class ResolveRevision
 
     public function handle(Repository $cache)
     {
-        $project             = $this->project;
-        $revision            = $this->makeRevision();
+        $project  = $this->project;
+        $revision = $this->makeRevision();
 
         if ($revision->attr('cache.enabled', $project->attr('cache.enabled'))) {
 //        $cache->forget($this->cacheKey('projectLastModified'));
@@ -73,7 +76,9 @@ class ResolveRevision
             $this->dispatch(new MergeAttributes($revision));
         }
 
-        Hooks::run('revisions.resolved', [$this]);
+        $attributes = $this->dispatch(new AggregateAttributes($revision->getAttributes(), $this->buildParameterData($revision), true, false));
+        $revision->setRawAttributes($attributes);
+        Hooks::run('revisions.resolved', [ $this ]);
         $revision->fireEvent('resolved', $revision);
         ResolvedRevision::dispatch($revision);
         return $revision;
@@ -86,7 +91,7 @@ class ResolveRevision
         $attributes[ 'key' ] = basename(dirname($path));
         $project             = $this->project;
         $this->revision      = app()
-            ->make(Revision::class, compact('attributes','project'))
+            ->make(Revision::class, compact('attributes', 'project'))
             ->setParent($project)
             ->setFiles($project->getFiles())
             ->setConfigFilePath($path);

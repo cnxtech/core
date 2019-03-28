@@ -4,7 +4,9 @@ namespace Codex\Projects\Commands;
 
 use Codex\Contracts\Projects\Project;
 use Codex\Hooks;
+use Codex\Mergable\Commands\AggregateAttributes;
 use Codex\Mergable\Commands\MergeAttributes;
+use Codex\Mergable\Concerns\BuildsParameterData;
 use Codex\Projects\Events\ResolvedProject;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -12,6 +14,7 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 class ResolveProject
 {
     use DispatchesJobs;
+    use BuildsParameterData;
 
     /**
      * @var string
@@ -61,7 +64,8 @@ class ResolveProject
         }
         $project->updateDisk();
 
-
+        $attributes = $this->dispatch(new AggregateAttributes($project->getAttributes(), $this->buildParameterData($project), true, false));
+        $project->setRawAttributes($attributes);
         Hooks::run('project.resolved', [ $this ]);
         $project->fireEvent('resolved', $project);
         ResolvedProject::dispatch($project);

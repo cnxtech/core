@@ -97,6 +97,6 @@ return [
     'documents' => [
         'title'       => null,
         'subtitle'    => null,
-        'description' => null,
+        'description' => '%project.disk%'
     ],
 ];
