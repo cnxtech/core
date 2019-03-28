@@ -52,7 +52,7 @@ class ResolveDocument
 
         $parameters = $this->buildParameterData($document);
         $attributes = $document->getAttributes();
-        $attributes = $this->dispatch(new AggregateAttributes($attributes, $parameters, true, false));
+        $attributes = $this->dispatch(new AggregateAttributes($attributes, $parameters, true, true));
         $document->setRawAttributes($attributes);
         Hooks::run('document.resolved', [ $document ]);
         $document->fireEvent('resolved');

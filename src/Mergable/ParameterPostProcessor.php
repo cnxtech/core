@@ -36,6 +36,7 @@ class ParameterPostProcessor
             if ( ! $this->ignoreParameterException) {
                 throw ParameterNotFoundException::fromException($exception);
             }
+            $parameters = new ParameterBag($config);
         }
 
         array_walk_recursive($config, function (&$value) use ($parameters) {

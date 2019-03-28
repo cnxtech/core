@@ -76,9 +76,9 @@ class ResolveRevision
             $this->dispatch(new MergeAttributes($revision));
         }
 
-        $attributes = $this->dispatch(new AggregateAttributes($revision->getAttributes(), $this->buildParameterData($revision), true, false));
+        $attributes = $this->dispatch(new AggregateAttributes($revision->getAttributes(), $this->buildParameterData($revision), true, true));
         $revision->setRawAttributes($attributes);
-        Hooks::run('revisions.resolved', [ $this ]);
+        Hooks::run('revisions.resolved', [ $revision ]);
         $revision->fireEvent('resolved', $revision);
         ResolvedRevision::dispatch($revision);
         return $revision;
