@@ -31,6 +31,7 @@ class AttributeConfigBuilderGenerator
         $builder = new TreeBuilder('root');
         /** @var ArrayNodeDefinition $rootNode */
         $rootNode = $builder->getRootNode();
+
         $rootNode->ignoreExtraKeys(true);
         $nodeBuilder = $rootNode->addDefaultsIfNotSet()->children();
         foreach ($this->registry->keys() as $groupName) {

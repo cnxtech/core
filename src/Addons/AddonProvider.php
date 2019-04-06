@@ -56,13 +56,13 @@ class AddonProvider
     public function register(Addon $addon)
     {
         if ( ! $addon->isEnabled()) {
-            return;
+            return $this;
         }
 
         $provider = $addon->getServiceProvider();
 
         if ( ! class_exists($provider)) {
-            return;
+            return $this;
         }
 
         /** @var \Codex\Addons\AddonServiceProvider $provider */
@@ -77,6 +77,16 @@ class AddonProvider
 
         $this->registerProviders($provider);
 
+        $boot = function () use ($provider) {
+            if (method_exists($provider, 'attributes')) {
+                $this->application->call([ $provider, 'attributes' ]);
+            }
+        };
+        if ($this->application->hasBeenBootstrapped()) {
+            $boot();
+        } else {
+            $this->application->booting($boot);
+        }
         return $provider;
     }
 
@@ -87,17 +97,18 @@ class AddonProvider
 
     protected function mapConfig(AddonServiceProvider $provider)
     {
+        $config = $this->application[ 'config' ];
         foreach ($provider->mapConfig as $from => $to) {
-            $fromValue = $this->application[ 'config' ]->get($from, []);
+            $fromValue = $config->get($from, []);
             if ($fromValue instanceof Closure) {
                 $fromValue = app()->call($to);
             }
             if (is_array($fromValue)) {
                 foreach ($fromValue as $key => $value) {
-                    $this->application[ 'config' ]->set($to . '.' . $key, $value);
+                    $config->set($to . '.' . $key, $value);
                 }
             } else {
-                $this->application[ 'config' ]->set($to, $fromValue);
+                $config->set($to, $fromValue);
             }
         }
     }
@@ -121,18 +132,15 @@ class AddonProvider
      */
     protected function registerCommands(AddonServiceProvider $provider)
     {
-        if ($commands = $provider->commands) {
-
-            // To register the commands with Artisan, we will grab each of the arguments
-            // passed into the method and listen for Artisan "start" event which will
-            // give us the Artisan console instance which we will give commands to.
-            $this->events->listen(
-                'Illuminate\Console\Events\ArtisanStarting',
-                function (ArtisanStarting $event) use ($commands) {
-                    $event->artisan->resolveCommands($commands);
-                }
-            );
+        if ( ! $provider->commands) {
+            return;
         }
+        // To register the commands with Artisan, we will grab each of the arguments
+        // passed into the method and listen for Artisan "start" event which will
+        // give us the Artisan console instance which we will give commands to.
+        $this->events->listen(ArtisanStarting::class, function (ArtisanStarting $event) use ($provider) {
+            $event->artisan->resolveCommands($provider->commands);
+        });
     }
 
     /**

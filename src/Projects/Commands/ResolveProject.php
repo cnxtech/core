@@ -64,8 +64,8 @@ class ResolveProject
         }
         $project->updateDisk();
 
-        $attributes = $this->dispatch(new AggregateAttributes($project->getAttributes(), $this->buildParameterData($project), true, true));
-        $project->setRawAttributes($attributes);
+//        $attributes = $this->dispatch(new AggregateAttributes($project->getAttributes(), $this->buildParameterData($project)));
+//        $project->setRawAttributes($attributes);
         Hooks::run('project.resolved', [ $project ]);
         $project->fireEvent('resolved', $project);
         ResolvedProject::dispatch($project);

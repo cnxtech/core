@@ -3,24 +3,35 @@
 namespace Codex\Config;
 
 use Codex\Contracts\Config\Repository as RepositoryContract;
+use Codex\Mergable\ParameterPostProcessor;
 use Illuminate\Config\Repository as BaseRepository;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 use Zend\ConfigAggregator\ArrayProvider;
 use Zend\ConfigAggregator\ConfigAggregator;
-use Zend\ConfigAggregatorParameters\ParameterPostProcessor;
+
 
 class Repository extends BaseRepository implements RepositoryContract
 {
+    use DispatchesJobs;
+
     /** @var \Illuminate\Contracts\Config\Repository */
     protected $config;
 
-    /**
-     * Repository constructor.
-     *
-     * @param \Illuminate\Contracts\Config\Repository $config
-     */
-    public function __construct(\Illuminate\Contracts\Config\Repository $config)
+    /** @var \Illuminate\Contracts\Foundation\Application */
+    protected $app;
+
+    /** @var \Codex\Config\ConfigProcessor */
+    protected $processor;
+
+    /** @var bool */
+    protected $useProcessor = true;
+
+    public function __construct(Application $app, \Illuminate\Contracts\Config\Repository $config, ConfigProcessor $processor)
     {
-        $this->config = $config;
+        $this->config    = $config;
+        $this->app       = $app;
+        $this->processor = $processor;
         parent::__construct();
     }
 
@@ -38,7 +49,7 @@ class Repository extends BaseRepository implements RepositoryContract
             return $this->getMany($key);
         }
         $value = $this->config->get($key, $default);
-        $value = $this->processParameters($value);
+        $value = $this->process($value);
         return $value;
     }
 
@@ -46,6 +57,7 @@ class Repository extends BaseRepository implements RepositoryContract
     {
         return $this->config->get($key, $default);
     }
+
     public function rawMany($keys)
     {
         return $this->config->get($keys);
@@ -65,7 +77,7 @@ class Repository extends BaseRepository implements RepositoryContract
         } else {
             $value = $this->config->get($keys);
         }
-        $value = $this->processParameters($value);
+        $value = $this->process($value);
         return $value;
     }
 
@@ -81,21 +93,53 @@ class Repository extends BaseRepository implements RepositoryContract
 
     public function all()
     {
-        return $this->processParameters($this->config->all());
+        return $this->process($this->config->all());
     }
 
-    protected function processParameters($config)
+    protected function process($value)
     {
-        $aggregator = new ConfigAggregator(
-            [ new ArrayProvider(compact('config')) ],
-            null,
+        $agg   = new ConfigAggregator(
             [
-                new ParameterPostProcessor(collect($this->config->all())->filter(function ($item, $key) {
-                    return starts_with($key, 'codex');
-                })->toArray()),
-            ]
+                function() use ($value) {
+                    $config = new \Illuminate\Config\Repository();
+                    $config->set($this->config->all());
+                    $config->set('value',$value);
+                    return $config->all();
+                },
+//                new ArrayProvider([ 'config' => $this->config, 'value' => $value ])
+            ],
+            null,
+            [ new ParameterPostProcessor(array_merge($this->config->all(), $value), true) ]
         );
-        return data_get($aggregator->getMergedConfig(), 'config', []);
+        $value = data_get($agg->getMergedConfig(), 'value',$value);
+        return $value;
+        if ( ! $this->useProcessor) {
+            return $value;
+        }
+        $this->processor->setValue('codex', $this->app[ 'codex' ]);
+        return $this->processor->process($value);
     }
+
+    public function getProcessor()
+    {
+        return $this->processor;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isUseProcessor(): bool
+    {
+        return $this->useProcessor;
+    }
+
+    /**
+     * @param bool $useProcessor
+     */
+    public function setUseProcessor(bool $useProcessor): void
+    {
+        $this->useProcessor = $useProcessor;
+    }
+
 
 }

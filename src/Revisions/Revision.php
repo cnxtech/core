@@ -57,7 +57,13 @@ class Revision extends Model implements RevisionContract, ChildInterface, Parent
         $this->initialize($attributes, $registry);
         $this->addGetMutator('inherits', 'getInheritKeys', true, true);
         $this->addGetMutator('changes', 'getChanges', true, true);
+//        foreach($this->getInheritKeys() as $key){
+//            if($this->getParent()->hasGetMutator($key)){
+//                $this->getParent()->getMutators
+//            }
+//        }
         Hooks::run('revision.initialized', [ $this ]);
+
     }
 
     public function url($documentKey = null, $absolute = true)

@@ -5,10 +5,11 @@ namespace Codex\Addons\Extensions;
 use Codex\Addons\Addon;
 use Illuminate\Support\Collection;
 
+/**
+ * @property-read \Codex\Addons\Extensions\Extension[] $items
+ */
 class ExtensionCollection extends Collection
 {
-
-
     /**
      * Search for and return matching extensions.
      *

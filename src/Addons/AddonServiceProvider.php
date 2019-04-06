@@ -2,6 +2,7 @@
 
 namespace Codex\Addons;
 
+use Codex\Attributes\AttributeDefinitionRegistry;
 use Codex\Concerns\ProvidesResources;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\ServiceProvider;
@@ -105,6 +106,7 @@ class AddonServiceProvider extends ServiceProvider
     /** @var string */
     protected $packagePath = '{rootDir}';
 
+
     /*
      |---------------------------------------------------------------------
      | Resources
@@ -125,13 +127,6 @@ class AddonServiceProvider extends ServiceProvider
      * @var string
      */
     protected $resourcesDestinationPath = '{path.resource}';
-
-    /*
-     |---------------------------------------------------------------------
-     | Views
-     |---------------------------------------------------------------------
-     |
-     */
 
     /**
      * View destination path, by default uses laravel's 'resources/views/vendor/{namespace}'.
@@ -157,13 +152,6 @@ class AddonServiceProvider extends ServiceProvider
      */
     protected $viewDirs = [/* 'dirName' => 'namespace' */ ];
 
-    /*
-     |---------------------------------------------------------------------
-     | Assets
-     |---------------------------------------------------------------------
-     |
-     */
-
     /**
      * Assets destination path.
      *
@@ -186,37 +174,6 @@ class AddonServiceProvider extends ServiceProvider
      */
     protected $assetDirs = [/* 'dirName' => 'namespace' */ ];
 
-    /*
-     |---------------------------------------------------------------------
-     | Configuration
-     |---------------------------------------------------------------------
-     |
-     */
-
-    /**
-     * Collection of configuration files.
-     *
-     * @var array
-     */
-//    protected $configFiles = [];
-
-    /** @var string */
-//    protected $configDestinationPath = '{path.config}';
-
-    /**
-     * Path to the config directory.
-     *
-     * @var string
-     */
-//    protected $configPath = '{packagePath}/config';
-
-    /*
-     |---------------------------------------------------------------------
-     | Translation
-     |---------------------------------------------------------------------
-     |
-     */
-
     /** @var string */
     protected $translationDestinationPath = '{resourcesDestinationPath}/lang/vendor/{namespace}';
 
@@ -225,13 +182,6 @@ class AddonServiceProvider extends ServiceProvider
 
     /** @var array */
     protected $translationDirs = [/* 'dirName' => 'namespace', */ ];
-
-    /*
-     |---------------------------------------------------------------------
-     | Database | Migrations | Seeds
-     |---------------------------------------------------------------------
-     |
-     */
 
     /** @var string */
     protected $databaseDestinationPath = '{path.database}';
@@ -321,12 +271,12 @@ class AddonServiceProvider extends ServiceProvider
     /**
      * resolvePath method.
      *
-     * @todo
-     *
      * @param       $pathPropertyName
      * @param array $extras
      *
      * @return string
+     * @todo
+     *
      */
     public function resolvePath($name, array $extras = [])
     {
@@ -355,6 +305,7 @@ class AddonServiceProvider extends ServiceProvider
      * getPaths method
      *
      * @return array
+     * @throws \ReflectionException
      */
     private function getPaths()
     {
@@ -395,6 +346,12 @@ class AddonServiceProvider extends ServiceProvider
         return $paths;
     }
 
+    /**
+     * getRootDir method
+     *
+     * @return mixed
+     * @throws \ReflectionException
+     */
     private function getRootDir()
     {
         if ($this->rootDir === null) {
@@ -417,4 +374,6 @@ class AddonServiceProvider extends ServiceProvider
         }
         return $this->rootDir;
     }
+
+    public function attributes(AttributeDefinitionRegistry $registry){    }
 }

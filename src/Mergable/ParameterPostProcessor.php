@@ -2,61 +2,70 @@
 
 namespace Codex\Mergable;
 
+use Codex\Support\DotArrayWrapper;
+use Illuminate\Support\Arr;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException as SymfonyParameterNotFoundException;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBag;
 use Zend\ConfigAggregatorParameters\ParameterNotFoundException;
 
 class ParameterPostProcessor
 {
     /**
-     * @var array
+     * @var \Symfony\Component\DependencyInjection\ParameterBag\ParameterBag
      */
+    private $parameterBag;
+
+
+    /** @var \Codex\Support\DotArrayWrapper|array */
     private $parameters;
 
     /** @var bool */
     private $ignoreParameterException;
 
-    /**
-     * @param array $parameters
-     */
-    public function __construct(array $parameters, bool $ignoreParameterException = false)
+    /** @var \Codex\Contracts\Mergable\Model */
+    private $model;
+
+
+    public function __construct($parameters=[], bool $ignoreParameterException = false)
     {
         $this->parameters               = $parameters;
+//        $this->parameters               = DotArrayWrapper::make($parameters);
         $this->ignoreParameterException = $ignoreParameterException;
     }
+
+
 
 
     public function __invoke(array $config): array
     {
 
+        $bag = $this->getParameterBag();
         try {
-            $parameters = $this->getResolvedParameters();
+            $bag->resolve();
         }
         catch (SymfonyParameterNotFoundException $exception) {
             if ( ! $this->ignoreParameterException) {
                 throw ParameterNotFoundException::fromException($exception);
             }
-            $parameters = new ParameterBag($config);
         }
 
-        array_walk_recursive($config, function (&$value) use ($parameters) {
+        array_walk_recursive($config, function (&$value) use ($bag) {
             try {
-                $value      = $parameters->resolveValue($value);
+                $value = $bag->resolveValue($value);
             }
             catch (SymfonyParameterNotFoundException $exception) {
                 if ( ! $this->ignoreParameterException) {
                     throw ParameterNotFoundException::fromException($exception);
                 }
             }
-            $value = $parameters->unescapeValue($value);
+            $value = $bag->unescapeValue($value);
         });
 
-        $config[ 'parameters' ] = $parameters->all();
+        $config[ 'parameters' ] = $bag->all();
 
         return $config;
     }
 
-    private function resolveNestedParameters(array $values, string $prefix = ''): array
+    private function resolveNestedParameters($values, string $prefix = ''): array
     {
         $convertedValues = [];
         foreach ($values as $key => $value) {
@@ -74,13 +83,45 @@ class ParameterPostProcessor
         return $convertedValues;
     }
 
-    private function getResolvedParameters(): ParameterBag
+    public function getParameterBag(): ParameterBag
     {
         $resolved = $this->resolveNestedParameters($this->parameters);
-        $bag      = new ParameterBag($resolved);
-
-        $bag->resolve();
+        $bag= new ParameterBag($resolved);
+        if($this->model !== null) {
+            $bag->setModel($this->model);
+        }
         return $bag;
+//        return new ParameterBag($this->parameters->getItems());
     }
+
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
+
+    public function setParameter($key, $value)
+    {
+        data_set($this->parameters,$key,$value);
+    }
+
+    /**
+     * @return \Codex\Contracts\Mergable\Model
+     */
+    public function getModel(): \Codex\Contracts\Mergable\Model
+    {
+        return $this->model;
+    }
+
+    /**
+     * @param \Codex\Contracts\Mergable\Model $model
+     */
+    public function setModel(\Codex\Contracts\Mergable\Model $model)
+    {
+        $this->model = $model;
+        return $this;
+    }
+
+
+
 
 }

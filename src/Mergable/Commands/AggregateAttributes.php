@@ -2,9 +2,8 @@
 
 namespace Codex\Mergable\Commands;
 
-use Codex\Mergable\ParameterPostProcessor;
-use Zend\ConfigAggregator\ArrayProvider;
-use Zend\ConfigAggregator\ConfigAggregator;
+use Codex\Config\ConfigProcessor;
+use Illuminate\Contracts\Foundation\Application;
 
 class AggregateAttributes
 {
@@ -12,41 +11,38 @@ class AggregateAttributes
     protected $attributes;
 
     /** @var array */
-    protected $parameters;
+    protected $values;
 
-    /** @var bool */
-    protected $attributesInParameters;
-
-    /** @var bool */
-    protected $ignoreParameterExceptions;
-
-    /**
-     * AggregateAttributes constructor.
-     *
-     * @param array $attributes
-     * @param array $parameters
-     * @param bool  $attributesInParameters
-     */
-    public function __construct(array $attributes = [], array $parameters = [], bool $attributesInParameters = true, bool $ignoreParameterExceptions = true)
+    public function __construct($attributes = [], $values = [])
     {
-        $this->attributes                = $attributes;
-        $this->parameters                = $parameters;
-        $this->attributesInParameters    = $attributesInParameters;
-        $this->ignoreParameterExceptions = $ignoreParameterExceptions;
+        $this->attributes = $attributes;
+        $this->values     = $values;
     }
 
-    public function handle()
+    public function handle(Application $app)
     {
-        $attributes = $this->attributes;
-        $parameters = $this->parameters;
-        if ($this->attributesInParameters) {
-            $parameters = array_replace_recursive($attributes, $this->parameters);
+        $processor = new ConfigProcessor($app, $app[ 'codex.config.language' ]);
+        $processor->setValue('app', $app);
+        $processor->setValue('config', $app[ 'config' ]);
+
+        foreach($this->attributes as $key=>$value){
+            $processor->setValue($key, $value);
         }
-        $aggregator = new ConfigAggregator(
-            [ new ArrayProvider(compact('attributes')) ],
-            null,
-            [ new ParameterPostProcessor($parameters, $this->ignoreParameterExceptions) ]
-        );
-        return data_get($aggregator->getMergedConfig(), 'attributes', []);
+        foreach ($this->values as $key => $value) {
+            $processor->setValue($key, $value);
+        }
+        return $processor->process($this->attributes);
+
+//        $attributes = $this->attributes;
+//        $parameters = $this->parameters;
+//        if ($this->attributesInParameters) {
+//            $parameters = array_replace_recursive($attributes, $this->parameters);
+//        }
+//        $aggregator = new ConfigAggregator(
+//            [ new ArrayProvider(compact('attributes')) ],
+//            null,
+//            [ new ParameterPostProcessor($parameters, $this->ignoreParameterExceptions) ]
+//        );
+//        return data_get($aggregator->getMergedConfig(), 'attributes', []);
     }
 }

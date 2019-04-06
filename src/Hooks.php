@@ -3,14 +3,21 @@
 namespace Codex;
 
 use Illuminate\Routing\Pipeline;
+use Illuminate\Support\Arr;
 
 class Hooks
 {
     protected static $handlers = [];
 
+    /**
+     * @param string|string[]|array $id
+     * @param $handler
+     */
     public static function register($id, $handler)
     {
-        static::$handlers[ $id ][] = $handler;
+        foreach (Arr::wrap($id) as $_id) {
+            static::$handlers[ $_id ][] = $handler;
+        }
     }
 
     public static function isRegistered($id)
@@ -23,8 +30,11 @@ class Hooks
         unset(self::$handlers[ $name ]);
     }
 
-    public static function getHandlers($id)
+    public static function getHandlers($id = null)
     {
+        if ($id === null) {
+            return static::$handlers;
+        }
         if ( ! static::isRegistered($id)) {
             return [];
         }

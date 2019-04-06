@@ -4,6 +4,8 @@
 namespace Codex\Support;
 
 
+use Illuminate\Support\Arr;
+
 trait HasDotArray
 {
 
@@ -49,11 +51,11 @@ trait HasDotArray
         return $this;
     }
 
-//    public function unset($keys)
-//    {
-//        array_forget($this->items, $keys);
-//        return $this;
-//    }
+    public function unset($key)
+    {
+        array_forget($this->items, $key);
+        return $this;
+    }
 
     public function push($key, $value)
     {
@@ -90,33 +92,15 @@ trait HasDotArray
         return $key === null ? collect($this->items) : collect($this->get($key, []));
     }
 
-    /**
-     * without method
-     *
-     * @param string|array $keys
-     *
-     * @return \Codex\Support\DotArrayWrapper
-     */
     public function without($keys)
     {
         $keys = is_string($keys) ? func_get_args() : $keys;
-//        return $this->clone()->unset($keys);
+        return $this;
     }
 
-    /**
-     * merge method
-     * unique = false === append (double values in arrays may occur)
-     * unique = true === merge
-     *
-     * @param array $array
-     * @param bool  $mergeWithSelf If false, a new instance is created with the resulting merge. If true, the array will be merged into the current instance
-     * @param bool  $unique
-     *
-     * @return static
-     */
     public function merge(array $array, $mergeWithSelf = false, $unique = true)
     {
-        $result = \Illuminate\Support\Arr::merge($this->items, $array, $unique);
+        $result = Arr::merge($this->items, $array, $unique);
         if ($mergeWithSelf) {
             $this->items = $result;
             return $this;
@@ -138,11 +122,6 @@ trait HasDotArray
     {
         return count($this->items);
     }
-
-//    public function clone()
-//    {
-//        return static::make($this->items);
-//    }
 
     /**
      * Get the instance as an array.
@@ -238,17 +217,23 @@ trait HasDotArray
         return new \ArrayIterator($this->items);
     }
 
-    /**
-     * make method
-     *
-     * @param array $array
-     *
-     * @return static
-     */
     public static function make(array $array = [])
     {
         $wrapper        = new static();
         $wrapper->items = $array;
         return $wrapper;
     }
+
+    public function getItems()
+    {
+        return $this->items;
+    }
+
+    public function setItems($items)
+    {
+        $this->items = $items;
+        return $this;
+    }
+
+
 }

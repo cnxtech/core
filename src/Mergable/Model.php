@@ -9,6 +9,7 @@ use Codex\Concerns\HasCallbacks;
 use Codex\Concerns\HasContainer;
 use Codex\Concerns\HasEvents;
 use Codex\Concerns\Macroable;
+use Codex\Config\ConfigProcessor;
 use Codex\Contracts\Mergable\ChildInterface;
 use Codex\Contracts\Mergable\Mergable;
 use Codex\Contracts\Mergable\Model as ModelContract;
@@ -25,6 +26,8 @@ use Illuminate\Database\Eloquent\JsonEncodingException;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\Arr;
 use JsonSerializable;
+use Zend\ConfigAggregator\ArrayProvider;
+use Zend\ConfigAggregator\ConfigAggregator;
 
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, Mergable, ModelContract
 {
@@ -48,6 +51,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $primaryKey = 'key';
 
     protected $keyType = 'string';
+
+    /**
+     * @var \Codex\Mergable\ParameterPostProcessor
+     */
+    protected $parameterProcessor;
 
     public function getClassSlug()
     {
@@ -105,7 +113,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function attr($key, $default = null)
     {
         $this->show($key);
-        if($this->hasAttribute($key)) {
+        if ($this->hasAttribute($key)) {
             $data = $this->getAttribute($key);
         } else {
             $data = data_get($this, $key, $default);
@@ -122,9 +130,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
     public function push($key, $value)
     {
-        $data   = $this->attr($key, []);
-        $data[] = $value;
-        data_set($this->attributes, $key, $data);
+        /** @var array $data */
+        $data = $this->attr($key, []);
+        if (is_array($data)) {
+            $data[] = $value;
+            data_set($this->attributes, $key, $data);
+        }
         return $this;
     }
 
@@ -173,6 +184,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
     protected $initialized = false;
 
+    /** @var ConfigProcessor */
+    private $processor;
+
 
     public function initialize(array $attributes = [], AttributeDefinitionGroup $attributeDefinitions = null)
     {
@@ -202,6 +216,30 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         return $this;
     }
+
+    protected function initializeParameterPostProcessor($value)
+    {
+        if ($this->parameterProcessor === null) {
+            $app = app();
+
+//            $parameters                          = is_array($value) ? $value : compact('value');
+            $parameters[ 'app' ]                 = $app;
+            $parameters[ 'config' ]              = $app[ 'config' ];
+            $parameters[ $this->getClassSlug() ] = $this;
+            $parameters[ 'this' ]                = $this;
+
+            $target = $this;
+            while ($target instanceof ChildInterface) {
+                $name                = $target->getClassSlug();
+                $parameters[ $name ] = $target;
+                $target              = $target->getParent();
+            }
+            $this->parameterProcessor = new ParameterPostProcessor($parameters, true);
+        }
+        $this->parameterProcessor->setParameter('value', $value);
+        return $this->parameterProcessor;
+    }
+
 
     protected function bootIfNotBooted()
     {
@@ -340,8 +378,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
     public function hasAttribute($key)
     {
-        return array_has($this->attributes, $key) || $this->hasGetMutator($key);
-//        return array_has($this->attributes, $key);
+
+        return array_has($this->attributes, $key) || $this->hasGetMutator($key) || array_key_exists($key, $this->getAttributeKeys());
     }
 
     public function getAttribute($key)
@@ -364,6 +402,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
     public function getAttributeValue($key)
     {
+        $value = $this->getRawAttributeValue($key);
+        $value = $this->processAttributeValue($key, $value);
+        return $value;
+    }
+
+    /** get unprocessed attribute value */
+    public function getRawAttributeValue($key)
+    {
         $value = $this->getAttributeFromArray($key);
 
         // If the attribute has a get mutator, we will call that then return what
@@ -374,6 +420,33 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         }
 
         return $value;
+    }
+
+    protected function processAttributeValue($key, $value)
+    {
+        if ($this->parameterProcessor === null) {
+            $app                                 = app();
+            $parameters                          = [];
+            $parameters[ 'app' ]                 = $app;
+            $parameters[ 'config' ]              = $app[ 'config' ];
+            $parameters[ $this->getClassSlug() ] = $this;
+            $parameters[ 'this' ]                = $this;
+            $target                              = $this;
+            while ($target instanceof ChildInterface) {
+                $name                = $target->getClassSlug();
+                $parameters[ $name ] = $target;
+                $target              = $target->getParent();
+            }
+            $this->parameterProcessor = new ParameterPostProcessor($parameters, true);
+            $this->parameterProcessor->setModel($this);
+        }
+        $this->parameterProcessor->setParameter('value', $value);
+        $agg = new ConfigAggregator(
+            [ new ArrayProvider(compact('value')) ],
+            storage_path('asdf.php'), // @todo implement cache
+            [ $this->parameterProcessor ]
+        );
+        return $agg->getMergedConfig()[ 'value' ]; //        $value = data_get($agg->getMergedConfig(), 'value', $value);
     }
 
     public function callClosures(bool $value = true)
@@ -607,6 +680,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         return $this;
     }
 
+//    public function getDynamicSetMutator($key)
+//    {
+//        return $this->setMutators[ $key ];
+//    }
+
     public function addSetMutator($key, $mutatorMethod)
     {
         $this->setMutators[ $key ] = $this->createMutatorMethod($mutatorMethod);
@@ -630,7 +708,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected function callDynamicGetMutator($key, $value)
     {
         if ($this->hasDynamicGetMutator($key)) {
-            return $this->getMutators[ $key ]($value);
+            $mutator = $this->getDynamicGetMutator($key);
+            return $mutator($value);
         }
     }
 
@@ -660,14 +739,60 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         return $this->hasDynamicGetMutator($key) || $this->hasMethodGetMutator($key);
     }
 
-    protected function hasMethodGetMutator($key)
+    public function hasMethodGetMutator($key)
     {
         return method_exists($this, 'get' . studly_case($key) . 'Attribute');
     }
 
-    protected function hasDynamicGetMutator($key)
+    public function hasDynamicGetMutator($key)
     {
-        return array_key_exists($key, $this->getMutators);
+        if (strpos($key, '.') === false) {
+            return array_key_exists($key, $this->getMutators);
+        }
+
+        $current = $key;
+        $sliced  = [];
+        foreach (array_reverse(explode('.', $key)) as $part) {
+            if (array_key_exists($current, $this->getMutators)) {
+                return true;
+            }
+            $current  = str_remove_right($current, '.' . $part);
+            $sliced[] = $part;
+        }
+        return false;
+    }
+
+
+    public function getDynamicGetMutator($key)
+    {
+        if (strpos($key, '.') === false) {
+            return $this->getMutators[ $key ];
+        }
+        $current = $key;
+        $sliced  = [];
+        foreach (array_reverse(explode('.', $key)) as $part) {
+            if (array_key_exists($current, $this->getMutators)) {
+                $mutator = $this->getMutators[ $current ];
+                if (empty($sliced)) {
+                    return $mutator;
+                }
+                return function ($value) use ($mutator, $sliced) {
+                    $value = $mutator($value);
+                    return data_get($value, implode('.', $sliced));
+                };
+                break;
+            }
+            $current  = str_remove_right($current, '.' . $part);
+            $sliced[] = $part;
+        }
+
+
+        return null;
+    }
+
+    protected function getClosestParentDynamicGetMutator($key)
+    {
+
     }
 
     public function hasSetMutator($key)
@@ -933,7 +1058,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function __toString()
     {
-        return $this->getKey();
+        /** @var string $key */
+        $key = $this->getKey();
+        return $key;
     }
 
     /**

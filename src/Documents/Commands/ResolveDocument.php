@@ -2,6 +2,7 @@
 
 namespace Codex\Documents\Commands;
 
+use Codex\Config\ConfigProcessor;
 use Codex\Contracts\Documents\Document as DocumentContract;
 use Codex\Contracts\Revisions\Revision;
 use Codex\Documents\Document;
@@ -49,11 +50,10 @@ class ResolveDocument
         $document   = app(DocumentContract::class, compact('attributes', 'revision'));
         $this->dispatch(new MergeAttributes($document));
 
-
-        $parameters = $this->buildParameterData($document);
-        $attributes = $document->getAttributes();
-        $attributes = $this->dispatch(new AggregateAttributes($attributes, $parameters, true, true));
-        $document->setRawAttributes($attributes);
+//        $parameters = $this->buildParameterData($document);
+//        $attributes = $document->getAttributes();
+//        $attributes = $this->dispatch(new AggregateAttributes($attributes, $parameters));
+//        $document->setRawAttributes($attributes);
         Hooks::run('document.resolved', [ $document ]);
         $document->fireEvent('resolved');
         ResolvedDocument::dispatch($document);

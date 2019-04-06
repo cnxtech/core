@@ -51,6 +51,14 @@ class AddonIntegrator
     }
 
 
+    /**
+     * register method
+     *
+     * @param $path
+     *
+     * @return \Codex\Addons\Addon|null
+     * @throws \Exception
+     */
     public function register($path)
     {
         if ( ! is_dir($path)) {
@@ -87,6 +95,14 @@ class AddonIntegrator
         return $addon;
     }
 
+    /**
+     * getComposerData method
+     *
+     * @param $path
+     *
+     * @return mixed
+     * @throws \Exception
+     */
     protected function getComposerData($path)
     {
         if ( ! file_exists($path . '/composer.json')) {

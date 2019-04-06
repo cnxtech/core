@@ -6,9 +6,6 @@ class AddonFinder
 {
     protected $baseDir;
 
-    /**
-     * AddonFinder constructor.
-     */
     public function __construct()
     {
         $this->baseDir = base_path('codex-addons');
@@ -17,12 +14,6 @@ class AddonFinder
     public function find()
     {
         return glob("{$this->baseDir}/*/*", GLOB_ONLYDIR);
-//        $paths = [];
-//        foreach (glob("{$this->baseDir}/*/*", GLOB_ONLYDIR) as $path) {
-//            $name    = trim(str_replace_first($this->baseDir, '', $path), '/');
-//            $paths[] = compact('name', 'path');
-//        }
-//        return $paths;
     }
 
     /**

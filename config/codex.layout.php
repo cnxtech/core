@@ -55,14 +55,39 @@ return [
         'children'       => null,
     ],
     'footer'    => [
-        'show'     => true,
-        'fixed'    => false,
-        'height'   => 64,
-        'color'    => 'blue-grey-9',
-        'class'    => [ 'c-layout-footer' => true ],
-        'style'    => [],
-        'menu'     => [],
-        'children' => null,
+        'show'      => true,
+        'fixed'     => false,
+        'height'    => 64,
+        'color'     => 'blue-grey-9',
+        'class'     => [ 'c-layout-footer' => true ],
+        'style'     => [],
+        'text'      => '© Copyright Robin Radic',
+        'menu'      => [],
+        'children2' => [
+            [
+                'component' => 'c-col',
+                'span'      => 12,
+                'children'  => '© Copyright Robin Radic',
+                'style'     => [ 'line-height' => '<%= layout.footer.height.toPx() %>', ],
+            ],
+            [
+                'component' => 'c-col',
+                'span'      => 12,
+                'style'     => [ 'text-align' => 'right', ],
+                'children'  => [
+                    [
+                        'component' => 'c-dynamic-menu',
+                        'theme'     => 'dark',
+                        'items'     => [
+                            [
+                                'label' => 'Footer link',
+                                'href'  => '#footer-link',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ],
     ],
     'container' => [
         'class'    => [ 'c-layout-container' => true ],

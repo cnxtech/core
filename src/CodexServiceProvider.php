@@ -245,7 +245,6 @@ class CodexServiceProvider extends ServiceProvider
             $part->add('width', 'integer')->setDefault(200);
             $part->add('collapsedWidth', 'integer')->setDefault(50);
             $part->add('fixed', 'boolean')->setDefault(false);
-            $part->addChild($menu);
             return $part;
         };
         $addLayoutVerticalSide   = function (string $name, string $apiType) use ($addLayoutPart, $menu) {
@@ -253,27 +252,37 @@ class CodexServiceProvider extends ServiceProvider
             $part->add('show', 'boolean')->setDefault(true);
             $part->add('fixed', 'boolean')->setDefault(false);
             $part->add('height', 'integer')->setDefault(64);
-            $part->addChild($menu);
             return $part;
         };
 
         $layoutContainer = $addLayoutPart('container', 'LayoutContainer');
-        $layoutHeader    = $addLayoutVerticalSide('header', 'LayoutHeader');
-        $layoutFooter    = $addLayoutVerticalSide('footer', 'LayoutFooter');
-        $layoutLeft      = $addLayoutHorizontalSide('left', 'LayoutLeft');
-        $layoutRight     = $addLayoutHorizontalSide('right', 'LayoutRight');
-        $layoutMiddle    = $addLayoutPart('middle', 'LayoutMiddle');
-        $layoutContent   = $addLayoutPart('content', 'LayoutContent');
-        $layoutToolbar   = $addLayoutPart('toolbar', 'LayoutToolbar');
-        $layoutToolbar->add('breadcrumbs', 'dictionaryPrototype', '[Assoc]');
+        $layoutContainer->add('stretch', 'boolean')->setDefault(true);
 
+        $layoutHeader = $addLayoutVerticalSide('header', 'LayoutHeader');
+        $layoutHeader->addChild($menu);
         $layoutHeader->add('show_left_toggle', 'boolean')->setDefault(false);
         $layoutHeader->add('show_right_toggle', 'boolean')->setDefault(false);
-        $layoutContainer->add('stretch', 'boolean')->setDefault(true);
+
+        $layoutFooter = $addLayoutVerticalSide('footer', 'LayoutFooter');
+        $layoutFooter->addChild($menu);
+        $layoutFooter->add('text', 'string');
+
+        $layoutLeft = $addLayoutHorizontalSide('left', 'LayoutLeft');
+        $layoutLeft->addChild($menu);
+
+        $layoutRight = $addLayoutHorizontalSide('right', 'LayoutRight');
+        $layoutRight->addChild($menu);
+
+        $layoutMiddle = $addLayoutPart('middle', 'LayoutMiddle');
         $layoutMiddle->add('padding', 'mixed', 'Mixed', 0);
         $layoutMiddle->add('margin', 'mixed', 'Mixed', 0);
+
+        $layoutContent = $addLayoutPart('content', 'LayoutContent');
         $layoutContent->add('padding', 'mixed', 'Mixed', 0);
         $layoutContent->add('margin', 'mixed', 'Mixed', 0);
+
+        $layoutToolbar = $addLayoutPart('toolbar', 'LayoutToolbar');
+        $layoutToolbar->add('breadcrumbs', 'dictionaryPrototype', '[Assoc]');
         $layoutToolbar->add('left', 'dictionaryPrototype', '[Assoc]'); //->setApiType('LayoutToolbarItem', [ 'new'])->setDefault([]);
         $layoutToolbar->add('right', 'dictionaryPrototype', '[Assoc]'); //->setApiType('LayoutToolbarItem', [ 'new'])->setDefault([]);
 
