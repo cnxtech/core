@@ -21,17 +21,17 @@ class Repository extends BaseRepository implements RepositoryContract
     /** @var \Illuminate\Contracts\Foundation\Application */
     protected $app;
 
-    /** @var \Codex\Config\ConfigProcessor */
-    protected $processor;
-
     /** @var bool */
     protected $useProcessor = true;
 
-    public function __construct(Application $app, \Illuminate\Contracts\Config\Repository $config, ConfigProcessor $processor)
+    /** @var ParameterPostProcessor */
+    protected $parameterProcessor;
+
+    public function __construct(Application $app, \Illuminate\Contracts\Config\Repository $config)
     {
-        $this->config    = $config;
-        $this->app       = $app;
-        $this->processor = $processor;
+        $this->config             = $config;
+        $this->app                = $app;
+        $this->parameterProcessor = new ParameterPostProcessor(compact('app', 'config'), true);
         parent::__construct();
     }
 
@@ -49,7 +49,7 @@ class Repository extends BaseRepository implements RepositoryContract
             return $this->getMany($key);
         }
         $value = $this->config->get($key, $default);
-        $value = $this->process($value);
+        $value = $this->process($value, $default);
         return $value;
     }
 
@@ -96,34 +96,25 @@ class Repository extends BaseRepository implements RepositoryContract
         return $this->process($this->config->all());
     }
 
-    protected function process($value)
+
+    protected function process($value, $default = null)
     {
-        $agg   = new ConfigAggregator(
-            [
-                function() use ($value) {
-                    $config = new \Illuminate\Config\Repository();
-                    $config->set($this->config->all());
-                    $config->set('value',$value);
-                    return $config->all();
-                },
-//                new ArrayProvider([ 'config' => $this->config, 'value' => $value ])
-            ],
-            null,
-            [ new ParameterPostProcessor(array_merge($this->config->all(), $value), true) ]
-        );
-        $value = data_get($agg->getMergedConfig(), 'value',$value);
-        return $value;
         if ( ! $this->useProcessor) {
             return $value;
         }
-        $this->processor->setValue('codex', $this->app[ 'codex' ]);
-        return $this->processor->process($value);
+        foreach ($this->config->all() as $key => $val) {
+            $this->parameterProcessor->setParameter($key, $val);
+        }
+        $this->parameterProcessor->setParameter('value', $value);
+        $agg    = new ConfigAggregator(
+            [ new ArrayProvider(compact('value')) ],
+            storage_path('config.php'), // @todo implement cache
+            [ $this->parameterProcessor ]
+        );
+        $merged = $agg->getMergedConfig();
+        return array_key_exists('value', $merged) ? $merged[ 'value' ] : $default; //        $value = data_get($agg->getMergedConfig(), 'value', $value);
     }
 
-    public function getProcessor()
-    {
-        return $this->processor;
-    }
 
     /**
      * @return bool

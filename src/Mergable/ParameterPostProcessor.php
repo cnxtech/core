@@ -2,8 +2,6 @@
 
 namespace Codex\Mergable;
 
-use Codex\Support\DotArrayWrapper;
-use Illuminate\Support\Arr;
 use Symfony\Component\DependencyInjection\Exception\ParameterNotFoundException as SymfonyParameterNotFoundException;
 use Zend\ConfigAggregatorParameters\ParameterNotFoundException;
 
@@ -25,14 +23,11 @@ class ParameterPostProcessor
     private $model;
 
 
-    public function __construct($parameters=[], bool $ignoreParameterException = false)
+    public function __construct($parameters = [], bool $ignoreParameterException = false)
     {
         $this->parameters               = $parameters;
-//        $this->parameters               = DotArrayWrapper::make($parameters);
         $this->ignoreParameterException = $ignoreParameterException;
     }
-
-
 
 
     public function __invoke(array $config): array
@@ -86,12 +81,11 @@ class ParameterPostProcessor
     public function getParameterBag(): ParameterBag
     {
         $resolved = $this->resolveNestedParameters($this->parameters);
-        $bag= new ParameterBag($resolved);
-        if($this->model !== null) {
+        $bag      = new ParameterBag($resolved);
+        if ($this->model !== null) {
             $bag->setModel($this->model);
         }
-        return $bag;
-//        return new ParameterBag($this->parameters->getItems());
+        return $bag;//        return new ParameterBag($this->parameters->getItems());
     }
 
     public function getParameters()
@@ -101,7 +95,7 @@ class ParameterPostProcessor
 
     public function setParameter($key, $value)
     {
-        data_set($this->parameters,$key,$value);
+        data_set($this->parameters, $key, $value);
     }
 
     /**
@@ -120,8 +114,6 @@ class ParameterPostProcessor
         $this->model = $model;
         return $this;
     }
-
-
 
 
 }

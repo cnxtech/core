@@ -4,9 +4,7 @@ namespace Codex\Revisions\Commands;
 
 use Codex\Contracts\Projects\Project;
 use Codex\Hooks;
-use Codex\Mergable\Commands\AggregateAttributes;
 use Codex\Mergable\Commands\MergeAttributes;
-use Codex\Mergable\Concerns\BuildsParameterData;
 use Codex\Revisions\Events\ResolvedRevision;
 use Codex\Revisions\Revision;
 use Illuminate\Contracts\Cache\Repository;
@@ -17,7 +15,6 @@ use Symfony\Component\Yaml\Yaml;
 class ResolveRevision
 {
     use DispatchesJobs;
-    use BuildsParameterData;
 
     /**
      * @var string
@@ -76,8 +73,6 @@ class ResolveRevision
             $this->dispatch(new MergeAttributes($revision));
         }
 
-//        $attributes = $this->dispatch(new AggregateAttributes($revision->getAttributes(), $this->buildParameterData($revision)));
-//        $revision->setRawAttributes($attributes);
         Hooks::run('revisions.resolved', [ $revision ]);
         $revision->fireEvent('resolved', $revision);
         ResolvedRevision::dispatch($revision);

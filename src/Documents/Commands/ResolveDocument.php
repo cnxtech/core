@@ -8,7 +8,6 @@ use Codex\Contracts\Revisions\Revision;
 use Codex\Documents\Document;
 use Codex\Documents\Events\ResolvedDocument;
 use Codex\Hooks;
-use Codex\Mergable\Commands\AggregateAttributes;
 use Codex\Mergable\Commands\MergeAttributes;
 use Codex\Mergable\Concerns\BuildsParameterData;
 use Illuminate\Foundation\Bus\DispatchesJobs;
@@ -16,7 +15,6 @@ use Illuminate\Foundation\Bus\DispatchesJobs;
 class ResolveDocument
 {
     use DispatchesJobs;
-    use BuildsParameterData;
 
     /**
      * @var \Codex\Contracts\Revisions\Revision
@@ -49,11 +47,6 @@ class ResolveDocument
         $attributes = compact('key', 'path');
         $document   = app(DocumentContract::class, compact('attributes', 'revision'));
         $this->dispatch(new MergeAttributes($document));
-
-//        $parameters = $this->buildParameterData($document);
-//        $attributes = $document->getAttributes();
-//        $attributes = $this->dispatch(new AggregateAttributes($attributes, $parameters));
-//        $document->setRawAttributes($attributes);
         Hooks::run('document.resolved', [ $document ]);
         $document->fireEvent('resolved');
         ResolvedDocument::dispatch($document);
