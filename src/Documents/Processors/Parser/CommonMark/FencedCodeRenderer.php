@@ -52,6 +52,23 @@ class FencedCodeRenderer extends \League\CommonMark\Block\Renderer\FencedCodeRen
 //            ['language' => $attrs['language']]
 //        );
         $attrs = array_replace_recursive($attrs, $this->config->getConfig('element_attributes/c-code-highlight', []));
+//        $match = preg_match_all('/@var\s(.*?)\s\$(.*?)[\s\*]/m', $content, $matches);
+//        if ($match && count($matches[ 0 ]) > 0) {
+//            foreach ($matches[ 0 ] as $k => $v) {
+//                $original     = $matches[ 0 ][ $k ];
+//                $replacement= $matches[ 0 ][ $k ];
+//                $type         = $matches[ 1 ][ $k ];
+//                $variableName = $matches[ 2 ][ $k ];
+//                $linkProps     = json_encode([
+//                    'fqsen'     => $type,
+//                    'action'    => 'drawer',
+//                    'modifiers' => ['popover','!styling','!icon'],
+//                ], JSON_UNESCAPED_SLASHES);
+//
+//                $replacement=str_replace($type, "<phpdoc-link props='{$linkProps}'>{$type}</phpdoc-link>", $replacement);
+//                $content=str_replace_first($original, $replacement, $content);
+//            }
+//        }
         return new HtmlElement('c-code-highlight', $attrs, $content);
     }
 

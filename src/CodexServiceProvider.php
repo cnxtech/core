@@ -234,7 +234,7 @@ class CodexServiceProvider extends ServiceProvider
             $part->add('class', 'array.scalarPrototype');
             $part->add('style', 'array.scalarPrototype')->setDefault([]);
             $part->add('color', 'string')->setDefault(null);
-            $part->add('children', 'dictionaryPrototype', '[Assoc]'); //->setApiType('LayoutToolbarItem', [ 'new'])->setDefault([]);
+            $part->add('children', 'dictionaryPrototype', '[Assoc]', null); //->setApiType('LayoutToolbarItem', [ 'new'])->setDefault([]);
             return $part;
         };
         $addLayoutHorizontalSide = function (string $name, string $apiType) use ($addLayoutPart, $menu) {
