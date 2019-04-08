@@ -2,6 +2,8 @@
 
 namespace Codex\Filesystem;
 
+use Codex\Exceptions\InvalidArgumentException;
+use RuntimeException;
 use SplFileInfo;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -39,14 +41,18 @@ class Tmp
     {
         $this->prefix     = $prefix;
         $this->filesystem = $fs ?? new Filesystem();
-        $this->id         = uniqid('run-', true);
+        $this->id         = md5(uniqid($prefix, true));
     }
 
-    public function initRunFolder()
+    public function initRunFolder($clean=false)
     {
         clearstatcache();
-        if ( ! file_exists($this->getTmpPath()) && ! is_dir($this->getTmpPath())) {
-            $this->filesystem->mkdir($this->getTmpPath(), 0755);
+        $path = $this->getTmpPath();
+        if ($clean && is_dir($path)) {
+            $this->filesystem->remove($path);
+        }
+        if ( ! file_exists($path) && ! is_dir($path)) {
+            $this->filesystem->mkdir($path, 0755);
         }
     }
 
@@ -122,21 +128,30 @@ class Tmp
     {
         $this->initRunFolder();
         $fileInfo = new SplFileInfo($this->getTmpPath() . '/' . $fileName);
-        $this->filesystem->touch($fileInfo);
+        $this->filesystem->touch((string)$fileInfo);
+//        $file          = $fileInfo->openFile('r+');
         $this->files[] = [
             'file'     => $fileInfo,
             'preserve' => $preserve,
         ];
-        $this->filesystem->chmod($fileInfo, 0600);
+        $this->filesystem->chmod((string)$fileInfo, 0600);
         return $fileInfo;
     }
 
-    /**
-     *
-     * Set temp id
-     *
-     * @param $id
-     */
+    public function moveDirTo($path)
+    {
+        if ($this->filesystem->exists($path)) {
+            throw InvalidArgumentException::make("Could not move temporary directory to {$path}. Destination directory already exists");
+        }
+        $dirPath = dirname($path);
+        if ( ! $this->filesystem->exists($dirPath)) {
+            if ( ! mkdir($dirPath, 0755, true) && ! is_dir($dirPath)) {
+                throw new RuntimeException(sprintf('Directory "%s" was not created', $dirPath));
+            }
+        }
+        $this->filesystem->rename($this->getTmpFolder(), $path);
+    }
+
     public function setId($id)
     {
         $this->id = $id;
@@ -160,7 +175,9 @@ class Tmp
             }
         }
         if ( ! $preserveRunFolder) {
-            $fs->remove($this->getTmpPath());
+            if ($fs->exists($this->getTmpPath())) {
+                $fs->remove($this->getTmpPath());
+            }
         }
     }
 }
