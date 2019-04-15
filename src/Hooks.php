@@ -5,6 +5,7 @@ namespace Codex;
 use Illuminate\Routing\Pipeline;
 use Illuminate\Support\Arr;
 
+
 class Hooks
 {
     protected static $handlers = [];
