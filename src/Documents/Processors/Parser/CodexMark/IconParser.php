@@ -1,9 +1,7 @@
 <?php
 
-namespace Codex\Documents\Processors\Parser\CommonMark;
+namespace Codex\Documents\Processors\Parser\CodexMark;
 
-use League\CommonMark\Inline\Element\HtmlInline;
-use League\CommonMark\Inline\Element\Image;
 use League\CommonMark\Inline\Parser\AbstractInlineParser;
 use League\CommonMark\InlineParserContext;
 

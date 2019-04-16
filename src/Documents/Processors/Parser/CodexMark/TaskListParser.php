@@ -1,6 +1,6 @@
 <?php
 
-namespace Codex\Documents\Processors\Parser\CommonMark;
+namespace Codex\Documents\Processors\Parser\CodexMark;
 
 use League\CommonMark\Block\Element\Paragraph;
 use League\CommonMark\Block\Parser\AbstractBlockParser;

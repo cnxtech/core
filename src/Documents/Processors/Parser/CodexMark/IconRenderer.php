@@ -1,13 +1,12 @@
 <?php
 
-namespace Codex\Documents\Processors\Parser\CommonMark;
+namespace Codex\Documents\Processors\Parser\CodexMark;
 
 use League\CommonMark\ElementRendererInterface;
 use League\CommonMark\Inline\Element\AbstractInline;
 use League\CommonMark\Inline\Renderer\InlineRendererInterface;
 use League\CommonMark\Util\Configuration;
 use League\CommonMark\Util\ConfigurationAwareInterface;
-use League\CommonMark\Util\RegexHelper;
 use League\CommonMark\Util\Xml;
 
 class IconRenderer implements InlineRendererInterface, ConfigurationAwareInterface

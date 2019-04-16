@@ -1,6 +1,6 @@
 <?php
 
-namespace Codex\Documents\Processors\Parser\CommonMark;
+namespace Codex\Documents\Processors\Parser\CodexMark;
 
 use League\CommonMark\Block\Parser as BlockParser;
 use League\CommonMark\Block\Renderer as BlockRenderer;
@@ -8,13 +8,11 @@ use League\CommonMark\Extension\Extension;
 use League\CommonMark\Inline\Parser as InlineParser;
 use League\CommonMark\Inline\Processor as InlineProcessor;
 use League\CommonMark\Inline\Renderer as InlineRenderer;
-
+use Webuni\CommonMark\AttributesExtension;
+use Webuni\CommonMark\TableExtension;
 
 class CodexCommonMarkExtension extends Extension
 {
-    /**
-     * @return BlockParser\BlockParserInterface[]
-     */
     public function getBlockParsers()
     {
         return [
@@ -30,13 +28,11 @@ class CodexCommonMarkExtension extends Extension
             new BlockParser\IndentedCodeParser(),
             new BlockParser\LazyParagraphParser(),
 
-            new \Webuni\CommonMark\TableExtension\TableParser(),
+            new TableExtension\TableParser(),
+            new AttributesExtension\AttributesBlockParser(),
         ];
     }
 
-    /**
-     * @return InlineParser\InlineParserInterface[]
-     */
     public function getInlineParsers()
     {
         return [
@@ -49,25 +45,33 @@ class CodexCommonMarkExtension extends Extension
             new AutolinkParser(),
             new IconParser(),
             new InlineParser\HtmlInlineParser(),
-            new InlineParser\CloseBracketParser(),
+//            new InlineParser\CloseBracketParser(),
+            new CloseBracketParser(),
             new InlineParser\OpenBracketParser(),
             new InlineParser\BangParser(),
+            new OpenAbbreviationBracketParser(),
+
+            new AttributesExtension\AttributesInlineParser()
         ];
     }
 
-    /**
-     * @return InlineProcessor\InlineProcessorInterface[]
-     */
     public function getInlineProcessors()
     {
         return [
             new InlineProcessor\EmphasisProcessor(),
+
+            new AttributesExtension\AttributesInlineProcessor()
         ];
     }
 
-    /**
-     * @return BlockRenderer\BlockRendererInterface[]
-     */
+    public function getDocumentProcessors()
+    {
+        return [
+            new AttributesExtension\AttributesProcessor()
+        ];
+    }
+
+
     public function getBlockRenderers()
     {
         return [
@@ -88,17 +92,14 @@ class CodexCommonMarkExtension extends Extension
             'League\CommonMark\Block\Element\Paragraph'     => new BlockRenderer\ParagraphRenderer(),
             'League\CommonMark\Block\Element\ThematicBreak' => new BlockRenderer\ThematicBreakRenderer(),
 
-            'Webuni\CommonMark\TableExtension\Table'        => new TableRenderer(), //\Webuni\CommonMark\TableExtension\TableRenderer(),
-            'Webuni\CommonMark\TableExtension\TableCaption' => new \Webuni\CommonMark\TableExtension\TableCaptionRenderer(),
-            'Webuni\CommonMark\TableExtension\TableRows'    => new \Webuni\CommonMark\TableExtension\TableRowsRenderer(),
-            'Webuni\CommonMark\TableExtension\TableRow'     => new \Webuni\CommonMark\TableExtension\TableRowRenderer(),
-            'Webuni\CommonMark\TableExtension\TableCell'    => new \Webuni\CommonMark\TableExtension\TableCellRenderer(),
+            TableExtension\Table::class        => new TableRenderer(), //\Webuni\CommonMark\TableExtension\TableRenderer(),
+            TableExtension\TableCaption::class => new TableExtension\TableCaptionRenderer(),
+            TableExtension\TableRows::class    => new TableExtension\TableRowsRenderer(),
+            TableExtension\TableRow::class     => new TableExtension\TableRowRenderer(),
+            TableExtension\TableCell::class    => new TableExtension\TableCellRenderer(),
         ];
     }
 
-    /**
-     * @return InlineRenderer\InlineRendererInterface[]
-     */
     public function getInlineRenderers()
     {
         return [
@@ -109,6 +110,7 @@ class CodexCommonMarkExtension extends Extension
 
             Icon::class                                => new IconRenderer(),
             Emoji::class                               => new IconRenderer(),
+            Abbreviation::class                        => new AbbreviationRenderer(),
 
 //            'League\CommonMark\Inline\Element\Link'       => new InlineRenderer\LinkRenderer(),
             'League\CommonMark\Inline\Element\Link'    => new LinkRenderer(),
