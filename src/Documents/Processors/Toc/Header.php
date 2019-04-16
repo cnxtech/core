@@ -9,7 +9,7 @@
  * @license https://codex-project.mit-license.org MIT License
  */
 
-namespace Codex\Processors\Toc;
+namespace Codex\Documents\Processors\Toc;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Tree\Node\Node;

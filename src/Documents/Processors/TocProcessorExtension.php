@@ -13,9 +13,8 @@ namespace Codex\Documents\Processors;
 
 use Codex\Attributes\AttributeDefinition;
 use Codex\Contracts\Documents\Document;
-use Codex\Processors\Toc\Header;
+use Codex\Documents\Processors\Toc\Header;
 use Illuminate\Contracts\View\Factory;
-use Symfony\Component\Debug\Exception\FatalThrowableError;
 
 /**
  * This is the class TocFilter.

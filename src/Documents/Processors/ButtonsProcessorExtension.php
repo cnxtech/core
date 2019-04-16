@@ -13,7 +13,6 @@ namespace Codex\Documents\Processors;
 
 use Codex\Attributes\AttributeDefinition;
 use Codex\Contracts\Documents\Document;
-use Codex\Processors\Toc\Header;
 use Illuminate\Contracts\View\Factory;
 
 class ButtonsProcessorExtension extends ProcessorExtension implements ProcessorInterface

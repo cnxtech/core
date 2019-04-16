@@ -9,7 +9,7 @@
  * @license https://codex-project.mit-license.org MIT License
  */
 
-namespace Codex\Processors\Toc;
+namespace Codex\Documents\Processors\Toc;
 
 class HeaderValue
 {
@@ -98,7 +98,7 @@ class HeaderValue
     /**
      * getHeader method.
      *
-     * @return \Codex\Processors\Toc\Header|null
+     * @return \Codex\Documents\Processors\Toc\Header|null
      */
     public function getHeader()
     {
