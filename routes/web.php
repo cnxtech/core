@@ -11,5 +11,5 @@ Route::get(codex()->attr('http.backend_data_url'))
     ->name('codex.backend_data')
     ->uses('DocumentController@getBackendData');
 
-Route::redirect('/', route('codex.documentation',[],false))
+Route::redirect('/', codex()->getAttribute('http.documentation_prefix'))
     ->name('codex');
