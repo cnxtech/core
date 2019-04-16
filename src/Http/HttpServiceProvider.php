@@ -12,7 +12,6 @@ class HttpServiceProvider extends RouteServiceProvider
 
     public function map(Router $router, Codex $codex)
     {
-        $a = 'a';
         $router
             ->middleware('web')
             ->namespace($this->namespace)
@@ -27,12 +26,6 @@ class HttpServiceProvider extends RouteServiceProvider
         if ($router->getRoutes()->getByName('codex.documentation') === null) {
             $router->getRoutes()->refreshNameLookups();
         }
-//        $documentationRoute = $router->getRoutes()->getByName('codex.documentation');
-        $router
-            ->redirect('/', route('codex.documentation'))
-            ->middleware('web')
-            ->prefix($codex[ 'http.prefix' ])
-            ->name('codex');
     }
 
 
