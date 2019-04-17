@@ -103,6 +103,7 @@ class CommonMarkParser implements ParserInterface, ExtensionInterface
             new CodexMark\OpenAbbreviationBracketParser(),
         ] : [
             new InlineParser\CloseBracketParser(),
+            new InlineParser\OpenBracketParser(),
         ], [
             new InlineParser\BangParser(),
             new AttributesExtension\AttributesInlineParser(),
