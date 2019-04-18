@@ -88,13 +88,14 @@ class ConfigResolver
         $node->ignoreExtraKeys(true);
         return $node;
     }
+
     public function dictionaryPrototype(AttributeDefinition $attribute, ArrayNodeDefinition $target)
     {
         $target->attribute('attribute', $attribute);
         $target->addDefaultsIfNotSet();
         $target->ignoreExtraKeys(true);
-        $node = $target->children()->arrayNode($attribute->name);
-        $arrayProto = $node->arrayPrototype();
+        $node        = $target->children()->arrayNode($attribute->name);
+        $arrayProto  = $node->arrayPrototype();
         $scalarProto = $arrayProto->variablePrototype();
         $arrayProto->ignoreExtraKeys(true)->normalizeKeys(false);
 
