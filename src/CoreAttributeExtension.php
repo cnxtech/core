@@ -48,9 +48,9 @@ class CoreAttributeExtension extends AttributeExtension
 
         $menu = new AttributeDefinition();
         $menu->name('menu')->type(T::RECURSIVE)->api('MenuItem', [ 'array', 'new' ]);
-        $menu->child('id', T::STRING, 'ID', function () {
+        $menu->child('id', T::STRING, function () {
             return md5(str_random());
-        });
+        }, 'ID');
         $menu->child('type', T::STRING);
         $menu->child('class', T::STRING);
         $menu->child('side', T::STRING);

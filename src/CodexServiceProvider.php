@@ -84,6 +84,7 @@ class CodexServiceProvider extends ServiceProvider
         \Codex\Documents\Processors\TocProcessorExtension::class,
         \Codex\Documents\Processors\HeaderProcessorExtension::class,
         \Codex\Documents\Processors\ButtonsProcessorExtension::class,
+        \Codex\Attributes\AttributeSchemaExtension::class
     ];
 
     protected $middleware = [ Http\DebugbarCollectionLoggerMiddleware::class ];

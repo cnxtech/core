@@ -50,7 +50,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $primaryKey = 'key';
 
     protected $keyType = 'string';
-    
+
     public function getClassSlug()
     {
         return str_slug(last(explode('\\', static::class)));
@@ -61,6 +61,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $attributes = is_string($attributes) ? func_get_args() : $attributes;
         $attributes = Arr::explodeToPaths($attributes);
         foreach ($attributes as $attribute) {
+            if (head($attribute) === '*') {
+                $attribute = $this->getAttributeKeys();
+            }
             foreach ($attribute as $keys) {
                 $keys = explode('.', $keys);
                 $key  = array_shift($keys);
@@ -177,7 +180,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected static $traitInitializers = [];
 
     protected $initialized = false;
-    
+
     /**
      * @var \Codex\Models\ParameterPostProcessor
      */
@@ -913,11 +916,22 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Convert the model instance to an array.
      *
+     * @param string|string[] $show
+     *
+     * @param bool            $rehide
+     *
      * @return array
      */
-    public function toArray()
+    public function toArray($show = null, $rehide = true)
     {
-        return array_merge($this->attributesToArray(), $this->relationsToArray());
+        if ($show !== null) {
+            $this->show($show);
+        }
+        $data = array_merge($this->attributesToArray(), $this->relationsToArray());
+        if ($show !== null && $rehide) {
+            $this->rehide(true);
+        }
+        return $data;
     }
 
     /**

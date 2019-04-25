@@ -21,11 +21,14 @@ class BuildDefinitionSchema
         foreach ($registry->keys() as $definitionName) {
             $definition                     = $registry->resolve($definitionName);
             $definitionType                 = 'extend type ' . studly_case(str_singular($definition->name));
-            $this->types[ $definitionType ] = [];
+            if(!array_key_exists($definitionType, $this->types)) {
+                $this->types[ $definitionType ] = [];
+            }
             $this->generateChildren($definition->children, $this->types[ $definitionType ]);
         }
 
-        $generated = collect($this->types)->map(function ($fields, $type) {
+        $generated = collect($this->types)
+            ->map(function ($fields, $type) {
             $fields = collect($fields)->map(function ($type, $name) {
                 return "\t{$name}: {$type}";
             })->implode("\n");
