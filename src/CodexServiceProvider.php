@@ -109,6 +109,7 @@ class CodexServiceProvider extends ServiceProvider
 
         return $app;
     }
+    
 
     public function booting()
     {
