@@ -2,84 +2,86 @@
 
 namespace Codex\Attributes;
 
+use Illuminate\Support\Collection;
 
 /**
- * @property-read AttributeDefinitionGroup $codex
- * @property-read AttributeDefinitionGroup $projects
- * @property-read AttributeDefinitionGroup $revisions
- * @property-read AttributeDefinitionGroup $documents
+ * @property-read AttributeDefinition $codex
+ * @property-read AttributeDefinition $projects
+ * @property-read AttributeDefinition $revisions
+ * @property-read AttributeDefinition $documents
+ * @method AttributeDefinition get($key, $default = null)
  */
-class AttributeDefinitionRegistry
+class AttributeDefinitionRegistry extends Collection
 {
-    /** @var AttributeDefinitionGroup[] */
-    protected $groups = [];
-
-    public function __construct()
+    public function __construct($items = [])
     {
-        $codex     = $this->addGroup('codex');
-        $projects  = $this->addGroup('projects')->setParentGroup($codex);
-        $revisions = $this->addGroup('revisions')->setParentGroup($projects);
-        $documents = $this->addGroup('documents')->setParentGroup($revisions);
+        parent::__construct($items);
+        $codex     = $this->add('codex');
+        $projects  = $this->add('projects')->parent($codex);
+        $revisions = $this->add('revisions')->parent($projects);
+        $documents = $this->add('documents')->parent($revisions);
     }
 
-    public function addGroup(string $name)
+
+    public function push($name)
     {
-        return $this->groups[ $name ] = AttributeDefinitionFactory::group($name);
+        $this->put($name, with(new AttributeDefinition())->name($name)->type(AttributeType::MAP));
+        return $this;
     }
 
-    public function keys()
+    public function add(string $name)
     {
-        return array_keys($this->groups);
+        $this->push($name);
+        return $this->get($name);
     }
 
-    public function getGroup(string $name)
+    public function child(string $name)
     {
-        return $this->groups[ $name ];
+        return $this->add($name);
     }
 
-    /**
-     * Returns the group after ensuring all the attributes that should inherit and merge are copied from the parent
-     *
-     * @param string $name
-     *
-     * @return AttributeDefinitionGroup
-     */
-    public function resolveGroup(string $name)
+    public function resolve($definition)
     {
-        $group = $this->getGroup($name);
-        if ( ! $group->hasParentGroup()) {
-            return $group;
+        if ( ! $definition instanceof AttributeDefinition) {
+            $definition = $this->get($definition);
         }
-        $parent = $group->parentGroup;
-        foreach (array_merge($group->inheritKeys, $group->mergeKeys) as $sourceKey => $targetKey) {
+        if ( ! $definition->hasParent()) {
+            return $definition;
+        }
+        $parent = $definition->parent;
+        foreach (array_merge($definition->inheritKeys, $definition->mergeKeys) as $sourceKey => $targetKey) {
             if (is_int($sourceKey)) {
                 $sourceKey = $targetKey;
             }
-            if ( ! $parent->hasChild($sourceKey) || $group->hasChild($targetKey)) {
+            if ( ! $parent->children->has($sourceKey) || $definition->children->has($targetKey)) {
                 continue;
             }
-            $source = $parent->getChild($sourceKey);
-            $this->addSourceToTarget($group, $targetKey, $source);
+            $source = $parent->children->get($sourceKey);
+            $this->addSourceToTarget($definition, $targetKey, $source);
         }
-        return $group;
+        return $definition;
     }
 
-    protected function addSourceToTarget($target, $targetKey, $source)
+    protected function addSourceToTarget(AttributeDefinition $target, $targetKey, AttributeDefinition $source)
     {
-        $targetChild = $target->add($targetKey, $source->type->getValue(), $source->apiType->name, $source->default, $source->noApi);
-        if ($source->hasChildren()) {
-            foreach ($source->children as $child) {
-                $this->addSourceToTarget($targetChild, $child->name, $child);
-            }
+        $targetChild = $target
+            ->child($targetKey, $source->type)
+            ->api($source->api)
+            ->default($source->default)
+            ->noApi($source->noApi);
+
+        foreach ($source->children as $child) {
+            $this->addSourceToTarget($targetChild, $child->name, $child);
         }
     }
 
     /** @noinspection MagicMethodsValidityInspection */
     public function __get($key)
     {
-        if (array_key_exists($key, $this->groups)) {
-            return $this->getGroup($key);
+        if ($this->has($key)) {
+            return $this->get($key);
         }
+        return parent::__get($key);
     }
 
 }

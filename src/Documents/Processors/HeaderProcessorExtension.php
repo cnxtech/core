@@ -4,6 +4,7 @@ namespace Codex\Documents\Processors;
 
 use Codex\Attributes\AttributeDefinition;
 use Codex\Contracts\Documents\Document;
+use Codex\Attributes\AttributeType as T;
 
 class HeaderProcessorExtension extends ProcessorExtension implements ProcessorInterface
 {
@@ -18,9 +19,9 @@ class HeaderProcessorExtension extends ProcessorExtension implements ProcessorIn
 
     public function defineConfigAttributes(AttributeDefinition $definition)
     {
-        $definition->add('view', 'string');                 // => 'codex::processors.header',
-        $definition->add('remove_from_document', 'boolean'); // => true,
-        $definition->add('remove_regex', 'string');         // => '/<h1>(.*?)<\/h1>/',// TODO: Implement defineConfigAttributes() method.
+        $definition->child('view', T::STRING);                 // => 'codex::processors.header',
+        $definition->child('remove_from_document', T::BOOL); // => true,
+        $definition->child('remove_regex', T::STRING);         // => '/<h1>(.*?)<\/h1>/',// TODO: Implement defineConfigAttributes() method.
     }
 
     public function process(Document $document)

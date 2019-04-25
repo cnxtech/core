@@ -3,7 +3,7 @@
 
 namespace Codex\Contracts\Documents;
 
-use Codex\Contracts\Mergable\Model;
+use Codex\Contracts\Models\Model;
 
 /**
  * Interface Document

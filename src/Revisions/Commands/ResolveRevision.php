@@ -4,7 +4,7 @@ namespace Codex\Revisions\Commands;
 
 use Codex\Contracts\Projects\Project;
 use Codex\Hooks;
-use Codex\Mergable\Commands\MergeAttributes;
+use Codex\Models\Commands\MergeAttributes;
 use Codex\Revisions\Events\ResolvedRevision;
 use Codex\Revisions\Revision;
 use Illuminate\Contracts\Cache\Repository;

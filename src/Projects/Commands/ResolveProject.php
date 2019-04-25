@@ -4,7 +4,7 @@ namespace Codex\Projects\Commands;
 
 use Codex\Contracts\Projects\Project;
 use Codex\Hooks;
-use Codex\Mergable\Commands\MergeAttributes;
+use Codex\Models\Commands\MergeAttributes;
 use Codex\Projects\Events\ResolvedProject;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Foundation\Bus\DispatchesJobs;

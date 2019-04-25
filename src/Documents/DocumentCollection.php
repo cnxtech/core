@@ -4,7 +4,7 @@ namespace Codex\Documents;
 
 use Codex\Documents\Commands\FindDocuments;
 use Codex\Documents\Commands\ResolveDocument;
-use Codex\Mergable\ModelCollection;
+use Codex\Models\ModelCollection;
 
 /**
  * This is the class DocumentCollection.

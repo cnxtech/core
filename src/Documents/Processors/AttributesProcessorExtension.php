@@ -4,9 +4,10 @@ namespace Codex\Documents\Processors;
 
 use Codex\Attributes\AttributeDefinition;
 use Codex\Contracts\Documents\Document;
-use Codex\Mergable\Commands\MergeAttributes;
+use Codex\Models\Commands\MergeAttributes;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Symfony\Component\Yaml\Yaml;
+use Codex\Attributes\AttributeType as T;
 
 class AttributesProcessorExtension extends ProcessorExtension implements PreProcessorInterface
 {
@@ -21,9 +22,9 @@ class AttributesProcessorExtension extends ProcessorExtension implements PreProc
 
     public function defineConfigAttributes(AttributeDefinition $definition)
     {
-        $tags = $definition->add('tags', 'array.arrayPrototype');
-        $tags->add('open', 'string');
-        $tags->add('close', 'string');
+        $tags = $definition->child('tags', T::ARRAY(T::MAP) );
+        $tags->child('open', T::STRING);
+        $tags->child('close', T::STRING);
     }
 
     public function preProcess(Document $document)

@@ -3,7 +3,7 @@
 namespace Codex\Documents\Processors;
 
 use Codex\Attributes\AttributeDefinition;
-use Codex\Attributes\AttributeDefinitionType;
+use Codex\Attributes\AttributeType as T;
 use Codex\Contracts\Documents\Document;
 
 class ParserProcessorExtension extends ProcessorExtension implements ProcessorInterface
@@ -21,22 +21,22 @@ class ParserProcessorExtension extends ProcessorExtension implements ProcessorIn
 
     public function defineConfigAttributes(AttributeDefinition $definition)
     {
-        $definition->setType(AttributeDefinitionType::DICTIONARY_ARRAY());
-//        $parser = $definition->add('markdown', 'dictionaryPrototype');
-//        $parser->add('parser', 'string');
-//        $parser->add('file_types', 'array.scalarPrototype');
-//        $parser->add('options', 'dictionaryPrototype');
+        $definition->type(T::MAP());
+//        $parser = $definition->child('markdown', T::ARRAY(T::MAP));
+//        $parser->child('parser', T::STRING);
+//        $parser->child('file_types', T::ARRAY(T::STRING));
+//        $parser->child('options', T::ARRAY(T::MAP));
 
-        $definition->add('parser', 'string');
-        $definition->add('file_types', 'array.scalarPrototype');
-        $definition->add('options', 'dictionaryPrototype');
+//        $definition->child('parser', T::STRING);
+//        $definition->child('file_types', T::ARRAY(T::STRING));
+//        $definition->child('options', T::MAP);
     }
 
     public function process(Document $document)
     {
         $ext     = $document->getExtension();
         $parser  = $this->getDocumentParser($document);
-        $parsed  = $parser->parse($document->getContent(true));
+        $parsed  = $parser->parse($document->getContent());
         $content = view($document->getAttribute('view'), [ 'content' => $parsed, 'document' => $document ])->render();
         $document->setContent($content);
     }

@@ -374,6 +374,4 @@ class AddonServiceProvider extends ServiceProvider
         }
         return $this->rootDir;
     }
-
-    public function attributes(AttributeDefinitionRegistry $registry){    }
 }

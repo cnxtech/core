@@ -11,6 +11,7 @@
 
 namespace Codex\Exceptions;
 
+use Codex\Attributes\AttributeDefinition;
 use GraphQL\Error\Error;
 use Illuminate\Contracts\Support\Responsable;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,7 +30,7 @@ class NotFoundException extends Exception implements Responsable
     public function toResponse($request)
     {
         return $request->expectsJson() ?
-            response()->json(['error' => $this->getMessage()], $this->status) :
+            response()->json([ 'error' => $this->getMessage() ], $this->status) :
             response()->make($this->getMessage(), $this->status);
     }
 
@@ -71,5 +72,14 @@ class NotFoundException extends Exception implements Responsable
     public static function revision($key)
     {
         return new static("Revision [{$key}] does not exist");
+    }
+
+    public static function definition($name, AttributeDefinition $parent = null)
+    {
+        $message = "Definition [{$name}] does not exist";
+        if ($parent !== null) {
+            $message = "Child {$message} in [$parent->name}]";
+        }
+        return new static($message);
     }
 }

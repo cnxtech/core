@@ -20,12 +20,12 @@ class ConfigCommand extends Command
         ];
         $registry = codex()->getRegistry();
         foreach ($registry->keys() as $key) {
-            $group = $registry->getGroup($key);
+            $group = $registry->get($key);
             data_set($types, $key, []);
 
             if (array_key_exists($key, $inherits)) {
                 $fromKey = $inherits[ $key ];
-                $from    = $registry->getGroup($fromKey);
+                $from    = $registry->get($fromKey);
                 foreach ($group->inheritKeys as $inheritKey) {
                     $inherited = data_get($types[ $fromKey ], $inheritKey);
                     data_set($types[ $key ], $inheritKey, $inherited);

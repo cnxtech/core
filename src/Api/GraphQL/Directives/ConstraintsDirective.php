@@ -26,7 +26,7 @@ class ConstraintsDirective extends BaseDirective implements FieldManipulator, Fi
     /**
      * resolveConstraints method
      *
-     * @param \Illuminate\Support\Collection|\Codex\Mergable\EloquentCollection|array $collection
+     * @param \Illuminate\Support\Collection|\Codex\Models\EloquentCollection|array   $collection
      * @param                                                                         $query
      *
      * @return array

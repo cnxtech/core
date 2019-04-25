@@ -8,25 +8,25 @@ use Illuminate\Support\Arr;
 class RegisterExtension
 {
     /** @var string[] */
-    protected $class;
+    protected $classes;
 
     protected $addon;
 
     /**
      * RegisterExtension constructor.
      *
-     * @param array|string[]|string $class
+     * @param array|string[]|string $classes
      * @param Addon|null            $addon
      */
-    public function __construct($class, Addon $addon = null)
+    public function __construct($classes, Addon $addon = null)
     {
-        $this->class = Arr::wrap($class);
-        $this->addon = $addon;
+        $this->classes = Arr::wrap($classes);
+        $this->addon   = $addon;
     }
 
     public function handle(ExtensionCollection $extensions)
     {
-        foreach ($this->class as $class) {
+        foreach ($this->classes as $class) {
             /** @var \Codex\Addons\Extensions\Extension $extension */
             $extension = app()->make($class);
             if ($this->addon !== null) {

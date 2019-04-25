@@ -2,7 +2,7 @@
 
 namespace Codex\Projects;
 
-use Codex\Mergable\ModelCollection;
+use Codex\Models\ModelCollection;
 use Codex\Projects\Commands\FindProjects;
 use Codex\Projects\Commands\ResolveProject;
 use Codex\Projects\Events\ResolvedProject;

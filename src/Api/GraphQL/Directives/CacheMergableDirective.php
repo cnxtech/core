@@ -2,7 +2,7 @@
 
 namespace Codex\Api\GraphQL\Directives;
 
-use Codex\Mergable\Model;
+use Codex\Models\Model;
 use GraphQL\Language\AST\DirectiveNode;
 use Nuwave\Lighthouse\Exceptions\DirectiveException;
 use Nuwave\Lighthouse\Schema\Context;

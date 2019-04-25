@@ -4,6 +4,7 @@ namespace Codex\Documents\Processors;
 
 use Codex\Addons\Extensions\Extension;
 use Codex\Attributes\AttributeDefinition;
+use Codex\Attributes\AttributeType as T;
 use Codex\Attributes\AttributeDefinitionRegistry;
 use Codex\Contracts\Documents\Document;
 use Illuminate\Contracts\Config\Repository;
@@ -36,8 +37,8 @@ abstract class ProcessorExtension extends Extension
 
     protected function registerConfigAttributes(Repository $config, AttributeDefinitionRegistry $registry)
     {
-        $processors = $registry->getGroup('codex')->getChild('processors');
-        $processor  = $processors->add($this->getName(), 'dictionary', 'Assoc');
+        $processors = $registry->get('codex')->get('processors');
+        $processor  = $processors->child($this->getName(), T::MAP);
         $this->defineConfigAttributes($processor);
     }
 

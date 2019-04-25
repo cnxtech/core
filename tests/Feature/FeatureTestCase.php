@@ -4,7 +4,7 @@ namespace Codex\Tests\Feature;
 
 use Codex\Codex;
 use Codex\Contracts\Projects\Project;
-use Codex\Mergable\Commands\MergeAttributes;
+use Codex\Models\Commands\MergeAttributes;
 use Codex\Projects\ProjectCollection;
 use Codex\Tests\Fixture\CreatesConfigData;
 use Codex\Tests\TestCase;

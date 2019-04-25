@@ -4,11 +4,11 @@ namespace Codex\Documents;
 
 use Codex\Concerns;
 use Codex\Contracts\Documents\Document as DocumentContract;
-use Codex\Contracts\Mergable\ChildInterface;
+use Codex\Contracts\Models\ChildInterface;
 use Codex\Contracts\Revisions\Revision;
 use Codex\Hooks;
-use Codex\Mergable\Concerns\HasParent;
-use Codex\Mergable\Model;
+use Codex\Models\Concerns\HasParent;
+use Codex\Models\Model;
 use Codex\Support\DB;
 
 /**
@@ -61,7 +61,7 @@ class Document extends Model implements DocumentContract, ChildInterface
         $this->contentResolver     = function (Document $document) {
             return $document->getFiles()->get($document->getPath());
         };
-        $registry                  = $this->getCodex()->getRegistry()->resolveGroup('documents');
+        $registry                  = $this->getCodex()->getRegistry()->resolve('documents');
         $attributes[ 'extension' ] = path_get_extension($attributes[ 'path' ]);
         $attributes                = Hooks::waterfall('document.initialize', $attributes, [ $registry, $this ]);
         $this->initialize($attributes, $registry);

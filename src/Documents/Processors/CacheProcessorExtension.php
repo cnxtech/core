@@ -7,6 +7,7 @@ use Codex\Attributes\AttributeDefinitionRegistry;
 use Codex\Contracts\Documents\Document;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Config\Repository as Config;
+use Codex\Attributes\AttributeType as T;
 
 class CacheProcessorExtension extends ProcessorExtension implements PreProcessorInterface, PostProcessorInterface
 {

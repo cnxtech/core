@@ -4,7 +4,7 @@
 namespace Codex\Contracts\Projects;
 
 
-use Codex\Contracts\Mergable\Model;
+use Codex\Contracts\Models\Model;
 
 /**
  * Interface ProjectInterface

@@ -2,7 +2,7 @@
 
 namespace Codex\Api\GraphQL;
 
-use Codex\Mergable\Model;
+use Codex\Models\Model;
 use GraphQL\Type\Definition\ResolveInfo;
 
 class Utils

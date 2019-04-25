@@ -12,6 +12,8 @@
 namespace Codex\Documents\Processors;
 
 use Codex\Attributes\AttributeDefinition;
+use Codex\Attributes\AttributeType;
+use Codex\Attributes\AttributeType as T;
 use Codex\Contracts\Documents\Document;
 use Codex\Documents\Processors\Toc\Header;
 use Illuminate\Contracts\View\Factory;
@@ -57,13 +59,13 @@ class TocProcessorExtension extends ProcessorExtension implements ProcessorInter
 
     public function defineConfigAttributes(AttributeDefinition $definition)
     {
-        $definition->add('disable', 'array.scalarPrototype', '[Int]!');           //=> [ 1 ],
-        $definition->add('regex', 'string')->setDefault('/<h(\d)>([\w\W]*?)<\/h\d>/');
-        $definition->add('header_link_show', 'boolean')->setDefault(false);
-        $definition->add('header_link_text', 'string')->setDefault('#');
-        $definition->add('minimum_nodes', 'integer')->setDefault(2);
-        $definition->add('header_view', 'string')->setDefault('codex::processors.toc-header');
-        $definition->add('view', 'string')->setDefault('codex::processors.toc');
+        $definition->child('disable', AttributeType::MAP)->api('[Int]!');           //=> [ 1 ],
+        $definition->child('regex', T::STRING,'/<h(\d)>([\w\W]*?)<\/h\d>/');
+        $definition->child('header_link_show', T::BOOL,false);
+        $definition->child('header_link_text', T::STRING,'#');
+        $definition->child('minimum_nodes', T::INT,2);
+        $definition->child('header_view', T::STRING,'codex::processors.toc-header');
+        $definition->child('view', T::STRING,'codex::processors.toc');
     }
 
     public function proces3s(Document $document)
@@ -82,13 +84,13 @@ class TocProcessorExtension extends ProcessorExtension implements ProcessorInter
             }
             $node = $this->createHeaderNode($size, $text);
             if ($size === $prevSize) {
-                $prevNode->getParent()->addChild($node);
+                $prevNode->getParent()->child($node);
                 $node->setParent($prevNode->getParent());
             } elseif ($size < $prevSize) {
                 $parentNode = $prevNode->getParent();
                 while (true) {
                     if ($size === $parentNode->getValue()->getSize()) {
-                        $parentNode->getParent()->addChild($node);
+                        $parentNode->getParent()->child($node);
                         $node->setParent($parentNode->getParent());
                         break;
                     }
@@ -98,7 +100,7 @@ class TocProcessorExtension extends ProcessorExtension implements ProcessorInter
                     $parentNode = $parentNode->getParent();
                 }
             } elseif ($size > $prevSize) {
-                $prevNode->addChild($node);
+                $prevNode->child($node);
                 $node->setParent($prevNode);
             }
 
@@ -161,7 +163,7 @@ class TocProcessorExtension extends ProcessorExtension implements ProcessorInter
                             $rootNode->addChild($node);
                             break;
                         }
-                        $parentNode->getParent()->addChild($node);
+                        $parentNode->getParent()->child($node);
                         $node->setParent($parentNode->getParent());
                         break;
                     }

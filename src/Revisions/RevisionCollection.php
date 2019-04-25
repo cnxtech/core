@@ -2,7 +2,7 @@
 
 namespace Codex\Revisions;
 
-use Codex\Mergable\ModelCollection;
+use Codex\Models\ModelCollection;
 use Codex\Revisions\Commands\FindRevisions;
 use Codex\Revisions\Commands\ResolveRevision;
 

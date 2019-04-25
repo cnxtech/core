@@ -6,7 +6,7 @@ use Codex\Api\GraphQL\Directives\QueryConstraints;
 use Codex\Codex;
 use Codex\Exceptions\NotFoundException;
 use Codex\Hooks;
-use Codex\Mergable\Commands\GetChangedAttributes;
+use Codex\Models\Commands\GetChangedAttributes;
 use GraphQL\Type\Definition\ResolveInfo;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 

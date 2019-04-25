@@ -8,13 +8,13 @@ use Codex\Api\GraphQL\GraphQL;
 use Codex\Attributes\AttributeDefinitionRegistry;
 use Codex\Contracts\Config\Repository as Config;
 use Codex\Contracts\Documents\Document;
-use Codex\Contracts\Mergable\ParentInterface;
+use Codex\Contracts\Models\ParentInterface;
 use Codex\Contracts\Projects\Project;
 use Codex\Contracts\Revisions\Revision;
 use Codex\Exceptions\NotFoundException;
-use Codex\Mergable\Commands\ProcessAttributes;
-use Codex\Mergable\Concerns\HasChildren;
-use Codex\Mergable\Model;
+use Codex\Models\Commands\ProcessAttributes;
+use Codex\Models\Concerns\HasChildren;
+use Codex\Models\Model;
 use Codex\Projects\ProjectCollection;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
@@ -75,10 +75,10 @@ class Codex extends Model implements ParentInterface
         $this->api        = $api;
 
         $this->setChildren($projects->setParent($this));
-        $attributes                 = array_except($config->raw('codex', []), [ 'projects', 'revisions', 'documents' ]);
-        $this->attributeDefinitions = $registry->resolveGroup('codex');
-        $attributes                 = $this->dispatch(new ProcessAttributes($this, $attributes));
-        $this->initialize($attributes, $this->attributeDefinitions)->rehide();
+        $attributes       = array_except($config->raw('codex', []), [ 'projects', 'revisions', 'documents' ]);
+        $this->definition = $registry->resolve('codex');
+        $attributes       = $this->dispatch(new ProcessAttributes($this, $attributes));
+        $this->initialize($attributes, $this->definition)->rehide();
         $this->addGetMutator('urls', 'getUrls', true, true);
         $this->addGetMutator('changes', 'getChanges', true, true);
     }
@@ -125,7 +125,7 @@ class Codex extends Model implements ParentInterface
     /**
      * projects method
      *
-     * @return \Codex\Mergable\EloquentCollection|\Codex\Contracts\Projects\Project[]
+     * @return \Codex\Models\EloquentCollection|\Codex\Contracts\Projects\Project[]
      */
     public function projects()
     {

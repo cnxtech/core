@@ -3,7 +3,7 @@
 namespace Codex\Contracts\Revisions;
 
 
-use Codex\Contracts\Mergable\Model;
+use Codex\Contracts\Models\Model;
 
 /**
  * Interface RevisionInterface

@@ -3,7 +3,6 @@
 namespace Codex;
 
 use Codex\Addons\Extensions\RegisterExtension;
-use Codex\Attributes\AttributeDefinitionFactory;
 use Codex\Concerns\ProvidesResources;
 use Codex\Contracts\Documents\Document;
 use Codex\Documents\Events\ResolvedDocument;
@@ -12,11 +11,10 @@ use Codex\Log\Log;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Bus\DispatchesJobs;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Collection;
+use Illuminate\Support\{Arr, Collection};
 use Laradic\ServiceProvider\ServiceProvider;
 use League\Flysystem\Filesystem as Flysystem;
-use Radic\BladeExtensions\BladeExtensionsServiceProvider;
+
 
 class CodexServiceProvider extends ServiceProvider
 {
@@ -36,41 +34,39 @@ class CodexServiceProvider extends ServiceProvider
     protected $assetDirs = [ 'assets' => 'codex_core' ];
 
     protected $commands = [
-        Console\AddonsMakeCommand::class,
-        Console\AddonsListCommand::class,
-        Console\AddonsDisableCommand::class,
-        Console\AddonsEnableCommand::class,
-        Console\AddonsUninstallCommand::class,
-        Console\AddonsInstallCommand::class,
-        Console\ProjectsMakeCommand::class,
-        Console\ConfigCommand::class,
+        \Codex\Console\AddonsMakeCommand::class,
+        \Codex\Console\AddonsListCommand::class,
+        \Codex\Console\AddonsDisableCommand::class,
+        \Codex\Console\AddonsEnableCommand::class,
+        \Codex\Console\AddonsUninstallCommand::class,
+        \Codex\Console\AddonsInstallCommand::class,
+        \Codex\Console\ProjectsMakeCommand::class,
+        \Codex\Console\ConfigCommand::class,
     ];
 
     public $singletons = [
-        Codex::class                                  => Codex::class,
-        Addons\AddonManager::class                    => Addons\AddonManager::class,
-        Addons\AddonCollection::class                 => Addons\AddonCollection::class,
-        Addons\AddonRegistry::class                   => Addons\AddonRegistry::class,
-        Addons\Extensions\ExtensionCollection::class  => Addons\Extensions\ExtensionCollection::class,
-        Attributes\AttributeDefinitionRegistry::class => Attributes\AttributeDefinitionRegistry::class,
-        Attributes\ConfigResolverRegistry::class      => Attributes\ConfigResolverRegistry::class,
+        Codex::class                                         => Codex::class,
+        \Codex\Addons\AddonManager::class                    => \Codex\Addons\AddonManager::class,
+        \Codex\Addons\AddonCollection::class                 => \Codex\Addons\AddonCollection::class,
+        \Codex\Addons\AddonRegistry::class                   => \Codex\Addons\AddonRegistry::class,
+        \Codex\Addons\Extensions\ExtensionCollection::class  => \Codex\Addons\Extensions\ExtensionCollection::class,
+        \Codex\Attributes\AttributeDefinitionRegistry::class => \Codex\Attributes\AttributeDefinitionRegistry::class,
     ];
 
     public $providers = [
-        Api\ApiServiceProvider::class,
-        Http\HttpServiceProvider::class,
-        BladeExtensionsServiceProvider::class,
+        \Codex\Api\ApiServiceProvider::class,
+        \Codex\Http\HttpServiceProvider::class,
+        \Radic\BladeExtensions\BladeExtensionsServiceProvider::class,
     ];
 
     public $bindings = [
-        'codex'                             => Codex::class,
-        'codex.addons'                      => Addons\AddonCollection::class,
-        'codex.extensions'                  => Addons\Extensions\ExtensionCollection::class,
-        'codex.attributes'                  => Attributes\AttributeDefinitionRegistry::class,
-        'codex.attributes.config'           => Attributes\ConfigResolverRegistry::class,
-        Contracts\Projects\Project::class   => Projects\Project::class, //Contracts\Projects\Project::class
-        Contracts\Revisions\Revision::class => Revisions\Revision::class, //Contracts\Revisions\Revision::class
-        Contracts\Documents\Document::class => Documents\Document::class, //Contracts\Documents\Document::class
+        'codex'                                    => Codex::class,
+        'codex.addons'                             => \Codex\Addons\AddonCollection::class,
+        'codex.extensions'                         => \Codex\Addons\Extensions\ExtensionCollection::class,
+        'codex.attributes'                         => \Codex\Attributes\AttributeDefinitionRegistry::class,
+        \Codex\Contracts\Projects\Project::class   => \Codex\Projects\Project::class, //Contracts\Projects\Project::class
+        \Codex\Contracts\Revisions\Revision::class => \Codex\Revisions\Revision::class, //Contracts\Revisions\Revision::class
+        \Codex\Contracts\Documents\Document::class => \Codex\Documents\Document::class, //Contracts\Documents\Document::class
     ];
 
     protected $listen = [
@@ -80,15 +76,14 @@ class CodexServiceProvider extends ServiceProvider
     ];
 
     protected $extensions = [
-        Documents\Processors\AttributesProcessorExtension::class,
-        Documents\Processors\ParserProcessorExtension::class,
-        Documents\Processors\CacheProcessorExtension::class,
-        Documents\Processors\LinksProcessorExtension::class,
-        Documents\Processors\MacrosProcessorExtension::class,
-        Documents\Processors\TocProcessorExtension::class,
-        Documents\Processors\HeaderProcessorExtension::class,
-        Documents\Processors\ButtonsProcessorExtension::class,
-        Attributes\AttributeSchemaExtension::class,
+        \Codex\Documents\Processors\AttributesProcessorExtension::class,
+        \Codex\Documents\Processors\ParserProcessorExtension::class,
+        \Codex\Documents\Processors\CacheProcessorExtension::class,
+        \Codex\Documents\Processors\LinksProcessorExtension::class,
+        \Codex\Documents\Processors\MacrosProcessorExtension::class,
+        \Codex\Documents\Processors\TocProcessorExtension::class,
+        \Codex\Documents\Processors\HeaderProcessorExtension::class,
+        \Codex\Documents\Processors\ButtonsProcessorExtension::class,
     ];
 
     protected $middleware = [ Http\DebugbarCollectionLoggerMiddleware::class ];
@@ -117,13 +112,12 @@ class CodexServiceProvider extends ServiceProvider
 
     public function booting()
     {
-
-        $this->registerAttributeDefinitions();
+        $this->dispatchNow(new RegisterExtension(CoreAttributeExtension::class));
 
         $manager = $this->app->make(Addons\AddonManager::class);
         $manager->register();
 
-        $this->dispatch(new RegisterExtension($this->extensions));
+        $this->dispatchNow(new RegisterExtension($this->extensions));
     }
 
     /**
@@ -164,186 +158,5 @@ class CodexServiceProvider extends ServiceProvider
             $flysystem = new Flysystem($adapter);
             return new FilesystemAdapter($flysystem);
         });
-    }
-
-    protected function registerAttributeDefinitions()
-    {
-        $registry = $this->app->make(Attributes\AttributeDefinitionRegistry::class);
-        $codex    = $registry->codex;
-        $codex->add('changes', 'dictionary', 'Assoc');
-
-        $cache = $codex->add('cache', 'dictionary')->setApiType('CacheConfig', [ 'new' ]);
-        $cache->add('enabled', 'boolean');
-        $cache->add('key', 'string');
-        $cache->add('minutes', 'integer');
-
-        $codex->add('display_name', 'string')->setDefault('Codex');
-        $codex->add('description', 'string')->setDefault('');
-        $codex->add('default_project', 'string', 'ID')->setDefault(null);
-
-//        $routeMap = $codex->add('routeMap', 'array.scalarPrototype')->noApi();
-
-        $urls = $codex->add('urls', 'dictionary')->setApiType('CodexUrls', [ 'new' ]);
-        $urls->add('api', 'string');
-        $urls->add('root', 'string');
-        $urls->add('documentation', 'string');
-
-        $paths = $codex->add('paths', 'dictionary')->noApi();
-        $paths->add('docs', 'string');
-        $paths->add('log', 'string');
-
-        $processors = $codex->add('processors', 'dictionary')->noApi(); //->setApiType('Processors', [ 'new' ]);
-//        $processors = $codex->add('processors', 'dictionary')->setApiType('Processors', [ 'new' ]);
-//        $processors->add('enabled', 'array.scalarPrototype');
-        $processors->add('enabled', 'array.scalarPrototype', 'Assoc');
-
-        $http = $codex->add('http', 'dictionary')->setApiType('HttpConfig', [ 'new' ]);
-        $http->add('prefix', 'string');
-        $http->add('api_prefix', 'string');
-        $http->add('documentation_prefix', 'string');
-        $http->add('documentation_view', 'string');
-        $http->add('backend_data_url', 'string');
-
-        $menu = AttributeDefinitionFactory::attribute('menu', 'array.recursive')->setApiType('MenuItem', [ 'array', 'new' ]);
-        $menu->add('id', 'string', 'ID', function () {
-            return md5(str_random());
-        });
-        $menu->add('type', 'string');
-        $menu->add('class', 'string');
-        $menu->add('side', 'string');
-        $menu->add('target', 'string')->setDefault('self');
-        $menu->add('href', 'string');
-        $menu->add('path', 'string');
-        $menu->add('renderer', 'string');
-        $menu->add('expand', 'boolean');
-        $menu->add('selected', 'boolean');
-        $menu->add('label', 'string');
-        $menu->add('sublabel', 'string');
-        $menu->add('icon', 'string');
-        $menu->add('color', 'string');
-        $menu->add('project', 'string');
-        $menu->add('revision', 'string');
-        $menu->add('document', 'string');
-        $menu->add('projects', 'boolean');
-        $menu->add('revisions', 'boolean');
-        $menu->add('children', 'recurse')->setApiType('MenuItem', [ 'array' ]); //->children = $menu->children;
-
-        $layout                  = $codex->add('layout', 'dictionary')->setApiType('Layout', [ 'new' ]);
-        $addLayoutPart           = function (string $name, string $apiType) use ($layout) {
-            $part = $layout->add($name, 'dictionary')->setApiType($apiType, [ 'new' ]);
-            $part->add('class', 'array.scalarPrototype');
-            $part->add('style', 'array.scalarPrototype')->setDefault([]);
-            $part->add('color', 'string')->setDefault(null);
-            $part->add('children', 'dictionaryPrototype', '[Assoc]', null); //->setApiType('LayoutToolbarItem', [ 'new'])->setDefault([]);
-            return $part;
-        };
-        $addLayoutHorizontalSide = function (string $name, string $apiType) use ($addLayoutPart, $menu) {
-            $part = $addLayoutPart($name, $apiType);
-            $part->add('show', 'boolean')->setDefault(true);
-            $part->add('collapsed', 'boolean')->setDefault(false);
-            $part->add('outside', 'boolean')->setDefault(true);
-            $part->add('width', 'integer')->setDefault(200);
-            $part->add('collapsedWidth', 'integer')->setDefault(50);
-            $part->add('fixed', 'boolean')->setDefault(false);
-            return $part;
-        };
-        $addLayoutVerticalSide   = function (string $name, string $apiType) use ($addLayoutPart, $menu) {
-            $part = $addLayoutPart($name, $apiType);
-            $part->add('show', 'boolean')->setDefault(true);
-            $part->add('fixed', 'boolean')->setDefault(false);
-            $part->add('height', 'integer')->setDefault(64);
-            return $part;
-        };
-
-        $layoutContainer = $addLayoutPart('container', 'LayoutContainer');
-        $layoutContainer->add('stretch', 'boolean')->setDefault(true);
-
-        $layoutHeader = $addLayoutVerticalSide('header', 'LayoutHeader');
-        $layoutHeader->addChild($menu);
-        $layoutHeader->add('show_left_toggle', 'boolean')->setDefault(false);
-        $layoutHeader->add('show_right_toggle', 'boolean')->setDefault(false);
-
-        $layoutFooter = $addLayoutVerticalSide('footer', 'LayoutFooter');
-        $layoutFooter->addChild($menu);
-        $layoutFooter->add('text', 'string');
-
-        $layoutLeft = $addLayoutHorizontalSide('left', 'LayoutLeft');
-        $layoutLeft->addChild($menu);
-
-        $layoutRight = $addLayoutHorizontalSide('right', 'LayoutRight');
-        $layoutRight->addChild($menu);
-
-        $layoutMiddle = $addLayoutPart('middle', 'LayoutMiddle');
-        $layoutMiddle->add('padding', 'mixed', 'Mixed', 0);
-        $layoutMiddle->add('margin', 'mixed', 'Mixed', 0);
-
-        $layoutContent = $addLayoutPart('content', 'LayoutContent');
-        $layoutContent->add('padding', 'mixed', 'Mixed', 0);
-        $layoutContent->add('margin', 'mixed', 'Mixed', 0);
-
-        $layoutToolbar = $addLayoutPart('toolbar', 'LayoutToolbar');
-        $layoutToolbar->add('breadcrumbs', 'dictionaryPrototype', '[Assoc]');
-        $layoutToolbar->add('left', 'dictionaryPrototype', '[Assoc]'); //->setApiType('LayoutToolbarItem', [ 'new'])->setDefault([]);
-        $layoutToolbar->add('right', 'dictionaryPrototype', '[Assoc]'); //->setApiType('LayoutToolbarItem', [ 'new'])->setDefault([]);
-
-        $projects = $registry->projects;
-        $projects->addMergeKeys([]);
-        $projects->addInheritKeys([ 'processors', 'layout', 'cache' ]);
-        $projects->add('inherits', 'array.scalarPrototype', '[String]');
-        $projects->add('changes', 'dictionary', 'Assoc');
-        $projects->add('key', 'string', 'ID!');
-        $projects->add('path', 'string')->noApi();
-        $projects->add('display_name', 'string')->setDefault('');
-        $projects->add('description', 'string')->setDefault('');
-        $projects->add('disk', 'string')->setDefault(null);
-        $projects->add('view', 'string')->setDefault('codex::document');
-
-        $meta = $projects->add('meta', 'dictionary')->setApiType('Meta', [ 'new' ]);
-        $meta->add('icon', 'string')->setDefault('fa-book');
-        $meta->add('color', 'string')->setDefault('deep-orange');
-        $meta->add('license', 'string')->setDefault('MIT');
-
-        $meta->add('defaultTitle', 'string');
-        $meta->add('title', 'string');
-        $meta->add('titleTemplate', 'string');
-        $meta->add('titleAttributes', 'dictionary', 'Assoc');
-        $meta->add('htmlAttributes', 'dictionary', 'Assoc');
-        $meta->add('bodyAttributes', 'dictionary', 'Assoc');
-        $metaLink   = $meta->add('link', 'dictionaryPrototype', '[Assoc]', []);
-        $metameta   = $meta->add('meta', 'dictionaryPrototype', '[Assoc]', []);
-        $metaScript = $meta->add('script', 'array.scalarPrototype', '[String]', []);
-        $metaStyle  = $meta->add('style', 'array.scalarPrototype', '[String]', []);
-
-        $projects->add('default_revision', 'string')->setDefault('master');
-        $projects->add('allow_revision_php_config', 'string')->setDefault(false);
-        $projects->add('allowed_revision_config_files', 'array.scalarPrototype');
-
-        $projects->add('default_document', 'string')->setDefault('index');
-        $projects->add('document_extensions', 'array.scalarPrototype');
-
-
-        $revisions = $registry->revisions;
-        $revisions->addMergeKeys([]);
-        $revisions->addInheritKeys([ 'processors', 'meta', 'layout', 'view', 'cache', 'default_document', 'document_extensions' ]);
-        $revisions->add('inherits', 'array.scalarPrototype', '[String]');
-        $revisions->add('changes', 'dictionary', 'Assoc');
-        $revisions->add('key', 'string', 'ID!');
-
-        $documents = $registry->documents;
-        $documents->addMergeKeys([]);
-        $documents->addInheritKeys([ 'processors', 'meta', 'layout', 'view', 'cache' ]);
-        $documents->add('inherits', 'array.scalarPrototype', '[String]');
-        $documents->add('changes', 'dictionary', 'Assoc');
-        $documents->add('key', 'string', 'ID!');
-        $documents->add('path', 'string');
-        $documents->add('extension', 'string');
-        $documents->add('content', 'string');
-        $documents->add('last_modified', 'integer');
-        $documents->add('title', 'string')->setDefault('');
-        $documents->add('subtitle', 'string')->setDefault('');
-        $documents->add('description', 'string')->setDefault('');
-        $documents->add('scripts', 'array.scalarPrototype', '[String]', []);
-        $documents->add('styles', 'array.scalarPrototype', '[String]', []);
-        $documents->add('html', 'array.scalarPrototype', '[String]', []);
     }
 }

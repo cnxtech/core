@@ -3,13 +3,13 @@
 namespace Codex\Projects;
 
 use Codex\Concerns;
-use Codex\Contracts\Mergable\ChildInterface;
-use Codex\Contracts\Mergable\ParentInterface;
+use Codex\Contracts\Models\ChildInterface;
+use Codex\Contracts\Models\ParentInterface;
 use Codex\Contracts\Projects\Project as ProjectContract;
 use Codex\Hooks;
-use Codex\Mergable\Concerns\HasChildren;
-use Codex\Mergable\Concerns\HasParent;
-use Codex\Mergable\Model;
+use Codex\Models\Concerns\HasChildren;
+use Codex\Models\Concerns\HasParent;
+use Codex\Models\Model;
 use Codex\Revisions\RevisionCollection;
 use Codex\Support\DB;
 use Illuminate\Contracts\Filesystem\Factory;
@@ -66,7 +66,7 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
 
         $this->setParent($this->getCodex());
         $this->setChildren($revisions->setParent($this));
-        $registry   = $this->getCodex()->getRegistry()->resolveGroup('projects');
+        $registry   = $this->getCodex()->getRegistry()->resolve('projects');
         $attributes = Hooks::waterfall('project.initialize', $attributes, [ $registry, $this ]);
         $this->initialize($attributes, $registry);
         $this->addGetMutator('inherits', 'getInheritKeys', true, true);
@@ -80,7 +80,7 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
         return $this->getCodex()->url($this->getKey(), $revisionKey, $documentKey, $absolute);
     }
 
-    /** @return \Codex\Contracts\Revisions\Revision[]|\Codex\Mergable\EloquentCollection */
+    /** @return \Codex\Contracts\Revisions\Revision[]|\Codex\Models\EloquentCollection */
     public function revisions()
     {
         return $this->getRevisions()->toRelationship();

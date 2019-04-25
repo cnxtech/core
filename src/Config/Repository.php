@@ -3,7 +3,7 @@
 namespace Codex\Config;
 
 use Codex\Contracts\Config\Repository as RepositoryContract;
-use Codex\Mergable\ParameterPostProcessor;
+use Codex\Models\ParameterPostProcessor;
 use Illuminate\Config\Repository as BaseRepository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Bus\DispatchesJobs;

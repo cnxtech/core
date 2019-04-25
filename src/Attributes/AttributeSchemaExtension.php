@@ -3,22 +3,18 @@
 namespace Codex\Attributes;
 
 use Codex\Api\SchemaExtension;
+use Codex\Attributes\Commands\BuildDefinitionSchema;
+use Illuminate\Foundation\Bus\DispatchesJobs;
 
 class AttributeSchemaExtension extends SchemaExtension
 {
+    use DispatchesJobs;
+
     protected $provides = 'codex/core::schema.attributes';
-
-    /** @var AttributeSchemaGenerator */
-    protected $generator;
-
-    public function __construct(AttributeSchemaGenerator $generator)
-    {
-        $this->generator = $generator;
-    }
 
     public function getSchemaExtension(): string
     {
-        $generated = $this->generator->generate();
+        $generated = $this->dispatchNow(new BuildDefinitionSchema());
 
         return $generated;
     }

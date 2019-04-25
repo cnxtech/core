@@ -12,8 +12,10 @@
 namespace Codex\Documents\Processors;
 
 use Codex\Attributes\AttributeDefinition;
+use Codex\Attributes\AttributeType;
 use Codex\Contracts\Documents\Document;
 use Illuminate\Contracts\View\Factory;
+use Codex\Attributes\AttributeType as T;
 
 class ButtonsProcessorExtension extends ProcessorExtension implements ProcessorInterface
 {
@@ -48,12 +50,12 @@ class ButtonsProcessorExtension extends ProcessorExtension implements ProcessorI
 
     public function defineConfigAttributes(AttributeDefinition $definition)
     {
-//        $definition->setType(new AttributeDefinitionType('array.scalarPrototype'));
-        $buttons        = $definition->add('buttons', 'dictionaryPrototype', '[Assoc]');
-//        $buttons->add('button', 'array.scalarPrototype', 'Assoc');
-//        $buttons->add('label', 'string');
-        $buttonDefaults = $definition->add('button_defaults', 'dictionary', 'Assoc', []);
-        $definition->add('view', 'string')->setDefault('codex::processors.buttons');
+//        $definition->setType(new AttributeDefinitionType(T::ARRAY(T::STRING)));
+        $buttons        = $definition->child('buttons', AttributeType::MAP);
+//        $buttons->child('button', T::ARRAY(T::STRING) );
+//        $buttons->child('label', T::STRING);
+        $buttonDefaults = $definition->child('button_defaults', T::MAP);
+        $definition->child('view', T::STRING)->default('codex::processors.buttons');
     }
 
 

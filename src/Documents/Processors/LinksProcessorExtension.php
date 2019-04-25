@@ -3,6 +3,7 @@
 namespace Codex\Documents\Processors;
 
 use Codex\Attributes\AttributeDefinition;
+use Codex\Attributes\AttributeType as T;
 use Codex\Contracts\Documents\Document;
 use Codex\Documents\Processors\Links\Link;
 use Codex\Documents\Processors\Links\Url;
@@ -24,9 +25,9 @@ class LinksProcessorExtension extends ProcessorExtension implements ProcessorInt
 
     public function defineConfigAttributes(AttributeDefinition $definition)
     {
-        $definition->add('replace_tag', 'mixed')->setDefault(false);
-        $definition->add('prefix', 'string')->setDefault(null);
-        $definition->add('actions', 'array.scalarPrototype');
+        $definition->child('replace_tag', T::MIXED, false);
+        $definition->child('prefix', T::STRING,null);
+        $definition->child('actions', T::MAP);
     }
 
     public function process(Document $document)

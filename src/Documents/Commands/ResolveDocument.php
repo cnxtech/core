@@ -8,8 +8,8 @@ use Codex\Contracts\Revisions\Revision;
 use Codex\Documents\Document;
 use Codex\Documents\Events\ResolvedDocument;
 use Codex\Hooks;
-use Codex\Mergable\Commands\MergeAttributes;
-use Codex\Mergable\Concerns\BuildsParameterData;
+use Codex\Models\Commands\MergeAttributes;
+use Codex\Models\Concerns\BuildsParameterData;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
 class ResolveDocument

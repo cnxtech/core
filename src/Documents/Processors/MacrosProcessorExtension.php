@@ -12,7 +12,7 @@
 namespace Codex\Documents\Processors;
 
 use Codex\Attributes\AttributeDefinition;
-use Codex\Attributes\AttributeDefinitionType;
+use Codex\Attributes\AttributeType;
 use Codex\Contracts\Documents\Document;
 use Codex\Documents\Processors\Macros\Macro;
 
@@ -48,7 +48,7 @@ class MacrosProcessorExtension extends ProcessorExtension implements ProcessorIn
 
     public function defineConfigAttributes(AttributeDefinition $definition)
     {
-        $definition->setType(new AttributeDefinitionType('array.scalarPrototype'));
+//        $definition->type(AttributeType::MIXED);
     }
 
     public function process(Document $document)

@@ -78,9 +78,9 @@ class AddonProvider
         $this->registerProviders($provider);
 
         $boot = function () use ($provider) {
-            if (method_exists($provider, 'attributes')) {
-                $this->application->call([ $provider, 'attributes' ]);
-            }
+//            if (method_exists($provider, 'attributes')) {
+//                $this->application->call([ $provider, 'attributes' ]);
+//            }
         };
         if ($this->application->hasBeenBootstrapped()) {
             $boot();
