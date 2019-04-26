@@ -12,6 +12,7 @@ use Illuminate\Support\Fluent;
  * @method $this name($value)
  * @method $this noApi(bool $value = true)
  * @method $this required(bool $value = true)
+ * @method $this node(\Closure|null $node = null)
  * @property string                                                     $name
  * @property AttributeType                                              $type
  * @property ApiDefinition                                              $api
@@ -22,6 +23,8 @@ use Illuminate\Support\Fluent;
  * @property boolean                                                    $required
  * @property array                                                      $inheritKeys
  * @property array                                                      $mergeKeys
+ * @property string[]                                                   $validation
+ * @property \Closure|null                                              $node
  *
  * @method static AttributeType STRING()
  * @method static AttributeType BOOL()
@@ -47,7 +50,13 @@ class AttributeDefinition extends Fluent
     public function __construct($parent = null, array $attributes = [])
     {
         $children = new Collection();
-        parent::__construct(array_merge(compact('parent', 'children'), $attributes));
+        parent::__construct(array_replace(
+            [
+                'validation' => [],
+            ],
+            compact('parent', 'children'),
+            $attributes
+        ));
         $this
             ->parent($parent)
             ->name('root')
@@ -55,6 +64,17 @@ class AttributeDefinition extends Fluent
             ->api('Mixed')
             ->inheritKeys([])
             ->mergeKeys([]);
+    }
+
+    /**
+     * @param string|string[] $rules
+     *
+     * @return $this
+     */
+    public function validation($rules)
+    {
+        $this->attributes[ 'validation' ] = array_wrap($rules);
+        return $this;
     }
 
     public function clone()
@@ -139,20 +159,39 @@ class AttributeDefinition extends Fluent
         return array_merge(collect($this->attributes)->toArray(), compact('children')); //        return array_merge(parent::toArray(), compact('children'));
     }
 
-    public function getPath()
+    public function getPath($offset = 0)
     {
-        $segments = [ $this->name ];
-        $parent   = $this->parent;
+        $parents = array_merge($this->getParents(), [ $this ]);
+        $parents = array_slice($parents, $offset);
+        $parents = array_column($parents, 'name');
+        return implode('.', $parents);
+    }
+
+
+    /**
+     * @param int $offset
+     *
+     * @return static[]
+     */
+    public function getParents($offset = 0)
+    {
+        $parents = [];
+        $parent  = $this->parent;
         while ($parent) {
-            $segments[] = $parent->name;
-            $parent     = $parent->parent;
+            $parents[] = $parent;
+            $parent    = $parent->parent;
         }
-        return implode('.', array_reverse($segments));
+        return array_slice(array_reverse($parents), $offset);
     }
 
     public function hasParent()
     {
         return $this->parent !== null;
+    }
+
+    public function getRoot()
+    {
+        return head($this->getParents());
     }
 
     public function getChild(string $name)
@@ -173,8 +212,13 @@ class AttributeDefinition extends Fluent
         return $this->children->isNotEmpty();
     }
 
+    protected $disabledClosureGetters = [ 'node' ];
+
     public function get($offset, $default = null)
     {
+        if (in_array($offset, $this->disabledClosureGetters, true)) {
+            return parent::get($offset, $default);
+        }
         return value(parent::get($offset, function () use ($offset, $default) {
             if ($this->hasChild($offset)) {
                 return $this->getChild($offset);

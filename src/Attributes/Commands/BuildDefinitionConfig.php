@@ -4,6 +4,7 @@
 namespace Codex\Attributes\Commands;
 
 
+use Closure;
 use Codex\Attributes\AttributeDefinition;
 use Codex\Attributes\AttributeDefinitionRegistry;
 use Codex\Attributes\AttributeType as T;
@@ -81,6 +82,9 @@ class BuildDefinitionConfig
         }
         if ($definition->required) {
             $node->isRequired();
+        }
+        if ($definition->node instanceof Closure) {
+            $node = $definition->node->call($this, $node);
         }
         if ($definition->children->isNotEmpty()) {
             $parentNode->ignoreExtraKeys(true);

@@ -2,7 +2,7 @@
 
 namespace Codex\Commands;
 
-use Codex\Filesystem\Tmp;
+use Codex\Filesystem\Temp;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\View\Compilers\BladeCompiler;
 
@@ -23,7 +23,7 @@ class CompileBladeString
     public function handle(BladeCompiler $compiler)
     {
         try {
-            $tmp        = new Tmp('blade-string');
+            $tmp        = new Temp('blade-string');
             $fileSuffix = uniqid(time(), true);
             $string     = $compiler->compileString((string)$this->string);
             $file       = $tmp->createTmpFile($fileSuffix);

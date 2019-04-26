@@ -209,7 +209,7 @@ class Project extends Model implements ProjectContract, ChildInterface, ParentIn
     /**
      * getDisk method.
      *
-     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     * @return \Illuminate\Contracts\Filesystem\Filesystem|\Illuminate\Filesystem\FilesystemAdapter
      */
     public function getDisk()
     {

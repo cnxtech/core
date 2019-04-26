@@ -13,7 +13,6 @@ use Illuminate\Filesystem\FilesystemAdapter;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Support\{Arr, Collection};
 use Laradic\ServiceProvider\ServiceProvider;
-use League\Flysystem\Filesystem as Flysystem;
 
 
 class CodexServiceProvider extends ServiceProvider
@@ -84,7 +83,7 @@ class CodexServiceProvider extends ServiceProvider
         \Codex\Documents\Processors\TocProcessorExtension::class,
         \Codex\Documents\Processors\HeaderProcessorExtension::class,
         \Codex\Documents\Processors\ButtonsProcessorExtension::class,
-        \Codex\Attributes\AttributeSchemaExtension::class
+        \Codex\Attributes\AttributeSchemaExtension::class,
     ];
 
     protected $middleware = [ Http\DebugbarCollectionLoggerMiddleware::class ];
@@ -110,7 +109,7 @@ class CodexServiceProvider extends ServiceProvider
 
         return $app;
     }
-    
+
 
     public function booting()
     {
@@ -156,8 +155,7 @@ class CodexServiceProvider extends ServiceProvider
         $fsm = $this->app->make('filesystem');
 
         $fsm->extend('codex-local', function (Application $app, array $config = []) {
-            $adapter   = new Filesystem\Local($config[ 'root' ]);
-            $flysystem = new Flysystem($adapter);
+            $flysystem = new Filesystem\Local($config[ 'root' ]);
             return new FilesystemAdapter($flysystem);
         });
     }
