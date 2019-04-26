@@ -1,9 +1,12 @@
 <?php
 
 
-namespace Codex\Filesystem;
+namespace Codex\Filesystem\Utils;
 
 
+use Codex\Filesystem\File;
+use Codex\Filesystem\FileCollection;
+use Codex\Filesystem\Local;
 use Illuminate\Support\Arr;
 use League\Flysystem\FilesystemInterface;
 use Webmozart\Glob\Glob;
