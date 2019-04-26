@@ -40,7 +40,9 @@ class Copier
         foreach ($destItems as $destItem) {
             $srcItem = $destItem->getSrcFile();
             if ($srcItem !== null) {
-                $this->to->put($destItem->key(), $srcItem->read());
+                $key  = $destItem->key();
+                $path = path_njoin(data_get($options, 'path'), $key);
+                $this->to->put($path, $srcItem->read());
                 $this->copied[] = [
                     'src'      => $src,
                     'dest'     => $dest,

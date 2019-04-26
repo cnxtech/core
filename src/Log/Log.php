@@ -65,10 +65,14 @@ class Log extends BaseLogger implements LogContract
         return $handler;
     }
 
+    protected $artisanHandler;
+
     public function useArtisan(Command $command, $level = self::DEBUG)
     {
-        $this->pushHandler($handler = new ArtisanHandler($command, $level));
-        return $handler;
+        if ($this->artisanHandler === null) {
+            $this->pushHandler($this->artisanHandler = new ArtisanHandler($command, $level));
+        }
+        return $this->artisanHandler;
     }
 
     /**

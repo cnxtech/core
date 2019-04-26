@@ -39,7 +39,10 @@ class FindRevisions
     public function handle()
     {
         $paths = [];
-        foreach ($this->getFS()->directories() as $directory) {
+        $directories=$this->getFS()->directories();
+        $disk = $this->project->getDisk();
+        $dirs = $disk->listContents('/');
+        foreach ($directories as $directory) {
             if ($configFilePath = $this->getConfigFileFrom($directory)) {
                 $paths[ $directory ] = $configFilePath;
             }
