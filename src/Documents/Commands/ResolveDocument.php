@@ -2,14 +2,12 @@
 
 namespace Codex\Documents\Commands;
 
-use Codex\Config\ConfigProcessor;
 use Codex\Contracts\Documents\Document as DocumentContract;
 use Codex\Contracts\Revisions\Revision;
 use Codex\Documents\Document;
 use Codex\Documents\Events\ResolvedDocument;
 use Codex\Hooks;
 use Codex\Models\Commands\MergeAttributes;
-use Codex\Models\Concerns\BuildsParameterData;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 
 class ResolveDocument

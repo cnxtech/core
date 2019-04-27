@@ -19,7 +19,7 @@ use League\Flysystem\Filesystem;
  */
 class Local extends Filesystem
 {
-    public function __construct($root, $writeFlags = LOCK_EX, $linkHandling = LocalAdapter::SKIP_LINKS)
+    public function __construct($root, $writeFlags = LOCK_EX, $linkHandling = LocalAdapter::DISALLOW_LINKS)
     {
         $adapter = new LocalAdapter($root, $writeFlags, $linkHandling);
         parent::__construct($adapter, []);

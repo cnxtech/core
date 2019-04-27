@@ -26,10 +26,11 @@ class LocalAdapter extends BaseLocal
      */
     protected function getRecursiveDirectoryIterator($path, $mode = RecursiveIteratorIterator::SELF_FIRST)
     {
-        return new RecursiveIteratorIterator(
+        $iterator= new RecursiveIteratorIterator(
             new RecursiveDirectoryIterator($path, FilesystemIterator::SKIP_DOTS | FilesystemIterator::FOLLOW_SYMLINKS),
             $mode
         );
+        return $iterator;
     }
 
     /**
@@ -40,8 +41,15 @@ class LocalAdapter extends BaseLocal
     protected function mapFileInfo(SplFileInfo $file)
     {
         $normalized = parent::mapFileInfo($file);
+
         if ('link' === $normalized[ 'type' ]) {
-            $normalized[ 'type' ] = 'dir';
+            $links = new \SplFileInfo($file->getRealPath());
+            if($links->isDir()) {
+                $normalized[ 'type' ] = 'dir';
+            } elseif($links->isFile()){
+                $normalized[ 'type' ] = 'file';
+            }
+            $normalized['links'] = $links;
         }
 
         return $normalized;
