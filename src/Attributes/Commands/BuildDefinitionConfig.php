@@ -77,14 +77,17 @@ class BuildDefinitionConfig
         } elseif ($type->is(T::MAP)) {
             $node = $this->handleMap($definition, $parentNode);
         }
-        if (isset($definition->default)) {
-            $node->defaultValue($definition->default);
+
+        if ( ! $type->is(T::MAP)) {
+            if (isset($definition->default)) {
+                $node->defaultValue($definition->default);
+            }
         }
         if ($definition->required) {
             $node->isRequired();
         }
         if ($definition->node instanceof Closure) {
-            $node = $definition->node->call($this, $node);
+            $definition->node->call($this, $node, $parentNode);
         }
         if ($definition->children->isNotEmpty()) {
             $parentNode->ignoreExtraKeys(true);
@@ -129,7 +132,6 @@ class BuildDefinitionConfig
             $node = $parentNode->children()->arrayNode($definition->name);
             $node->ignoreExtraKeys();
             $node = $node->arrayPrototype();
-            $node->ignoreExtraKeys();
             return $node;
         }
         $node = $parentNode->children()->arrayNode($definition->name);
@@ -146,9 +148,35 @@ class BuildDefinitionConfig
 
     protected function handleMap(AttributeDefinition $definition, ArrayNodeDefinition $parentNode)
     {
+        $type        = $definition->type;
+        $childType   = $type->getChildType();
         $hasChildren = $definition->hasChildren();
-        $node        = $parentNode->children()->arrayNode($definition->name);
-        $node->ignoreExtraKeys();;
+
+        $parentNode->ignoreExtraKeys(true);
+        $node = $parentNode->children()->arrayNode($definition->name);
+        $node->ignoreExtraKeys(true);
+
+        if ( $hasChildren) {
+            if($childType->oneOf(T::STRING,T::BOOL,T::INT,T::FLOAT)) {
+                $node->prototype($childType->toConfigNodeTypeName());
+            } elseif($childType->is(T::MIXED)){
+                $node->variablePrototype();
+            } else {
+                $node->arrayPrototype();
+                $definition->default(null);
+            }
+        }
+
+//        if (isset($definition->default)) {
+//            if (is_array($definition->default)) {
+//                $node = $node->arrayPrototype();
+//                $definition->default(null);
+//            }
+//        } else {
+//        }
+
+        return $node;
+        $node->ignoreExtraKeys();
         if ( ! $hasChildren) {
             $node = $node->variablePrototype();
         }

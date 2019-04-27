@@ -4,9 +4,9 @@
 namespace Codex;
 
 
-use Codex\Attributes\AttributeExtension;
 use Codex\Attributes\AttributeDefinition;
 use Codex\Attributes\AttributeDefinitionRegistry;
+use Codex\Attributes\AttributeExtension;
 use Codex\Attributes\AttributeType as T;
 
 class CoreAttributeExtension extends AttributeExtension
@@ -37,7 +37,7 @@ class CoreAttributeExtension extends AttributeExtension
         $paths->child('log', T::STRING);
 
         $processors = $codex->child('processors', T::MAP)->noApi();
-        $processors->child('enabled', T::MAP, []);
+        $processors->child('enabled', T::MAP(T::BOOL));
 
         $http = $codex->child('http', T::MAP)->api('HttpConfig', [ 'new' ]);
         $http->child('prefix', T::STRING);
@@ -48,7 +48,7 @@ class CoreAttributeExtension extends AttributeExtension
 
         $menu = new AttributeDefinition();
         $menu->name('menu')->type(T::RECURSIVE)->api('MenuItem', [ 'array', 'new' ]);
-        $menu->child('id', T::STRING, function () {
+        $menu->child('id', T::STRING, static function () {
             return md5(str_random());
         }, 'ID');
         $menu->child('type', T::STRING);
@@ -128,8 +128,8 @@ class CoreAttributeExtension extends AttributeExtension
 
         $layoutToolbar = $addLayoutPart('toolbar', 'LayoutToolbar');
         $layoutToolbar->child('breadcrumbs', T::ARRAY(T::MAP));
-        $layoutToolbar->child('left', T::ARRAY(T::MAP));
-        $layoutToolbar->child('right', T::ARRAY(T::MAP));
+        $layoutToolbar->child('left', T::ARRAY(T::MIXED), null, '[Assoc]');
+        $layoutToolbar->child('right', T::ARRAY(T::MIXED), null, '[Assoc]');//, [], '[Assoc]');
 
         $projects = $registry->projects;
         $projects->mergeKeys([]);
@@ -151,13 +151,20 @@ class CoreAttributeExtension extends AttributeExtension
         $meta->child('defaultTitle', T::STRING);
         $meta->child('title', T::STRING);
         $meta->child('titleTemplate', T::STRING);
-        $meta->child('titleAttributes', T::MAP);
+        $meta->child('titleAttributes', T::MAP(T::STRING));
         $meta->child('htmlAttributes', T::MAP);
         $meta->child('bodyAttributes', T::MAP);
         $metaLink   = $meta->child('link', T::MAP, []);
         $metameta   = $meta->child('meta', T::MAP, []);
         $metaScript = $meta->child('script', T::ARRAY(T::STRING), []);
         $metaStyle  = $meta->child('style', T::ARRAY(T::STRING), []);
+//            ->node(function (NodeDefinition $node, ArrayNodeDefinition $parentNode) {
+//            $parentNode->addDefaultsIfNotSet();
+//            $parentNode->ignoreExtraKeys(true);
+//            $node = $parentNode->children()->arrayNode('titleAttributes');
+//            $node->ignoreExtraKeys(true);
+//            return $node; //->arrayPrototype()->variablePrototype();
+//        });
 
         $projects->child('default_revision', T::STRING, 'master');
         $projects->child('allow_revision_php_config', T::STRING, false);

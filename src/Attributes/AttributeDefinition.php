@@ -60,8 +60,8 @@ class AttributeDefinition extends Fluent
         $this
             ->parent($parent)
             ->name('root')
-            ->type('array')
-            ->api('Mixed')
+//            ->type('array')
+//            ->api('Mixed')
             ->inheritKeys([])
             ->mergeKeys([]);
     }
@@ -212,7 +212,7 @@ class AttributeDefinition extends Fluent
         return $this->children->isNotEmpty();
     }
 
-    protected $disabledClosureGetters = [ 'node' ];
+    protected $disabledClosureGetters = [ 'node', 'default' ];
 
     public function get($offset, $default = null)
     {

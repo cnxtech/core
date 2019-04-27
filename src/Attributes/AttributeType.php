@@ -10,7 +10,6 @@ use Codex\Support\Enum;
  * @method static AttributeType BOOL()
  * @method static AttributeType INT()
  * @method static AttributeType FLOAT()
- * @method static AttributeType MAP()
  * @method static AttributeType MIXED()
  */
 class AttributeType extends Enum
@@ -49,9 +48,15 @@ class AttributeType extends Enum
         self::RECURSE   => 'recurse',
     ];
 
-    public function isChildType()
+    /** @var static */
+    protected $childType;
+
+    protected function __construct($value, $ordinal = null)
     {
-        return $this->oneOf(self::MAP, self::ARRAY, self::RECURSE, self::RECURSIVE);
+        parent::__construct($value, $ordinal);
+        if ($value === self::ARRAY || $value === self::MAP) {
+            $this->childType = self::MIXED();
+        }
     }
 
     public function oneOf(...$types)
@@ -62,6 +67,72 @@ class AttributeType extends Enum
             }
         }
         return false;
+    }
+
+    public function toApiType()
+    {
+        return static::getApiType($this);
+    }
+
+    public function isChildType()
+    {
+        return $this->oneOf(self::MAP, self::ARRAY, self::RECURSE, self::RECURSIVE);
+    }
+
+    public function getChildType()
+    {
+        return $this->childType;
+    }
+
+    public function setChildType($childType)
+    {
+        $this->childType = $childType;
+        return $this;
+    }
+
+    public function toConfigNodeTypeName()
+    {
+        return static::getConfigNodeTypeName($this);
+    }
+
+    final public static function ARRAY($childType)
+    {
+        if ( ! $childType instanceof static) {
+            $childType = self::byName(strtoupper($childType));
+        }
+        $type = new static('array');
+        $type->setChildType($childType);
+        return $type;
+    }
+
+    final public static function MAP($childType = self::MIXED)
+    {
+        if ( ! $childType instanceof static) {
+            $childType = self::byName(strtoupper($childType));
+        }
+        $type = new static('map');
+        $type->setChildType($childType);
+        return $type;
+    }
+
+    /**
+     * @param AttributeType|string $type
+     *
+     * @return mixed|string
+     */
+    public static function getApiType($type)
+    {
+        if ( ! $type instanceof static) {
+            $type = static::get($type);
+            if ($type->is(static::ARRAY)) {
+
+            }
+        }
+        if ($type instanceof static) {
+            $type = $type->getValue();
+        }
+        $apiType = array_key_exists($type, static::$apiTypeMap) ? static::$apiTypeMap[ $type ] : 'Mixed';
+        return $apiType;
     }
 
     /**
@@ -75,60 +146,6 @@ class AttributeType extends Enum
             $type = $type->getValue();
         }
         return array_key_exists($type, static::$configNodeTypeMap) ? static::$configNodeTypeMap[ $type ] : 'variable';
-    }
-
-    /**
-     * @param AttributeType|string $type
-     *
-     * @return mixed|string
-     */
-    public static function getApiType($type)
-    {
-        if(!$type instanceof static){
-            $type = static::get($type);
-            if($type->is(static::ARRAY)){
-
-            }
-        }
-        if ($type instanceof static) {
-            $type = $type->getValue();
-        }
-        return array_key_exists($type, static::$apiTypeMap) ? static::$apiTypeMap[ $type ] : 'Mixed';
-    }
-
-    public function toApiType()
-    {
-        return static::getApiType($this);
-    }
-
-    public function toConfigNodeTypeName()
-    {
-        return static::getConfigNodeTypeName($this);
-    }
-
-
-    final public static function ARRAY($childType)
-    {
-        if ( ! $childType instanceof static) {
-            $childType = self::byName(strtoupper($childType));
-        }
-        $type = new static('array');
-        $type->setChildType($childType);
-        return $type;
-    }
-
-    /** @var static */
-    protected $childType;
-
-    public function getChildType()
-    {
-        return $this->childType;
-    }
-
-    public function setChildType($childType)
-    {
-        $this->childType = $childType;
-        return $this;
     }
 
 

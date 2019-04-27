@@ -3,6 +3,8 @@
 namespace Codex;
 
 use Codex\Addons\Extensions\RegisterExtension;
+use Codex\Attributes\AttributeDefinitionRegistry;
+use Codex\Attributes\Commands\BuildDefinitionTypeConfig;
 use Codex\Concerns\ProvidesResources;
 use Codex\Contracts\Documents\Document;
 use Codex\Documents\Events\ResolvedDocument;
@@ -113,6 +115,8 @@ class CodexServiceProvider extends ServiceProvider
 
     public function booting()
     {
+//        $this->dispatchNow(new RegisterExtension(CoreTypeAttributeExtension::class));
+//        $this->dispatchNow(new BuildDefinitionTypeConfig(app()->make(AttributeDefinitionRegistry::class)->get('codex')));
         $this->dispatchNow(new RegisterExtension(CoreAttributeExtension::class));
 
         $manager = $this->app->make(Addons\AddonManager::class);
