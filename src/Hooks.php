@@ -93,26 +93,4 @@ class Hooks
                 return $value;
             });
     }
-
-    public static function waterfall3($id, $value, array $args = [])
-    {
-        $pipes = collect(static::$handlers[ $id ])
-            ->map(function ($hook) {
-                return function ($value, ...$args) use ($hook) {
-                    if (is_callable($hook)) {
-                        $callback   = function ($error, $newValue) use (&$value) {
-                            $value = $newValue;
-                        };
-                        $hookReturn = $hook($value, $callback, ...$args);
-                    }
-                    return $value;
-                };
-            })
-            ->all();
-        foreach ($pipes as $pipe) {
-            $value = $pipe($value, $args);
-        }
-        return $value;
-    }
-
 }
