@@ -1,5 +1,8 @@
 <?php
 
+$docsPath = env('CODEX_DOCS_PATH', 'resources/docs');
+$docsPath = path_is_relative($docsPath) ? path_njoin(base_path(), $docsPath) : $docsPath;
+
 return [
     /*
     |--------------------------------------------------------------------------
@@ -32,7 +35,7 @@ return [
     'default_project' => env('CODEX_DEFAULT_PROJECT', 'codex'),
 
     'paths' => [
-        'docs' => resource_path('docs'),
+        'docs' => $docsPath,
         'log'  => storage_path('logs/codex.log'),
     ],
 
@@ -97,6 +100,6 @@ return [
     'documents' => [
         'title'       => null,
         'subtitle'    => null,
-        'description' => '%project.disk%'
+        'description' => '%project.disk%',
     ],
 ];
